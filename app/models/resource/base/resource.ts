@@ -224,12 +224,12 @@ export function composeResourceBase<
 }
 
 export type CompleteDataObjectValue = DataObjectValue & {
-	dataObject: DataObject;
+	dataObjectasdasd: DataObject;
 };
 
 export type CompleteDataObjectRemote = DataObjectRemote & {
 	dataObject: DataObject;
-	values: CompleteDataObjectValue[];
+	values: DataObjectValue[];
 };
 
 export type CompleteDataObject = DataObject & {

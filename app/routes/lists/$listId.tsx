@@ -3,22 +3,22 @@ import { redirect } from 'remix';
 import { json, useLoaderData, useCatch, Form } from 'remix';
 import invariant from 'tiny-invariant';
 import type { List } from '~/models/list.server';
-import type { ListItem } from '~/models/item.server';
+import type { ListItemData } from '~/models/item.server';
 import { getList, deleteList } from '~/models/list.server';
-import { getListItemsForList } from '~/models/item.server';
+import { getItemsForList } from '~/models/item.server';
 import { requireUserId } from '~/session.server';
 
 type LoaderData = {
 	list: List;
-	items: Array<ListItem>;
+	items: ListItemData[];
 };
 
 export const loader: LoaderFunction = async ({ request, params }) => {
 	const userId = await requireUserId(request);
 	invariant(params.listId, 'listId not found');
 
-	const list = await getList({ userId, id: params.listId });
-	const items = await getListItemsForList({ id: params.listId });
+	const list = await getList({ id: params.listId });
+	const items = await getItemsForList({ id: params.listId });
 
 	if (!list) {
 		throw new Response('Not Found', { status: 404 });
@@ -31,7 +31,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 	const userId = await requireUserId(request);
 	invariant(params.listId, 'listId not found');
 
-	await c({ userId, id: params.listId });
+	// await c({ userId, id: params.listId });
 
 	return redirect('/lists');
 };
@@ -89,7 +89,7 @@ function ItemList({ list, items }: Pick<LoaderData, 'list' | 'items'>) {
 							Play
 						</button>
 					</div>
-					<div className="col-span-8">{item.title}</div>
+					<div className="col-span-8">{item.resource.title}</div>
 				</li>
 			))}
 		</ul>

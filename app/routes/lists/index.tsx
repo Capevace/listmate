@@ -1,5 +1,5 @@
 import { json, Link, LoaderFunction, useLoaderData } from 'remix';
-import { List, getUserLists } from '~/models/list.server';
+import { List, getListsForUser } from '~/models/list.server';
 import { requireUserId } from '~/session.server';
 
 type LoaderData = {
@@ -8,7 +8,7 @@ type LoaderData = {
 
 export const loader: LoaderFunction = async ({ request, params }) => {
 	const userId = await requireUserId(request);
-	const lists = await getUserLists({ userId });
+	const lists = await getListsForUser({ id: userId });
 
 	return json<LoaderData>({ lists });
 };

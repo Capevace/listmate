@@ -1,4 +1,4 @@
-import { Repository } from '../repository';
+import { valueListToMap, ValueMap } from '../adapters/remote';
 import {
 	CompleteDataObjectRemote,
 	composeResourceBase,
@@ -36,26 +36,15 @@ export type SongData = {
 
 export type Song = Resource & ForceResourceType<ResourceType.SONG> & SongData;
 
-export function dataObjectToAlbum<ForcedSource extends SourceType>(
-	remote: CompleteDataObjectRemote,
-	values: Record<string, any>
-) {
-	if (!('name' in values)) {
-		throw new Error('Missing name');
-	}
-
-	return {
-		...composeResourceBase<ResourceType.ALBUM, ForcedSource>(remote),
-		name: values.name,
-	};
-}
-
 export type CreateAlbumParameters = AlbumData & {
 	artist?: ArtistData | Artist;
 };
 
-export function dataObjectToAlbum(remote: CompleteDataObjectRemote): Album {
-	const values = valueListToMap(remote.values);
+export function dataObjectToAlbum(
+	remote: CompleteDataObjectRemote,
+	values?: ValueMap
+): Album {
+	values = values ?? valueListToMap(remote.values);
 
 	if (!values.has('name')) {
 		throw new Error('Missing name');
@@ -70,8 +59,8 @@ export function dataObjectToAlbum(remote: CompleteDataObjectRemote): Album {
 
 export function dataObjectToArtist(
 	remote: CompleteDataObjectRemote,
-	values?: Map<string, any>
-): Album {
+	values?: ValueMap
+): Artist {
 	values = values ?? valueListToMap(remote.values);
 
 	if (!values.has('name')) {
@@ -79,10 +68,44 @@ export function dataObjectToArtist(
 	}
 
 	return {
-		...composeResourceBase<ResourceType.ALBUM, SourceType>(remote),
+		...composeResourceBase<ResourceType.ARTIST, SourceType>(remote),
 		// additional spotify-specific fields
 		name: values.get('name'),
-		artist: values.has('artist')
-			? dataObjectToArtist(remote, values.get('artist'))
 	};
 }
+
+export function dataObjectToSong(
+	remote: CompleteDataObjectRemote,
+	values?: ValueMap
+): Song {
+	values = values ?? valueListToMap(remote.values);
+
+	if (!values.has('name')) {
+		throw new Error('Missing name');
+	}
+
+	return {
+		...composeResourceBase<ResourceType.SONG, SourceType>(remote),
+		// additional spotify-specific fields
+		name: values.get('name'),
+	};
+}
+
+// export function dataObjectToArtist(
+// 	remote: CompleteDataObjectRemote,
+// 	values?: Map<string, any>
+// ): Album {
+// 	values = values ?? valueListToMap(remote.values);
+
+// 	if (!values.has('name')) {
+// 		throw new Error('Missing name');
+// 	}
+
+// 	return {
+// 		...composeResourceBase<ResourceType.ALBUM, SourceType>(remote),
+// 		// additional spotify-specific fields
+// 		name: values.get('name'),
+// 		artist: values.has('artist')
+// 			? dataObjectToArtist(remote, values.get('artist'))
+// 	};
+// }

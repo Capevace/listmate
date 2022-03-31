@@ -1,16 +1,19 @@
 import { json, Link, LoaderFunction, Outlet, useLoaderData } from 'remix';
-import { List, getUserLists } from '~/models/list.server';
-import { requireUserId } from '~/session.server';
+import { List, getListsForUser } from '~/models/list.server';
+import { User } from '~/models/user.server';
+import { requireUser } from '~/session.server';
 
 type LoaderData = {
+	user: User;
 	lists: List[];
 };
 
 export const loader: LoaderFunction = async ({ request, params }) => {
-	const userId = await requireUserId(request);
-	const lists = await getUserLists({ userId });
+	const user = await requireUser(request);
+	console.log(user);
+	const lists = await getListsForUser({ id: user.id });
 
-	return json<LoaderData>({ lists });
+	return json<LoaderData>({ user, lists });
 };
 
 function ListRow({ list }: { list: List }) {
@@ -41,7 +44,7 @@ export default function ListLayout() {
 							className="mr-4 h-8 w-8 rounded-full"
 						/>
 						<div className="text-lg text-white">
-							<span className="font-bold">John Doe</span>
+							<span className="font-bold">John Does</span>
 						</div>
 					</div>
 					<div className="flex items-center">
@@ -52,6 +55,7 @@ export default function ListLayout() {
 				</div>
 
 				<div className="flex flex-col">
+					<pre>{JSON.stringify(lists, null, 2)}</pre>
 					{lists.map((list) => (
 						<ListRow key={list.id} list={list} />
 					))}

@@ -1,6 +1,7 @@
-import type { User, List, ListItem, ListItemRemote } from '@prisma/client';
+import type { List, DataObjectRemote } from '@prisma/client';
 
 import { prisma } from '~/db.server';
+import { remoteToResource } from './resource/adapters/remote';
 import { Resource } from './resource/base/resource';
 
 export type { ListItem } from '@prisma/client';
@@ -12,19 +13,76 @@ export type ListItemData = {
 	position: number;
 };
 
-export async function getListItemsForList({
-	id,
-}: Pick<List, 'id'>): Promise<ListItemData[]> {
-	const items = await prisma.listItem.findMany({
-		where: { listId: id },
+/**
+ * Return all ListItems for a given list (DOES NOT convert output to using Resource types, just uses literal DB types).
+ *
+ * Includes the linked DataListRemotes and their DataListValues.
+ *
+ * @private
+ */
+async function getRawItemsInList(listId: List['id']) {
+	return await prisma.listItem.findMany({
+		where: { listId },
 		include: {
 			remote: {
 				include: {
+					dataObject: true,
 					values: true,
 				},
 			},
 		},
 	});
+}
+
+/**
+ * Add a new item to a list
+ *
+ * If position is set, the item will be inserted at that position.
+ * The position value of other items behind the new item will be updated.
+ */
+export async function addResourceToList(
+	listId: List['id'],
+	resourceId: DataObjectRemote['id'],
+	position?: number
+) {
+	if (position) {
+		const items = await getRawItemsInList(listId);
+
+		for (const item of items) {
+			if (item.position >= position) {
+				await prisma.listItem.update({
+					where: { id: item.id },
+					data: { position: item.position + 1 },
+				});
+			}
+		}
+	} else {
+		position = await prisma.listItem.count({
+			where: { listId },
+		});
+	}
+
+	return await prisma.listItem.create({
+		data: {
+			list: {
+				connect: {
+					id: listId,
+				},
+			},
+			remote: {
+				connect: {
+					id: resourceId,
+				},
+			},
+			position,
+		},
+	});
+}
+
+export async function getItemsForList({
+	id,
+}: Pick<List, 'id'>): Promise<ListItemData[]> {
+	const items = await getRawItemsInList(id);
 
 	return items.map((listItem) => ({
 		...listItem,

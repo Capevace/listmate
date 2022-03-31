@@ -1,26 +1,18 @@
-import {
-	DataObject,
-	DataObjectRemote,
-	DataObjectValue,
-	List,
-	PrismaClient,
-} from '@prisma/client';
+import { List, PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
-import { addResourceToList, ListData, upsertList } from '~/models/list.server';
+import { addResourceToList } from '~/models/item.server';
+import { upsertList } from '~/models/list.server';
 
 import type {
 	Album,
 	Artist,
 	Song,
-	SongData,
 	// SpotifyAlbum,
 	// SpotifyResource,
 } from '~/models/resource/base/music';
 import {
 	ResourceType,
 	SourceType,
-	Resource,
-	upsertResource,
 	createResources,
 } from '~/models/resource/base/resource';
 
