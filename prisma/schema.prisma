@@ -26,6 +26,12 @@ model Password {
     userId String @unique
 }
 
+model Session {
+    id        String    @id @default(uuid())
+    expiresAt DateTime?
+    data      String // JSON
+}
+
 // model Source {
 //     id          String         @id @default(uuid())
 //     name        String
