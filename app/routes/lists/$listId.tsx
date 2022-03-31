@@ -31,7 +31,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 	const userId = await requireUserId(request);
 	invariant(params.listId, 'listId not found');
 
-	await deleteList({ userId, id: params.listId });
+	await c({ userId, id: params.listId });
 
 	return redirect('/lists');
 };

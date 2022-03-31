@@ -26,6 +26,93 @@ model Password {
     userId String @unique
 }
 
+// model Source {
+//     id          String         @id @default(uuid())
+//     name        String
+//     type        String // spotify, youtube
+//     description String?
+//     lists       TagsOnLists[]
+//     faucets     SourceFaucet[]
+// }
+
+// model SourceFaucet {
+//     id   String @id @default(uuid())
+//     name String
+//     type String // spotify:playlist, youtube:playlist, youtube:channel
+
+//     Source   Source? @relation(fields: [sourceId], references: [id])
+//     sourceId String?
+// }
+
+// model Tag {
+//     name          String            @id
+//     description   String?
+//     createdByUser Boolean           @default(true)
+//     lists         TagsOnLists[]
+//     items         TagsOnListItems[]
+// }
+
+// model TagsOnLists {
+//     list    List   @relation(fields: [listId], references: [id])
+//     listId  String
+//     tag     Tag    @relation(fields: [tagName], references: [name])
+//     tagName String
+
+//     assignedAt DateTime @default(now())
+
+//     Source   Source? @relation(fields: [sourceId], references: [id])
+//     sourceId String?
+//     @@id([listId, tagName])
+// }
+
+// model Media {
+//     id        String   @id @default(uuid())
+//     createdAt DateTime @default(now())
+//     updatedAt DateTime @updatedAt
+// }
+
+model DataObject {
+    id        String   @id @default(uuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    title String
+    type  String // song, video, file 
+
+    remotes    DataObjectRemote[]
+    references DataObjectValue[]
+}
+
+model DataObjectRemote {
+    id           String     @unique @default(uuid())
+    dataObject   DataObject @relation(fields: [dataObjectId], references: [id])
+    dataObjectId String
+    api          String // youtube, spotify, local
+    foreignId    String
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    values     DataObjectValue[]
+    placements ListItem[]
+
+    @@id([api, foreignId])
+}
+
+model DataObjectValue {
+    api       String // youtube, spotify, local
+    foreignId String
+    key       String
+
+    remote DataObjectRemote @relation(fields: [api, foreignId], references: [api, foreignId])
+
+    value             String
+    valueDataObject   DataObject? @relation(fields: [valueDataObjectId], references: [id])
+    valueDataObjectId String?
+
+    @@id([api, foreignId, key])
+}
+
 model List {
     id        String   @id @default(uuid())
     createdAt DateTime @default(now())
@@ -37,55 +124,7 @@ model List {
     title       String
     description String?
 
-    tags  TagsOnLists[]
-    items ListItemsOnLists[]
-}
-
-model Source {
-    id          String         @id @default(uuid())
-    name        String
-    type        String // spotify, youtube
-    description String?
-    lists       TagsOnLists[]
-    faucets     SourceFaucet[]
-}
-
-model SourceFaucet {
-    id   String @id @default(uuid())
-    name String
-    type String // spotify:playlist, youtube:playlist, youtube:channel
-
-    Source   Source? @relation(fields: [sourceId], references: [id])
-    sourceId String?
-}
-
-model Tag {
-    name          String            @id
-    description   String?
-    createdByUser Boolean           @default(true)
-    lists         TagsOnLists[]
-    items         TagsOnListItems[]
-}
-
-model TagsOnLists {
-    list    List   @relation(fields: [listId], references: [id])
-    listId  String
-    tag     Tag    @relation(fields: [tagName], references: [name])
-    tagName String
-
-    assignedAt DateTime @default(now())
-
-    Source   Source? @relation(fields: [sourceId], references: [id])
-    sourceId String?
-    @@id([listId, tagName])
-}
-
-model Media {
-    id        String   @id @default(uuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-
+    items ListItem[]
 }
 
 model ListItem {
@@ -93,51 +132,35 @@ model ListItem {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    title String
-    type  String // song, video, file
+    position Int
 
-
-
-    remotes ListItemRemote[]
-    tags    TagsOnListItems[]
-
-    lists ListItemsOnLists[]
-}
-
-model ListItemRemote {
-    id        String   @id @default(uuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-    type     String // local:bookmark spotify:song, youtube:video
-    remoteId String
-
-    information String // JSON
-
-    main       ListItem @relation(fields: [mainItemId], references: [id])
-    mainItemId String
-}
-
-model TagsOnListItems {
-    listItem   ListItem @relation(fields: [listItemId], references: [id])
-    listItemId String
-
-    tag     Tag    @relation(fields: [tagName], references: [name])
-    tagName String
-
-    assignedAt DateTime @default(now())
-
-    @@id([listItemId, tagName])
-}
-
-model ListItemsOnLists {
     list   List   @relation(fields: [listId], references: [id])
     listId String
 
-    listItem   ListItem @relation(fields: [listItemId], references: [id])
-    listItemId String
-
-    assignedAt DateTime @default(now())
-
-    @@id([listId, listItemId])
+    remote   DataObjectRemote @relation(fields: [remoteId], references: [id])
+    remoteId String
 }
+
+// model TagsOnListItems {
+//     listItem   ListItem @relation(fields: [listItemId], references: [id])
+//     listItemId String
+
+//     tag     Tag    @relation(fields: [tagName], references: [name])
+//     tagName String
+
+//     assignedAt DateTime @default(now())
+
+//     @@id([listItemId, tagName])
+// }
+
+// model ListItemsOnLists {
+//     list   List   @relation(fields: [listId], references: [id])
+//     listId String
+
+//     listItem   ListItem @relation(fields: [listItemId], references: [id])
+//     listItemId String
+
+//     assignedAt DateTime @default(now())
+
+//     @@id([listId, listItemId])
+// }

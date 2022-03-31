@@ -57,7 +57,7 @@ export default function ListLayout() {
 					))}
 				</div>
 			</nav>
-			<main class="flex-1">
+			<main className="flex-1 bg-gray-900">
 				<Outlet />
 			</main>
 		</div>
