@@ -1,11 +1,12 @@
-import { valueListToMap, ValueMap } from '../adapters/remote';
+import invariant from 'tiny-invariant';
 import {
 	CompleteDataObjectRemote,
 	composeResourceBase,
-	Resource,
-	ResourceType,
-	SourceType,
-} from './resource';
+	getValueAsResource,
+	valueListToMap,
+	ValueMap,
+} from '../adapters/remote';
+import { Resource, ResourceType, SourceType } from './resource';
 
 export type ForceResourceType<T extends ResourceType> = {
 	type: T;
@@ -40,54 +41,52 @@ export type CreateAlbumParameters = AlbumData & {
 	artist?: ArtistData | Artist;
 };
 
-export function dataObjectToAlbum(
+export async function dataObjectToAlbum(
 	remote: CompleteDataObjectRemote,
 	values?: ValueMap
-): Album {
+): Promise<Album> {
 	values = values ?? valueListToMap(remote.values);
 
-	if (!values.has('name')) {
-		throw new Error('Missing name');
-	}
+	invariant(values.name, 'Missing name');
 
 	return {
 		...composeResourceBase<ResourceType.ALBUM, SourceType>(remote),
 		// additional spotify-specific fields
-		name: values.get('name'),
+		name: values.name.value,
+		artist: (await getValueAsResource(values.artist)) as Artist,
 	};
 }
 
-export function dataObjectToArtist(
+export async function dataObjectToArtist(
 	remote: CompleteDataObjectRemote,
 	values?: ValueMap
-): Artist {
+): Promise<Artist> {
 	values = values ?? valueListToMap(remote.values);
 
-	if (!values.has('name')) {
-		throw new Error('Missing name');
-	}
+	invariant(values.name, 'Missing name');
 
 	return {
 		...composeResourceBase<ResourceType.ARTIST, SourceType>(remote),
 		// additional spotify-specific fields
-		name: values.get('name'),
+		name: values.name.value,
 	};
 }
 
-export function dataObjectToSong(
+export async function dataObjectToSong(
 	remote: CompleteDataObjectRemote,
 	values?: ValueMap
-): Song {
+): Promise<Song> {
 	values = values ?? valueListToMap(remote.values);
 
-	if (!values.has('name')) {
-		throw new Error('Missing name');
-	}
+	invariant(values.name, 'Missing name');
 
 	return {
 		...composeResourceBase<ResourceType.SONG, SourceType>(remote),
 		// additional spotify-specific fields
-		name: values.get('name'),
+		name: values.name.value,
+		artist: (await getValueAsResource(values.artist)) as Artist,
+		album: (await getValueAsResource(values.album)) as Album,
+		// artist: values.has('artist') ? values.get('artist') : undefined,
 	};
 }
 

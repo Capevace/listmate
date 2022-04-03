@@ -6,10 +6,10 @@ import { Resource } from './resource/base/resource';
 
 export type { ListItem } from '@prisma/client';
 
-export type ListItemData = {
+export type ListItemData<ResourceKind extends Resource = Resource> = {
 	id: string;
 	listId: string;
-	resource: Resource;
+	resource: ResourceKind;
 	position: number;
 };
 
@@ -27,7 +27,11 @@ async function getRawItemsInList(listId: List['id']) {
 			remote: {
 				include: {
 					dataObject: true,
-					values: true,
+					values: {
+						include: {
+							valueDataObject: true,
+						},
+					},
 				},
 			},
 		},
@@ -81,13 +85,19 @@ export async function addResourceToList(
 
 export async function getItemsForList({
 	id,
-}: Pick<List, 'id'>): Promise<ListItemData[]> {
-	const items = await getRawItemsInList(id);
+}: Pick<List, 'id'>): Promise<ListItemData<Resource>[]> {
+	const rawItems = await getRawItemsInList(id);
+	let items: ListItemData<Resource>[] = [];
 
-	return items.map((listItem) => ({
-		...listItem,
-		resource: remoteToResource(listItem.remote),
-	}));
+	// TODO: performance could suffer because every conversion is done waited for
+	for (const listItem of rawItems) {
+		items.push({
+			...listItem,
+			resource: await remoteToResource(listItem.remote),
+		});
+	}
+
+	return items;
 }
 
 // function toUrl(search: string) {

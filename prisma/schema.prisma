@@ -103,6 +103,7 @@ model DataObjectRemote {
     placements ListItem[]
 
     @@id([api, foreignId])
+    @@unique([dataObjectId, api])
 }
 
 model DataObjectValue {

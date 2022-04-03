@@ -1,8 +1,23 @@
-import { DataObject, DataObjectRemote, DataObjectValue } from '@prisma/client';
+import type { DataObjectRemote } from '@prisma/client';
+import invariant from 'tiny-invariant';
 import { SetOptional } from 'type-fest';
 import { prisma as db } from '~/db.server';
+import { remoteToResource } from '../adapters/remote';
 
-import { SpotifyAlbum } from '../apis/spotify';
+// // Some types are not exported from @prisma/client, so we need to manually
+// // create them.
+// type DataObjectRemoteInclude = {
+// 	remote: {
+// 		include: {
+// 			dataObject: boolean;
+// 			values: {
+// 				include: {
+// 					valueDataObject: boolean;
+// 				};
+// 			};
+// 		};
+// 	};
+// };
 
 export enum ResourceType {
 	SONG = 'song',
@@ -14,12 +29,16 @@ export enum ResourceType {
 
 export function stringToResourceType(type: string): ResourceType {
 	switch (type) {
+		case 'bookmark':
+			return ResourceType.BOOKMARK;
 		case 'song':
 			return ResourceType.SONG;
 		case 'album':
 			return ResourceType.ALBUM;
 		case 'artist':
 			return ResourceType.ARTIST;
+		case 'playlist':
+			return ResourceType.PLAYLIST;
 		default:
 			throw new Error(`Unknown resource type: ${type}`);
 	}
@@ -35,8 +54,16 @@ export enum SourceType {
 
 export function stringToSourceType(type: string): SourceType {
 	switch (type) {
+		case 'local':
+			return SourceType.LOCAL;
 		case 'spotify':
 			return SourceType.SPOTIFY;
+		case 'youtube':
+			return SourceType.YOUTUBE;
+		case 'soundcloud':
+			return SourceType.SOUNDCLOUD;
+		case 'pocket':
+			return SourceType.POCKET;
 		default:
 			throw new Error(`Unknown source type: ${type}`);
 	}
@@ -193,7 +220,29 @@ export async function upsertResource(resource: SetOptional<Resource, 'id'>) {
 	return remote;
 }
 
-export async function createResources(resourcesToCreate: Resource[]) {
+export async function getResourceById(
+	id: Resource['id']
+): Promise<Resource | null> {
+	const remote = await db.dataObjectRemote.findUnique({
+		where: {
+			id,
+		},
+		include: {
+			dataObject: {
+				include: {
+					remotes: true,
+				},
+			},
+			values: true,
+		},
+	});
+
+	return remote ? await remoteToResource(remote) : null;
+}
+
+export async function createResources(
+	resourcesToCreate: SetOptional<Resource, 'id'>[]
+) {
 	let resources: Record<string, DataObjectRemote> = {};
 
 	for (const resource of resourcesToCreate) {
@@ -204,34 +253,15 @@ export async function createResources(resourcesToCreate: Resource[]) {
 	return resources;
 }
 
-export function composeResourceBase<
-	ForcedType extends ResourceType,
-	ForcedSource extends SourceType
->(
-	remote: CompleteDataObjectRemote
-): Resource & { type: ForcedType; api: ForcedSource } {
-	let resource = {
-		id: remote.dataObject.id,
-		title: remote.dataObject.title,
-		type: stringToResourceType(remote.dataObject.type) as ForcedType,
-		api: stringToSourceType(remote.api) as ForcedSource,
-		foreignId: remote.foreignId,
-	};
+async function createResource(
+	resourcesToCreate: SetOptional<Resource, 'id'>[]
+) {
+	let resources: Record<string, DataObjectRemote> = {};
 
-	// TODO: check if types actually match and this works?
+	for (const resource of resourcesToCreate) {
+		const createdRemote = await upsertResource(resource);
+		resources[createdRemote.foreignId] = createdRemote;
+	}
 
-	return resource;
+	return resources;
 }
-
-export type CompleteDataObjectValue = DataObjectValue & {
-	dataObjectasdasd: DataObject;
-};
-
-export type CompleteDataObjectRemote = DataObjectRemote & {
-	dataObject: DataObject;
-	values: DataObjectValue[];
-};
-
-export type CompleteDataObject = DataObject & {
-	remotes: CompleteDataObjectRemote[];
-};

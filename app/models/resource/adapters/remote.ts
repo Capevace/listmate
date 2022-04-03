@@ -1,37 +1,103 @@
-import { DataObjectValue } from '@prisma/client';
+import { DataObject, DataObjectRemote, DataObjectValue } from '@prisma/client';
+import invariant from 'tiny-invariant';
+import { prisma } from '~/db.server';
 import {
 	dataObjectToAlbum,
 	dataObjectToArtist,
 	dataObjectToSong,
 } from '../base/music';
 import {
-	CompleteDataObjectRemote,
 	Resource,
 	ResourceType,
+	SourceType,
+	stringToResourceType,
+	stringToSourceType,
 } from '../base/resource';
 
-export type ValueMap = Map<string, any>;
+export type ValueMap = { [key: string]: CompleteDataObjectValue };
 
-export function valueListToMap(values: DataObjectValue[]): ValueMap {
-	let object: ValueMap = new Map<string, any>();
+export type CompleteDataObjectValue = DataObjectValue & {
+	// valueDataObject: DataObject | null; // not undefined, cause we want null to be explicit
+};
+
+export type CompleteDataObjectRemote = DataObjectRemote & {
+	dataObject: DataObject;
+	values: CompleteDataObjectValue[];
+};
+
+export type CompleteDataObject = DataObject & {
+	remotes: CompleteDataObjectRemote[];
+};
+
+export function valueListToMap(values: CompleteDataObjectValue[]): ValueMap {
+	let object: ValueMap = {};
 
 	for (const value of values) {
-		object.set(value.key, value.valueDataObjectId);
+		object[value.key] = value;
 	}
 
 	return object;
 }
 
-export function remoteToResource(remote: CompleteDataObjectRemote): Resource {
+export async function getValueAsResource(
+	value: CompleteDataObjectValue
+): Promise<Resource> {
+	invariant(
+		value.valueDataObjectId,
+		"Can't load dynamic value, missing valueDataObjectId"
+	);
+
+	const [firstRemote] = await prisma.dataObjectRemote.findMany({
+		where: {
+			dataObjectId: value.valueDataObjectId,
+		},
+		include: {
+			dataObject: true,
+			values: {
+				include: {
+					valueDataObject: true,
+				},
+			},
+		},
+		take: 1,
+	});
+
+	invariant(firstRemote, 'DataObject has no remote');
+
+	return await remoteToResource(firstRemote);
+}
+
+export function composeResourceBase<
+	ForcedType extends ResourceType,
+	ForcedSource extends SourceType
+>(
+	remote: CompleteDataObjectRemote
+): Resource & { type: ForcedType; api: ForcedSource } {
+	let resource = {
+		id: remote.dataObject.id,
+		title: remote.dataObject.title,
+		type: stringToResourceType(remote.dataObject.type) as ForcedType,
+		api: stringToSourceType(remote.api) as ForcedSource,
+		foreignId: remote.foreignId,
+	};
+
+	// TODO: check if types actually match and this works?
+
+	return resource;
+}
+
+export async function remoteToResource(
+	remote: CompleteDataObjectRemote
+): Promise<Resource> {
 	const values = valueListToMap(remote.values);
 
 	switch (remote.dataObject.type) {
 		case ResourceType.ALBUM:
-			return dataObjectToAlbum(remote, values);
+			return await dataObjectToAlbum(remote, values);
 		case ResourceType.ARTIST:
-			return dataObjectToArtist(remote, values);
+			return await dataObjectToArtist(remote, values);
 		case ResourceType.SONG:
-			return dataObjectToSong(remote, values);
+			return await dataObjectToSong(remote, values);
 		default:
 			throw new Error('Unknown resource type');
 	}
