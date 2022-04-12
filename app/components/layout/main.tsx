@@ -56,7 +56,7 @@ export default function MainAppLayout({
 					))}
 				</div>
 			</nav>
-			<main className="flex-1 bg-gray-900">{children}</main>
+			<main className="flex-1 overflow-y-scroll bg-gray-900">{children}</main>
 		</div>
 	);
 }

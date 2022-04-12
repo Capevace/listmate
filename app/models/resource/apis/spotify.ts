@@ -1,10 +1,4 @@
-import {
-	CompleteDataObjectRemote,
-	composeResourceBase,
-	Resource,
-	ResourceType,
-	SourceType,
-} from '../base/resource';
+import { Resource, ResourceType, SourceType } from '../base/resource';
 import { Album, Artist, Song } from '../base/music';
 import { valueListToMap } from '../adapters/remote';
 

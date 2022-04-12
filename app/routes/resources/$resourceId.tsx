@@ -5,8 +5,11 @@ import invariant from 'tiny-invariant';
 import { getList } from '~/models/list.server';
 import { getItemsForList } from '~/models/item.server';
 import { requireUserId } from '~/session.server';
-import ResourceViewer from '~/components/resource/resource-viewer';
+import ResourceViewer, {
+	ResourceHeader,
+} from '~/components/resource/resource-viewer';
 import { getResourceById, Resource } from '~/models/resource/base/resource';
+import capitalize from '~/utilities/capitalize';
 
 type LoaderData = {
 	resource: Resource;

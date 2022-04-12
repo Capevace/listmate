@@ -12,6 +12,7 @@ import { Song } from '~/models/resource/base/music';
 import { Button } from '@mantine/core';
 
 import { PlayIcon, PlusIcon, DotsHorizontalIcon } from '@heroicons/react/solid';
+import ResourceValueLabel from '~/components/common/resource-value-label';
 
 type LoaderData = {
 	list: List;
@@ -43,22 +44,15 @@ export const action: ActionFunction = async ({ request, params }) => {
 
 function ListHeader({ list }: { list: List }) {
 	return (
-		<div className="relative my-5 border border-gray-700 bg-gray-800 px-10 pt-24 pb-8 shadow-xl sm:overflow-hidden sm:rounded-2xl">
-			<aside className="absolute left-0 right-0 top-0 flex h-full justify-end p-5">
-				<img
-					className="h-full rounded-xl shadow-lg"
-					src="https://i0.wp.com/909originals.com/wp-content/uploads/2019/01/DaftPunk_HomeworkLP.jpg?fit=1500%2C1500&ssl=1"
-					alt="List"
-				/>
-			</aside>
-			<div className="w-4/5">
+		<div className="relative my-5 flex border border-gray-700 bg-gray-800 px-10 py-9 shadow-xl sm:overflow-hidden sm:rounded-2xl">
+			<div className="flex flex-1 flex-col justify-between">
 				<div className="relative mb-5 flex flex-col">
 					<h1 className="mb-2 text-4xl font-bold text-gray-100">
 						{list.title}
 					</h1>
 					<p className="text-xl text-gray-300">{list.description}</p>
 				</div>
-				<nav className="flex gap-3">
+				<nav className="flex flex-shrink-0 gap-3">
 					<Form method="post">
 						<Button
 							type="submit"
@@ -81,22 +75,17 @@ function ListHeader({ list }: { list: List }) {
 					</Form>
 				</nav>
 			</div>
-		</div>
-	);
-}
-
-function AddItemForm({ list }: { list: List }) {
-	return (
-		<div className="relative my-5 bg-gray-900 bg-gradient-to-tr from-gray-900 to-gray-700 px-10 pt-24 pb-8 shadow-xl sm:overflow-hidden sm:rounded-2xl">
-			<Form method="post">
-				<input type="text" name="title" />
-				<button
-					type="submit"
-					className="rounded bg-gray-500 py-1 px-4 text-white hover:bg-gray-600 focus:bg-gray-400"
-				>
-					Add to list
-				</button>
-			</Form>
+			<aside className="h-48 justify-end">
+				<img
+					className="h-full rounded-xl shadow-lg"
+					src={
+						list.coverFileReferenceId
+							? `/media/${list.coverFileReferenceId}`
+							: `https://dummyimage.com/500x500/374151/d1d5db.png&text=%20%20%20%20%20%20${list.id}`
+					}
+					alt="List"
+				/>
+			</aside>
 		</div>
 	);
 }
@@ -135,9 +124,18 @@ function SongItemListRow({
 					<PlayIcon className="w-6 " />
 				</button>
 			</div>
-			<div className="col-span-5">{item.resource.title}</div>
-			<div className="col-span-3">{item.resource.artist?.name || '-'}</div>
-			<div className="col-span-2">{item.resource.album?.name || '-'}</div>
+			<div className="col-span-5 truncate">
+				<ResourceValueLabel
+					valueRef={item.resource.values.name}
+					forceRef={item.resource.id}
+				/>
+			</div>
+			<div className="col-span-3 truncate">
+				<ResourceValueLabel valueRef={item.resource.values.artist} />
+			</div>
+			<div className="col-span-2 truncate">
+				<ResourceValueLabel valueRef={item.resource.values.album} />
+			</div>
 			<div className="col-span-1 flex justify-end">
 				<button className="text-gray-700 hover:text-gray-400 ">
 					<DotsHorizontalIcon className="w-6 " />

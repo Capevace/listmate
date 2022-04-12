@@ -1,35 +1,23 @@
 import { DataObject, DataObjectRemote, DataObjectValue } from '@prisma/client';
-import invariant from 'tiny-invariant';
-import { prisma } from '~/db.server';
 import {
 	dataObjectToAlbum,
 	dataObjectToArtist,
 	dataObjectToSong,
 } from '../base/music';
-import {
-	Resource,
-	ResourceType,
-	SourceType,
-	stringToResourceType,
-	stringToSourceType,
-} from '../base/resource';
+import { Resource, ResourceType, stringToResourceType } from '../base/resource';
 
-export type ValueMap = { [key: string]: CompleteDataObjectValue };
+export type ValueMap = { [key: string]: DataObjectValue };
 
 export type CompleteDataObjectValue = DataObjectValue & {
-	// valueDataObject: DataObject | null; // not undefined, cause we want null to be explicit
-};
-
-export type CompleteDataObjectRemote = DataObjectRemote & {
-	dataObject: DataObject;
-	values: CompleteDataObjectValue[];
+	valueDataObject: DataObject | null; // not undefined, cause we want null to be explicit
 };
 
 export type CompleteDataObject = DataObject & {
-	remotes: CompleteDataObjectRemote[];
+	remotes: DataObjectRemote[];
+	values: DataObjectValue[];
 };
 
-export function valueListToMap(values: CompleteDataObjectValue[]): ValueMap {
+export function valueListToMap(values: DataObjectValue[]): ValueMap {
 	let object: ValueMap = {};
 
 	for (const value of values) {
@@ -39,46 +27,37 @@ export function valueListToMap(values: CompleteDataObjectValue[]): ValueMap {
 	return object;
 }
 
-export async function getValueAsResource(
-	value: CompleteDataObjectValue
-): Promise<Resource> {
-	invariant(
-		value.valueDataObjectId,
-		"Can't load dynamic value, missing valueDataObjectId"
-	);
+// export async function getValueAsResource(
+// 	valueId: DataObject['id']
+// ): Promise<Resource> {
+// 	const [firstObject] = await prisma.dataObject.findUnique({
+// 		where: {
+// 			id: valueId,
+// 		},
+// 		include: {
+// 			values: {
+// 				include: {
+// 					valueDataObject: true,
+// 				},
+// 			},
+// 		},
+// 		take: 1,
+// 	});
 
-	const [firstRemote] = await prisma.dataObjectRemote.findMany({
-		where: {
-			dataObjectId: value.valueDataObjectId,
-		},
-		include: {
-			dataObject: true,
-			values: {
-				include: {
-					valueDataObject: true,
-				},
-			},
-		},
-		take: 1,
-	});
+// 	invariant(firstObject, 'DataObject has no remote');
 
-	invariant(firstRemote, 'DataObject has no remote');
+// 	return await dataObjectToResource(firstObject);
+// }
 
-	return await remoteToResource(firstRemote);
-}
-
-export function composeResourceBase<
-	ForcedType extends ResourceType,
-	ForcedSource extends SourceType
->(
-	remote: CompleteDataObjectRemote
-): Resource & { type: ForcedType; api: ForcedSource } {
+export function composeResourceBase<ForcedType extends ResourceType>(
+	dataObject: CompleteDataObject
+): Resource & { type: ForcedType } {
 	let resource = {
-		id: remote.dataObject.id,
-		title: remote.dataObject.title,
-		type: stringToResourceType(remote.dataObject.type) as ForcedType,
-		api: stringToSourceType(remote.api) as ForcedSource,
-		foreignId: remote.foreignId,
+		id: dataObject.id,
+		title: dataObject.title,
+		type: stringToResourceType(dataObject.type) as ForcedType,
+		// api: stringToSourceType('local' /*api */) as ForcedSource,
+		values: {},
 	};
 
 	// TODO: check if types actually match and this works?
@@ -86,18 +65,18 @@ export function composeResourceBase<
 	return resource;
 }
 
-export async function remoteToResource(
-	remote: CompleteDataObjectRemote
+export async function dataObjectToResource(
+	dataObject: CompleteDataObject
 ): Promise<Resource> {
-	const values = valueListToMap(remote.values);
+	const values = valueListToMap(dataObject.values);
 
-	switch (remote.dataObject.type) {
+	switch (dataObject.type) {
 		case ResourceType.ALBUM:
-			return await dataObjectToAlbum(remote, values);
+			return await dataObjectToAlbum(dataObject, values);
 		case ResourceType.ARTIST:
-			return await dataObjectToArtist(remote, values);
+			return await dataObjectToArtist(dataObject, values);
 		case ResourceType.SONG:
-			return await dataObjectToSong(remote, values);
+			return await dataObjectToSong(dataObject, values);
 		default:
 			throw new Error('Unknown resource type');
 	}

@@ -42,7 +42,8 @@ export async function upsertList({
 	title,
 	description,
 	userId,
-}: SetOptional<List, 'id'>) {
+	coverFileReferenceId,
+}: SetOptional<List, 'id' | 'coverFileReferenceId'>) {
 	if (id) {
 		return await prisma.list.upsert({
 			where: { id },
@@ -54,6 +55,7 @@ export async function upsertList({
 				id,
 				title,
 				description,
+				coverFileReferenceId,
 				userId: userId ?? undefined,
 			},
 		});

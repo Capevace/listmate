@@ -5,6 +5,12 @@ import { fixColors, gray, blue, green, teal } from './tailwind-colors';
 // Set mantine to use tailwind colors
 export const theme: MantineThemeOverride = {
 	...DEFAULT_THEME,
+	fontFamily: 'inherit',
+	headings: {
+		fontWeight: '700',
+	},
+	fontFamilyMonospace:
+		'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
 	defaultRadius: 'md',
 	colorScheme: 'dark',
 	primaryColor: 'blue',

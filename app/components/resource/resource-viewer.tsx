@@ -1,44 +1,26 @@
-import { Resource, ResourceType } from '~/models/resource/base/resource';
+import {
+	Resource,
+	ResourceType,
+	ValueRef,
+} from '~/models/resource/base/resource';
 import capitalize from '~/utilities/capitalize';
+import ResourceValueLabel from '../common/resource-value-label';
 
 function GenericDetails({ resource }: { resource: Resource }) {
+	const valueList = Object.entries(resource.values);
+
 	return (
-		<dl>
-			<div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-				<dt className="text-sm font-medium text-gray-500">Full name</dt>
-				<dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-					Margot Foster
-				</dd>
-			</div>
-			<div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-				<dt className="text-sm font-medium text-gray-500">Application for</dt>
-				<dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-					Backend Developer
-				</dd>
-			</div>
-			<div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-				<dt className="text-sm font-medium text-gray-500">Email address</dt>
-				<dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-					margotfoster@example.com
-				</dd>
-			</div>
-			<div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-				<dt className="text-sm font-medium text-gray-500">
-					Salary expectation
-				</dt>
-				<dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-					$120,000
-				</dd>
-			</div>
-			<div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-				<dt className="text-sm font-medium text-gray-500">About</dt>
-				<dd className="mt-1 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-					Fugiat ipsum ipsum deserunt culpa aute sint do nostrud anim incididunt
-					cillum culpa consequat. Excepteur qui ipsum aliquip consequat sint.
-					Sit id mollit nulla mollit nostrud in ea officia proident. Irure
-					nostrud pariatur mollit ad adipisicing reprehenderit deserunt qui eu.
-				</dd>
-			</div>
+		<dl className="grid grid-cols-6">
+			{valueList.map(([key, value]: [string, ValueRef<string> | null]) => (
+				<div key={key} className="col-span-2">
+					<dt className="text-sm font-medium text-gray-400">
+						{capitalize(key)}
+					</dt>
+					<dd className="mt-1 text-lg  sm:col-span-2 sm:mt-0">
+						<ResourceValueLabel valueRef={value} />
+					</dd>
+				</div>
+			))}
 		</dl>
 	);
 }
@@ -51,20 +33,56 @@ function ResourceDetails({ resource }: { resource: Resource }) {
 	}
 }
 
+export function ResourceHeader({ resource }: { resource: Resource }) {
+	return (
+		<div className="flex items-end">
+			<div className="flex-1 items-stretch">
+				<div className="relative mb-5 flex flex-col">
+					<h1 className="mb-2 text-4xl font-bold text-gray-100">
+						{resource.title}
+					</h1>
+					<p className="text-xl text-gray-300">{capitalize(resource.type)}</p>
+				</div>
+				<nav className="flex items-end gap-3">
+					{/* <Form method="post">
+						<Button
+							type="submit"
+							color="pink"
+							size="md"
+							rightIcon={<PlayIcon className="w-7" />}
+						>
+							Play
+						</Button>
+					</Form>
+					<Form method="post">
+						<Button
+							type="submit"
+							color="gray"
+							size="md"
+							rightIcon={<PlusIcon className="w-6" />}
+						>
+							Add item to list
+						</Button>
+					</Form> */}
+				</nav>
+			</div>
+			<aside className="flex h-full w-1/5 ">
+				<img
+					className="h-full rounded-xl shadow-lg"
+					src="https://i0.wp.com/909originals.com/wp-content/uploads/2019/01/DaftPunk_HomeworkLP.jpg?fit=1500%2C1500&ssl=1"
+					alt="List"
+				/>
+			</aside>
+		</div>
+	);
+}
+
 export default function ResourceViewer({ resource }: { resource: Resource }) {
 	return (
-		<div className="overflow-hidden bg-white shadow sm:rounded-lg">
-			<div className="px-4 py-5 sm:px-6">
-				<h3 className="text-lg font-medium leading-6 text-gray-900">
-					{resource.title}
-				</h3>
-				<p className="mt-1 max-w-2xl text-sm text-gray-500">
-					{capitalize(resource.type)}
-				</p>
-			</div>
-			<div className="border-t border-gray-200">
-				<ResourceDetails resource={resource} />
-			</div>
+		<div className="relative my-5 border border-gray-700 bg-gray-800 px-10 py-8 shadow-xl sm:overflow-hidden sm:rounded-2xl">
+			<ResourceHeader resource={resource} />
+
+			<ResourceDetails resource={resource} />
 		</div>
 	);
 }

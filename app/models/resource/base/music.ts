@@ -1,100 +1,117 @@
+import { DataObject } from '@prisma/client';
 import invariant from 'tiny-invariant';
 import {
-	CompleteDataObjectRemote,
+	CompleteDataObject,
 	composeResourceBase,
-	getValueAsResource,
 	valueListToMap,
 	ValueMap,
 } from '../adapters/remote';
-import { Resource, ResourceType, SourceType } from './resource';
+import {
+	composeRefFromValue,
+	Resource,
+	ValueRef,
+	ResourceType,
+	RawValue,
+} from './resource';
 
 export type ForceResourceType<T extends ResourceType> = {
 	type: T;
 };
 
 export type ArtistData = {
-	name: string;
+	name: RawValue<string>;
 };
 
 export type Artist = Resource &
-	ForceResourceType<ResourceType.ARTIST> &
-	ArtistData;
+	ForceResourceType<ResourceType.ARTIST> & { values: ArtistData };
 
 export type AlbumData = {
-	name: string;
-	artist?: ArtistData;
+	name: RawValue<string>;
+	artist: ValueRef<string> | null;
 };
 
 export type Album = Resource &
-	ForceResourceType<ResourceType.ALBUM> &
-	AlbumData;
+	ForceResourceType<ResourceType.ALBUM> & { values: AlbumData };
 
 export type SongData = {
-	name: string;
-	artist?: ArtistData;
-	album?: AlbumData;
+	name: RawValue<string>;
+	artist: ValueRef<string> | null;
+	album: ValueRef<string> | null;
 };
 
-export type Song = Resource & ForceResourceType<ResourceType.SONG> & SongData;
+export type Song = Resource &
+	ForceResourceType<ResourceType.SONG> & { values: SongData };
 
 export type CreateAlbumParameters = AlbumData & {
 	artist?: ArtistData | Artist;
 };
 
 export async function dataObjectToAlbum(
-	remote: CompleteDataObjectRemote,
+	dataObject: CompleteDataObject,
 	values?: ValueMap
 ): Promise<Album> {
-	values = values ?? valueListToMap(remote.values);
+	values = values ?? valueListToMap(dataObject.values);
 
-	invariant(values.name, 'Missing name');
+	const name = composeRefFromValue<string>(values.name);
+
+	invariant(name, 'Missing name');
 
 	return {
-		...composeResourceBase<ResourceType.ALBUM, SourceType>(remote),
+		...composeResourceBase<ResourceType.ALBUM>(dataObject),
 		// additional spotify-specific fields
-		name: values.name.value,
-		artist: (await getValueAsResource(values.artist)) as Artist,
+		values: {
+			name,
+			artist: composeRefFromValue<string>(values.artist),
+		},
 	};
 }
 
 export async function dataObjectToArtist(
-	remote: CompleteDataObjectRemote,
+	dataObject: CompleteDataObject,
 	values?: ValueMap
 ): Promise<Artist> {
-	values = values ?? valueListToMap(remote.values);
+	values = values ?? valueListToMap(dataObject.values);
 
-	invariant(values.name, 'Missing name');
+	const name = composeRefFromValue<string>(values.name);
+
+	invariant(name, 'Missing name');
 
 	return {
-		...composeResourceBase<ResourceType.ARTIST, SourceType>(remote),
+		...composeResourceBase<ResourceType.ARTIST>(dataObject),
 		// additional spotify-specific fields
-		name: values.name.value,
+		values: {
+			name,
+		},
 	};
 }
 
 export async function dataObjectToSong(
-	remote: CompleteDataObjectRemote,
+	dataObject: CompleteDataObject,
 	values?: ValueMap
 ): Promise<Song> {
-	values = values ?? valueListToMap(remote.values);
+	values = values ?? valueListToMap(dataObject.values);
 
-	invariant(values.name, 'Missing name');
+	const name = composeRefFromValue<string>(values.name);
+
+	invariant(name, 'Missing name');
 
 	return {
-		...composeResourceBase<ResourceType.SONG, SourceType>(remote),
+		...composeResourceBase<ResourceType.SONG>(dataObject),
 		// additional spotify-specific fields
-		name: values.name.value,
-		artist: (await getValueAsResource(values.artist)) as Artist,
-		album: (await getValueAsResource(values.album)) as Album,
+		values: {
+			name,
+			artist: composeRefFromValue<string>(values.artist),
+			album: composeRefFromValue<string>(values.album),
+		},
 		// artist: values.has('artist') ? values.get('artist') : undefined,
 	};
 }
 
 // export function dataObjectToArtist(
-// 	remote: CompleteDataObjectRemote,
+// 	dataObject: CompleteDataObject,
 // 	values?: Map<string, any>
 // ): Album {
-// 	values = values ?? valueListToMap(remote.values);
+// 	values = values ?? valueListToMap(dataObject.values);
 
 // 	if (!values.has('name')) {
 // 		throw new Error('Missing name');
@@ -108,3 +125,12 @@ export async function dataObjectToSong(
 // 			? dataObjectToArtist(remote, values.get('artist'))
 // 	};
 // }
+
+/**
+ * album.name.value
+ * song.name.value
+ * song.album.value
+ * song.album.ref
+ * resource.sub.value
+ * resource.sub.ref
+ */

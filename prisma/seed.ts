@@ -14,7 +14,11 @@ import {
 	ResourceType,
 	SourceType,
 	createResources,
+	composeRefFromResource,
 } from '~/models/resource/base/resource';
+import { generateLibrary } from './fake-data';
+import fs from 'fs/promises';
+import { saveFile } from '~/models/file.server';
 
 const db = new PrismaClient();
 
@@ -53,20 +57,20 @@ const db = new PrismaClient();
 // 		}
 // 	}),
 
-async function createAlbumSongs(songs: string[], album: Album) {
-	const songsToCreate: Song[] = songs.map((songName) => ({
-		id: `TEST-${songName.replace(/\s/g, '-')}`,
-		foreignId: `TEST-FOREIGN-${songName.replace(/\s/g, '-')}`,
-		type: ResourceType.SONG,
-		api: SourceType.LOCAL,
-		name: songName,
-		title: songName,
-		album,
-		artist: album.artist,
-	}));
+// async function createAlbumSongs(songs: string[], album: Album) {
+// 	const songsToCreate: Song[] = songs.map((songName) => ({
+// 		id: `TEST-${songName.replace(/\s/g, '-')}`,
+// 		foreignId: `TEST-FOREIGN-${songName.replace(/\s/g, '-')}`,
+// 		type: ResourceType.SONG,
+// 		api: SourceType.LOCAL,
+// 		name: songName,
+// 		title: songName,
+// 		album: composeRefFromResource(album),
+// 		artist: composeRefFromResource(album.artist),
+// 	}));
 
-	return Object.values(await createResources(songsToCreate));
-}
+// 	return Object.values(await createResources(songsToCreate));
+// }
 
 // function dataObjectRemoteToResource(
 // 	remote: CompleteDataObjectRemote
@@ -137,120 +141,175 @@ const seed = async () => {
 		},
 	});
 
-	const artistsData: Record<string, Artist> = {
-		michaelJackson: {
-			id: 'michaelJackson',
-			foreignId: '5Z9ZqZyZz7zXaJQ7jackson',
-			title: 'Michael Jackson',
-			type: ResourceType.ARTIST,
-			api: SourceType.SPOTIFY,
-			name: 'Michael Jackson',
-		},
-		nirvana: {
-			id: 'nirvana',
-			foreignId: '5Z9ZqZyZz7zXaJQ7nirvana',
-			title: 'Nirvana',
-			name: 'Nirvana',
-			type: ResourceType.ARTIST,
-			api: SourceType.SPOTIFY,
-		},
-	};
-
-	const artists = await createResources(Object.values(artistsData));
-
-	const albumsData: Record<string, Album> = {
-		bad: {
-			id: 'bad',
-			foreignId: '5Z9ZqZyZz7zXaJQ7bad',
-			title: 'Bad',
-			type: ResourceType.ALBUM,
-			api: SourceType.SPOTIFY,
-			name: 'Bad',
-			artist: artistsData.michaelJackson,
-		},
-		nevermind: {
-			id: 'nevermind',
-			foreignId: '5Z9ZqZyZz7zXaJQ7nevermind',
-			title: 'Nevermind',
-			type: ResourceType.ALBUM,
-			api: SourceType.SPOTIFY,
-			name: 'Nevermind',
-			artist: artistsData.nirvana,
-		},
-	};
-
-	const albums = await createResources(Object.values(albumsData));
-
-	const badSongs = await createAlbumSongs(
-		[
-			'Bad',
-			'The Way You Make Me Feel',
-			'Speed Demon',
-			'Liberian Girl',
-			'Just Good Friends',
-			'Another Part of Me',
-			'Man in the Mirror',
-			"I Just Can't Stop Loving You",
-			'Dirty Diana',
-			'Smooth Criminal',
-			'Leave Me Alone',
-		],
-		albumsData.bad
+	const albumCover = await saveFile(
+		'album.webp',
+		await fs.readFile('/Users/mat/Downloads/album.webp')
 	);
 
-	const nevermindSongs = await createAlbumSongs(
-		[
-			'Smells Like Teen Spirit',
-			'In Bloom',
-			'Come as You Are',
-			'Breed',
-			'Lithium',
-			'Polly',
-			'Territorial Pissings',
-			'Drain You',
-			'Lounge Act',
-			'Stay Away',
-			'On a Plain',
-			'Something in the Way',
-			'Endless, Nameless',
-		],
-		albumsData.nevermind
-	);
+	const library = await generateLibrary(user.id, 10);
 
-	const listsData: List[] = [
-		{
-			id: 'eba1e99b-bc2a-4842-b0ee-52dc165353df',
-			title: 'Favourite Michael Jackson songs',
-			description: 'Michael Jackson songs',
-			createdAt: new Date(),
-			updatedAt: new Date(),
-			userId: user.id,
-		},
-		{
-			id: '10fd2a35-fade-46c0-8242-8bb9cc263576',
-			title: 'Rock songs',
-			description: 'The best of rock',
-			createdAt: new Date(),
-			updatedAt: new Date(),
-			userId: null,
-		},
-	];
+	const artists = await createResources(library.artists);
+	const albums = await createResources(library.albums);
+	const songs = await createResources(library.songs);
 
-	for (let list of listsData) {
-		list = await upsertList(list);
+	for (const playlist of library.lists) {
+		const list = await upsertList({
+			...playlist.list,
+			coverFileReferenceId: albumCover.id,
+		});
 
-		switch (list.id) {
-			case 'eba1e99b-bc2a-4842-b0ee-52dc165353df':
-				await addResourceToList(list.id, badSongs[0].id);
-				await addResourceToList(list.id, badSongs[1].id);
-				break;
-
-			case '10fd2a35-fade-46c0-8242-8bb9cc263576':
-				await addResourceToList(list.id, nevermindSongs[0].id);
-				await addResourceToList(list.id, nevermindSongs[1].id);
-				break;
+		for (const resource of playlist.songs) {
+			await addResourceToList(list.id, resource.id);
 		}
 	}
+
+	console.log('Library generated', {
+		artists: library.artists.length,
+		albums: library.albums.length,
+		songs: library.songs.length,
+		lists: library.lists.length,
+	});
+
+	/*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	*/
+	// const artistsData: Record<string, Artist> = {
+	// 	michaelJackson: {
+	// 		id: 'michaelJackson',
+	// 		foreignId: '5Z9ZqZyZz7zXaJQ7jackson',
+	// 		title: 'Michael Jackson',
+	// 		type: ResourceType.ARTIST,
+	// 		api: SourceType.SPOTIFY,
+	// 		name: 'Michael Jackson',
+	// 	},
+	// 	nirvana: {
+	// 		id: 'nirvana',
+	// 		foreignId: '5Z9ZqZyZz7zXaJQ7nirvana',
+	// 		title: 'Nirvana',
+	// 		name: 'Nirvana',
+	// 		type: ResourceType.ARTIST,
+	// 		api: SourceType.SPOTIFY,
+	// 	},
+	// };
+
+	// const artists = await createResources(Object.values(artistsData));
+
+	// const albumsData: Record<string, Album> = {
+	// 	bad: {
+	// 		id: 'bad',
+	// 		foreignId: '5Z9ZqZyZz7zXaJQ7bad',
+	// 		title: 'Bad',
+	// 		type: ResourceType.ALBUM,
+	// 		api: SourceType.SPOTIFY,
+	// 		name: 'Bad',
+	// 		artist: {
+	// 			ref: artistsData.michaelJackson.id,
+	// 			value: artistsData.michaelJackson.title,
+	// 		},
+	// 	},
+	// 	nevermind: {
+	// 		id: 'nevermind',
+	// 		foreignId: '5Z9ZqZyZz7zXaJQ7nevermind',
+	// 		title: 'Nevermind',
+	// 		type: ResourceType.ALBUM,
+	// 		api: SourceType.SPOTIFY,
+	// 		name: 'Nevermind',
+	// 		artist: {
+	// 			ref: artistsData.nirvana.id,
+	// 			value: artistsData.nirvana.title,
+	// 		},
+	// 	},
+	// };
+
+	// const albums = await createResources(Object.values(albumsData));
+
+	// const badSongs = await createAlbumSongs(
+	// 	[
+	// 		'Bad',
+	// 		'The Way You Make Me Feel',
+	// 		'Speed Demon',
+	// 		'Liberian Girl',
+	// 		'Just Good Friends',
+	// 		'Another Part of Me',
+	// 		'Man in the Mirror',
+	// 		"I Just Can't Stop Loving You",
+	// 		'Dirty Diana',
+	// 		'Smooth Criminal',
+	// 		'Leave Me Alone',
+	// 	],
+	// 	albumsData.bad
+	// );
+
+	// const nevermindSongs = await createAlbumSongs(
+	// 	[
+	// 		'Smells Like Teen Spirit',
+	// 		'In Bloom',
+	// 		'Come as You Are',
+	// 		'Breed',
+	// 		'Lithium',
+	// 		'Polly',
+	// 		'Territorial Pissings',
+	// 		'Drain You',
+	// 		'Lounge Act',
+	// 		'Stay Away',
+	// 		'On a Plain',
+	// 		'Something in the Way',
+	// 		'Endless, Nameless',
+	// 	],
+	// 	albumsData.nevermind
+	// );
+
+	// const listsData: List[] = [
+	// 	{
+	// 		id: 'eba1e99b-bc2a-4842-b0ee-52dc165353df',
+	// 		title: 'Favourite Michael Jackson songs',
+	// 		description: 'Michael Jackson songs',
+	// 		createdAt: new Date(),
+	// 		updatedAt: new Date(),
+	// 		userId: user.id,
+	// 	},
+	// 	{
+	// 		id: '10fd2a35-fade-46c0-8242-8bb9cc263576',
+	// 		title: 'Rock songs',
+	// 		description: 'The best of rock',
+	// 		createdAt: new Date(),
+	// 		updatedAt: new Date(),
+	// 		userId: null,
+	// 	},
+	// ];
+
+	// for (let list of listsData) {
+	// 	list = await upsertList(list);
+
+	// 	switch (list.id) {
+	// 		case 'eba1e99b-bc2a-4842-b0ee-52dc165353df':
+	// 			await addResourceToList(list.id, badSongs[0].id);
+	// 			await addResourceToList(list.id, badSongs[1].id);
+	// 			break;
+
+	// 		case '10fd2a35-fade-46c0-8242-8bb9cc263576':
+	// 			await addResourceToList(list.id, nevermindSongs[0].id);
+	// 			await addResourceToList(list.id, nevermindSongs[1].id);
+	// 			break;
+	// 	}
+	// }
 
 	// const smoothOperator = await db.listItem.create({
 	// 	data: {

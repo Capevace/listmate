@@ -1,12 +1,5 @@
-import {
-	CookieParseOptions,
-	CookieSerializeOptions,
-	CookieSignatureOptions,
-	createSessionStorage,
-	redirect,
-} from 'remix';
+import { createSessionStorage, redirect } from 'remix';
 import { prisma } from './db.server';
-import type { Session } from '@prisma/client';
 
 import invariant from 'tiny-invariant';
 
@@ -46,10 +39,14 @@ export const sessionStorage = createSessionStorage({
 		return session ? JSON.parse(session.data) : null;
 	},
 	async updateData(id, data, expiresAt) {
-		console.log(data);
-		await prisma.session.update({
+		await prisma.session.upsert({
 			where: { id },
-			data: {
+			update: {
+				expiresAt,
+				data: JSON.stringify(data),
+			},
+			create: {
+				id,
 				expiresAt,
 				data: JSON.stringify(data),
 			},

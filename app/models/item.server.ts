@@ -1,7 +1,7 @@
 import type { List, DataObjectRemote } from '@prisma/client';
 
 import { prisma } from '~/db.server';
-import { remoteToResource } from './resource/adapters/remote';
+import { dataObjectToResource } from './resource/adapters/remote';
 import { Resource } from './resource/base/resource';
 
 export type { ListItem } from '@prisma/client';
@@ -24,9 +24,9 @@ async function getRawItemsInList(listId: List['id']) {
 	return await prisma.listItem.findMany({
 		where: { listId },
 		include: {
-			remote: {
+			dataObject: {
 				include: {
-					dataObject: true,
+					remotes: true,
 					values: {
 						include: {
 							valueDataObject: true,
@@ -73,7 +73,7 @@ export async function addResourceToList(
 					id: listId,
 				},
 			},
-			remote: {
+			dataObject: {
 				connect: {
 					id: resourceId,
 				},
@@ -93,7 +93,7 @@ export async function getItemsForList({
 	for (const listItem of rawItems) {
 		items.push({
 			...listItem,
-			resource: await remoteToResource(listItem.remote),
+			resource: await dataObjectToResource(listItem.dataObject),
 		});
 	}
 

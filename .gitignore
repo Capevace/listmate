@@ -1,5 +1,6 @@
 node_modules
 
+/storage
 /build
 /public/build
 .env

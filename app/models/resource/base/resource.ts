@@ -1,8 +1,8 @@
-import type { DataObjectRemote } from '@prisma/client';
+import type { DataObject, DataObjectValue } from '@prisma/client';
 import invariant from 'tiny-invariant';
-import { SetOptional } from 'type-fest';
+import { SetOptional, Except } from 'type-fest';
 import { prisma as db } from '~/db.server';
-import { remoteToResource } from '../adapters/remote';
+import { dataObjectToResource } from '../adapters/remote';
 
 // // Some types are not exported from @prisma/client, so we need to manually
 // // create them.
@@ -52,6 +52,14 @@ export enum SourceType {
 	POCKET = 'pocket',
 }
 
+export const ALL_SOURCE_TYPES = [
+	'local',
+	'spotify',
+	'youtube',
+	'soundcloud',
+	'pocket',
+];
+
 export function stringToSourceType(type: string): SourceType {
 	switch (type) {
 		case 'local':
@@ -69,44 +77,66 @@ export function stringToSourceType(type: string): SourceType {
 	}
 }
 
+export type ValueRefMap = { [key: string]: ValueRef<any> | null };
+
 /* Basic types */
 export type Resource = {
 	id: string;
-	foreignId: string;
+	// foreignId: string;
 
 	title: string; // always available string, most basic representation of item
 	type: ResourceType;
-	api: SourceType;
+	// api: SourceType;
+	values: ValueRefMap;
 };
+
+export type RawValue<ValueType = string> = {
+	value: ValueType;
+};
+
+export type ValueRef<ValueType> = RawValue<ValueType> & {
+	ref?: Resource['id'];
+	value: ValueType;
+};
+
+export function composeRefFromValue<ValueType extends any = string>(
+	value?: DataObjectValue
+): RawValue<ValueType> | ValueRef<ValueType> | null {
+	return value
+		? ({
+				ref: value.valueDataObjectId,
+				value: value.value,
+		  } as ValueRef<ValueType>)
+		: null;
+}
+
+export function composeRefFromResource<ValueType extends any = string>(
+	resource?: Resource
+): ValueRef<ValueType> | null {
+	return resource
+		? ({
+				ref: resource.id,
+				value: resource.title,
+		  } as ValueRef<ValueType>)
+		: null;
+}
+
 const resourceValueBlacklist = ['id', 'title', 'foreignId', 'api', 'type'];
 
 export async function upsertResource(resource: SetOptional<Resource, 'id'>) {
-	const remote = await db.dataObjectRemote.upsert({
+	const dataObject = await db.dataObject.upsert({
 		where: {
-			api_foreignId: {
-				api: resource.api,
-				foreignId: resource.foreignId,
-			},
+			id: resource.id,
 		},
 		// TODO: when used with the if clause below, we can try and find similar dataobjects
-		update: {},
+		update: { id: resource.id },
 		create: {
 			id: resource.id,
-			api: resource.api,
-			foreignId: resource.foreignId,
-			dataObject: {
-				create: {
-					title: resource.title,
-					type: resource.type,
-				},
-			},
+			title: resource.title,
+			type: resource.type,
 		},
 		include: {
-			dataObject: {
-				include: {
-					remotes: true,
-				},
-			},
+			remotes: true,
 		},
 	});
 
@@ -146,108 +176,87 @@ export async function upsertResource(resource: SetOptional<Resource, 'id'>) {
 	// }
 	// === ok you can delete again	===
 
+	type ResourceData = Except<Resource, 'id' | 'type' | 'title'>;
+
 	let values = [];
-	const rawValues = Object.entries(resource).filter(
-		([key]) => !resourceValueBlacklist.includes(key)
-	);
 
-	for (const entry of rawValues) {
-		const [key, value] = entry;
+	for (const [key, valueRef] of Object.entries(resource.values)) {
+		console.log(key, valueRef, resource);
 
-		if (typeof value === 'object' && 'id' in value) {
-			const valueResource = value as Resource;
+		if (!valueRef) continue;
 
-			const valueRemote = await upsertResource(valueResource);
-
-			values.push(
-				await db.dataObjectValue.upsert({
-					where: {
-						api_foreignId_key: {
-							api: resource.api,
-							foreignId: resource.foreignId,
-							key,
-						},
-					},
-					update: {
-						value: valueRemote.dataObject.title,
-						valueDataObjectId: valueRemote.dataObject.id,
-					},
-					create: {
-						api: resource.api,
-						foreignId: resource.foreignId,
+		values.push(
+			await db.dataObjectValue.upsert({
+				where: {
+					dataObjectId_key: {
+						dataObjectId: dataObject.id,
 						key,
-						value: valueRemote.dataObject.title,
-						valueDataObjectId: valueRemote.dataObject.id,
 					},
-				})
-			);
-		} else {
-			values.push(
-				await db.dataObjectValue.upsert({
-					where: {
-						api_foreignId_key: {
-							api: resource.api,
-							foreignId: resource.foreignId,
-							key,
-						},
-					},
-					update: {
-						value: String(value),
-						valueDataObjectId: null,
-					},
-					create: {
-						api: resource.api,
-						foreignId: resource.foreignId,
-						key,
-						value: String(value),
-					},
-				})
-			);
-		}
+				},
+				update: {
+					value: valueRef.value,
+					valueDataObjectId: valueRef.ref,
+				},
+				create: {
+					dataObjectId: dataObject.id,
+					key,
+					value: valueRef.value,
+					valueDataObjectId: valueRef.ref,
+				},
+			})
+		);
 	}
 
 	// If remote was created
-	const previousRemoteIndex = remote.dataObject.remotes.findIndex(
-		(_remote) => _remote.api === remote.api
-	);
+	// const previousRemoteIndex = remote.dataObject.remotes.findIndex(
+	// 	(_remote) => _remote.api === remote.api
+	// );
 
-	if (previousRemoteIndex !== -1) {
-		remote.dataObject.remotes[previousRemoteIndex] = remote;
-	} else {
-		remote.dataObject.remotes.push(remote);
-	}
+	// if (previousRemoteIndex !== -1) {
+	// 	remote.dataObject.remotes[previousRemoteIndex] = remote;
+	// } else {
+	// 	remote.dataObject.remotes.push(remote);
+	// }
 
-	return remote;
+	const fullObject = await db.dataObject.findUnique({
+		where: {
+			id: dataObject.id,
+		},
+		include: {
+			remotes: true,
+			values: true,
+		},
+	});
+
+	invariant(fullObject, 'Could not upsert data object');
+
+	return fullObject;
 }
 
 export async function getResourceById(
 	id: Resource['id']
 ): Promise<Resource | null> {
-	const remote = await db.dataObjectRemote.findUnique({
+	const dataObject = await db.dataObject.findUnique({
 		where: {
 			id,
 		},
 		include: {
-			dataObject: {
-				include: {
-					remotes: true,
-				},
-			},
+			remotes: true,
 			values: true,
 		},
 	});
 
-	return remote ? await remoteToResource(remote) : null;
+	return dataObject ? await dataObjectToResource(dataObject) : null;
 }
 
 export async function createResources(
 	resourcesToCreate: SetOptional<Resource, 'id'>[]
 ) {
-	let resources: Record<string, DataObjectRemote> = {};
+	let resources: Record<string, DataObject> = {};
 
 	for (const resource of resourcesToCreate) {
-		const createdRemote = await upsertResource(resource);
-		resources[createdRemote.foreignId] = createdRemote;
+		const createdObject = await upsertResource(resource);
+		resources[createdObject.id] = createdObject;
 	}
 
 	return resources;
@@ -256,11 +265,11 @@ export async function createResources(
 async function createResource(
 	resourcesToCreate: SetOptional<Resource, 'id'>[]
 ) {
-	let resources: Record<string, DataObjectRemote> = {};
+	let resources: Record<string, DataObject> = {};
 
 	for (const resource of resourcesToCreate) {
-		const createdRemote = await upsertResource(resource);
-		resources[createdRemote.foreignId] = createdRemote;
+		const createdObject = await upsertResource(resource);
+		resources[createdObject.id] = createdObject;
 	}
 
 	return resources;
