@@ -4,7 +4,7 @@ import { json, useLoaderData, useCatch, Form } from 'remix';
 import invariant from 'tiny-invariant';
 import type { List } from '~/models/list.server';
 import type { ListItemData } from '~/models/item.server';
-import { getList, deleteList } from '~/models/list.server';
+import { getList } from '~/models/list.server';
 import { getItemsForList } from '~/models/item.server';
 import { requireUserId } from '~/session.server';
 import { ResourceType } from '~/models/resource/base/resource';
@@ -20,7 +20,7 @@ type LoaderData = {
 };
 
 export const loader: LoaderFunction = async ({ request, params }) => {
-	const userId = await requireUserId(request);
+	await requireUserId(request);
 	invariant(params.listId, 'listId not found');
 
 	const list = await getList({ id: params.listId });
@@ -34,7 +34,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 };
 
 export const action: ActionFunction = async ({ request, params }) => {
-	const userId = await requireUserId(request);
+	await requireUserId(request);
 	invariant(params.listId, 'listId not found');
 
 	// await c({ userId, id: params.listId });

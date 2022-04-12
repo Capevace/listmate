@@ -1,4 +1,4 @@
-import type { User, List, DataObjectRemote } from '@prisma/client';
+import type { User, List } from '@prisma/client';
 import { SetOptional } from 'type-fest';
 import { prisma } from '~/db.server';
 import { ListItemData } from './item.server';

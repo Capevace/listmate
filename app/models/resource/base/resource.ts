@@ -1,6 +1,6 @@
 import type { DataObject, DataObjectValue } from '@prisma/client';
 import invariant from 'tiny-invariant';
-import { SetOptional, Except } from 'type-fest';
+import { SetOptional } from 'type-fest';
 import { prisma as db } from '~/db.server';
 import { dataObjectToResource } from '../adapters/remote';
 
@@ -121,8 +121,6 @@ export function composeRefFromResource<ValueType extends any = string>(
 		: null;
 }
 
-const resourceValueBlacklist = ['id', 'title', 'foreignId', 'api', 'type'];
-
 export async function upsertResource(resource: SetOptional<Resource, 'id'>) {
 	const dataObject = await db.dataObject.upsert({
 		where: {
@@ -176,7 +174,7 @@ export async function upsertResource(resource: SetOptional<Resource, 'id'>) {
 	// }
 	// === ok you can delete again	===
 
-	type ResourceData = Except<Resource, 'id' | 'type' | 'title'>;
+	// type ResourceData = Except<Resource, 'id' | 'type' | 'title'>;
 
 	let values = [];
 
@@ -262,7 +260,7 @@ export async function createResources(
 	return resources;
 }
 
-async function createResource(
+export async function createResource(
 	resourcesToCreate: SetOptional<Resource, 'id'>[]
 ) {
 	let resources: Record<string, DataObject> = {};

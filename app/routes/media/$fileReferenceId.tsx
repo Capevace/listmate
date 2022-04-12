@@ -1,16 +1,7 @@
-import {
-	ActionFunction,
-	redirect,
-	Link,
-	LoaderFunction,
-	useLoaderData,
-	json,
-} from 'remix';
+import { LoaderFunction } from 'remix';
 import invariant from 'tiny-invariant';
-import { List, getListsForUser } from '~/models/list.server';
 import { getContentType, getFile, getFilePath } from '~/models/file.server';
 import * as fs from '~/fs.server';
-import { mime } from '~/mime.server';
 
 export const loader: LoaderFunction = async ({ request, params }) => {
 	const id = params.fileReferenceId;

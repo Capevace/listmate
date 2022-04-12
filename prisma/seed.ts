@@ -1,21 +1,8 @@
-import { List, PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { addResourceToList } from '~/models/item.server';
 import { upsertList } from '~/models/list.server';
-
-import type {
-	Album,
-	Artist,
-	Song,
-	// SpotifyAlbum,
-	// SpotifyResource,
-} from '~/models/resource/base/music';
-import {
-	ResourceType,
-	SourceType,
-	createResources,
-	composeRefFromResource,
-} from '~/models/resource/base/resource';
+import { createResources } from '~/models/resource/base/resource';
 import { generateLibrary } from './fake-data';
 import fs from 'fs/promises';
 import { saveFile } from '~/models/file.server';
@@ -148,9 +135,9 @@ const seed = async () => {
 
 	const library = await generateLibrary(user.id, 10);
 
-	const artists = await createResources(library.artists);
-	const albums = await createResources(library.albums);
-	const songs = await createResources(library.songs);
+	await createResources(library.artists);
+	await createResources(library.albums);
+	await createResources(library.songs);
 
 	for (const playlist of library.lists) {
 		const list = await upsertList({

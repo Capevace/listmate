@@ -1,14 +1,5 @@
-import { TrendingUpIcon } from '@heroicons/react/solid';
-import {
-	ActionFunction,
-	redirect,
-	Link,
-	LoaderFunction,
-	useLoaderData,
-	json,
-} from 'remix';
+import { redirect, LoaderFunction, json } from 'remix';
 import invariant from 'tiny-invariant';
-import { List, getListsForUser } from '~/models/list.server';
 import {
 	SourceType,
 	stringToSourceType,
@@ -57,7 +48,5 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 };
 
 export default function APILoaderPage() {
-	const data = useLoaderData<LoaderData>();
-
 	return <div>You are connected to this API.</div>;
 }

@@ -4,7 +4,6 @@ import type { Album, Artist, Song } from '~/models/resource/base/music';
 import {
 	composeRefFromResource,
 	ResourceType,
-	SourceType,
 } from '~/models/resource/base/resource';
 
 export function generateArtist(): Artist {
