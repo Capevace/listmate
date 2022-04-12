@@ -25,9 +25,8 @@ export default function MainAppLayout({
 }: MainAppLayoutProps) {
 	return (
 		<div className="flex h-full">
-			<nav className="flex flex-col border-r-2 border-gray-800 bg-gray-900">
-				{/* User box */}
-				<div className="flex w-full items-center justify-between gap-5 bg-gray-800 px-5 py-3">
+			<nav className="flex flex-col justify-between border-r-2 border-gray-800 bg-gray-900">
+				<div className="flex w-full items-center justify-start gap-5 bg-gray-800 px-5 py-3">
 					<div className="flex items-center">
 						<img
 							src="https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80"
@@ -49,11 +48,20 @@ export default function MainAppLayout({
 						</Form>
 					</div>
 				</div>
-
-				<div className="flex flex-col">
-					{lists.map((list) => (
-						<ListRow key={list.id} list={list} />
-					))}
+				<div className="flex flex-1 flex-col">
+					<div className="flex flex-1 flex-col overflow-y-scroll">
+						{lists.map((list) => (
+							<ListRow key={list.id} list={list} />
+						))}
+					</div>
+					<div className="flex flex-col">
+						<Link
+							to="/connections"
+							className="flex items-center px-5 py-3 text-gray-500 hover:bg-gray-800 hover:text-gray-400"
+						>
+							Connections
+						</Link>
+					</div>
 				</div>
 			</nav>
 			<main className="flex-1 overflow-y-scroll bg-gray-900">{children}</main>

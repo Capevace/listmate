@@ -46,14 +46,6 @@ model SourceToken {
     @@unique([api, userId])
 }
 
-model FileReference {
-    id        String   @id @default(uuid())
-    mimeType  String
-    createdAt DateTime @default(now())
-
-    coverReferences List[] @relation("FileCoverReferences")
-}
-
 // model Source {
 //     id          String         @id @default(uuid())
 //     name        String
@@ -107,6 +99,9 @@ model DataObject {
     title String
     type  String // song, video, file 
 
+    thumbnail       FileReference? @relation(fields: [thumbnailFileId], references: [id])
+    thumbnailFileId String?
+
     values     DataObjectValue[]  @relation("DataObjectValues")
     remotes    DataObjectRemote[]
     references DataObjectValue[]  @relation("DataObjectReferences")
@@ -118,18 +113,18 @@ model DataObjectRemote {
     dataObject   DataObject @relation(fields: [dataObjectId], references: [id], onDelete: Cascade)
     dataObjectId String
     api          String // youtube, spotify, local
-    foreignId    String
+    uri          String
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    @@id([api, foreignId])
+    @@id([api, uri])
     @@unique([dataObjectId, api])
 }
 
 model DataObjectValue {
     // api       String // youtube, spotify, local
-    // foreignId String
+    // uri String
     dataObject   DataObject @relation("DataObjectValues", fields: [dataObjectId], references: [id], onDelete: Cascade)
     dataObjectId String
     key          String
@@ -139,6 +134,16 @@ model DataObjectValue {
     valueDataObjectId String?
 
     @@id([dataObjectId, key])
+}
+
+model FileReference {
+    id        String   @id @default(uuid())
+    mimeType  String
+    createdAt DateTime @default(now())
+
+    coverReferences List[] @relation("FileCoverReferences")
+
+    thumbnailReferences DataObject[]
 }
 
 model List {

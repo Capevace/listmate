@@ -1,6 +1,10 @@
-import type { DataObject, DataObjectValue } from '@prisma/client';
+import type {
+	DataObjectRemote,
+	DataObjectValue,
+	FileReference,
+} from '@prisma/client';
 import invariant from 'tiny-invariant';
-import { SetOptional } from 'type-fest';
+import { Except } from 'type-fest';
 import { prisma as db } from '~/db.server';
 import { dataObjectToResource } from '../adapters/remote';
 
@@ -82,10 +86,13 @@ export type ValueRefMap = { [key: string]: ValueRef<any> | null };
 /* Basic types */
 export type Resource = {
 	id: string;
-	// foreignId: string;
+	// uri: string;
 
 	title: string; // always available string, most basic representation of item
 	type: ResourceType;
+
+	thumbnail: FileReference | null;
+
 	// api: SourceType;
 	values: ValueRefMap;
 };
@@ -121,100 +128,54 @@ export function composeRefFromResource<ValueType extends any = string>(
 		: null;
 }
 
-export async function upsertResource(resource: SetOptional<Resource, 'id'>) {
+async function upsertValues(resource: Resource) {
+	for (const [key, valueRef] of Object.entries(resource.values)) {
+		if (!valueRef) continue;
+
+		await db.dataObjectValue.upsert({
+			where: {
+				dataObjectId_key: {
+					dataObjectId: resource.id,
+					key,
+				},
+			},
+			update: {
+				value: valueRef.value,
+				valueDataObjectId: valueRef.ref,
+			},
+			create: {
+				dataObjectId: resource.id,
+				key,
+				value: valueRef.value,
+				valueDataObjectId: valueRef.ref,
+			},
+		});
+	}
+}
+
+export async function upsertResource(resource: Resource) {
 	const dataObject = await db.dataObject.upsert({
 		where: {
 			id: resource.id,
 		},
 		// TODO: when used with the if clause below, we can try and find similar dataobjects
-		update: { id: resource.id },
+		update: {
+			title: resource.title,
+			type: resource.type,
+			thumbnailFileId: resource.thumbnail?.id || null,
+		},
 		create: {
 			id: resource.id,
 			title: resource.title,
 			type: resource.type,
+			thumbnailFileId: resource.thumbnail?.id || null,
 		},
 		include: {
 			remotes: true,
 		},
 	});
 
-	// === DONT DELETE THIS, needed later ===
-	// if (remote) {
-	// 	remote = await db.dataObjectRemote.update({
-	// 		where: {
-	// 			api_foreignId: {
-	// 				api: resource.api,
-	// 				foreignId: resource.foreignId,
-	// 			},
-	// 		},
-	// 		data: {},
-	// 		include: {
-	// 			dataObject: {
-	// 				include: {
-	// 					remotes: true,
-	// 				},
-	// 			},
-	// 			values: true,
-	// 		},
-	// 	});
-	// } else {
-	// 	// TODO: find similar data objects
-
-	// 	remote = await db.dataObjectRemote.create({
-	// 		data: {},
-	// 		include: {
-	// 			dataObject: {
-	// 				include: {
-	// 					remotes: true,
-	// 				},
-	// 			},
-	// 			values: true,
-	// 		},
-	// 	});
-	// }
-	// === ok you can delete again	===
-
-	// type ResourceData = Except<Resource, 'id' | 'type' | 'title'>;
-
-	let values = [];
-
-	for (const [key, valueRef] of Object.entries(resource.values)) {
-		console.log(key, valueRef, resource);
-
-		if (!valueRef) continue;
-
-		values.push(
-			await db.dataObjectValue.upsert({
-				where: {
-					dataObjectId_key: {
-						dataObjectId: dataObject.id,
-						key,
-					},
-				},
-				update: {
-					value: valueRef.value,
-					valueDataObjectId: valueRef.ref,
-				},
-				create: {
-					dataObjectId: dataObject.id,
-					key,
-					value: valueRef.value,
-					valueDataObjectId: valueRef.ref,
-				},
-			})
-		);
-	}
-
-	// If remote was created
-	// const previousRemoteIndex = remote.dataObject.remotes.findIndex(
-	// 	(_remote) => _remote.api === remote.api
-	// );
-
-	// if (previousRemoteIndex !== -1) {
-	// 	remote.dataObject.remotes[previousRemoteIndex] = remote;
-	// } else {
-	// 	remote.dataObject.remotes.push(remote);
-	// }
+	await upsertValues(resource);
 
 	const fullObject = await db.dataObject.findUnique({
 		where: {
@@ -223,12 +184,13 @@ export async function upsertResource(resource: SetOptional<Resource, 'id'>) {
 		include: {
 			remotes: true,
 			values: true,
+			thumbnail: true,
 		},
 	});
 
 	invariant(fullObject, 'Could not upsert data object');
 
-	return fullObject;
+	return dataObjectToResource(fullObject);
 }
 
 export async function getResourceById(
@@ -241,16 +203,15 @@ export async function getResourceById(
 		include: {
 			remotes: true,
 			values: true,
+			thumbnail: true,
 		},
 	});
 
 	return dataObject ? await dataObjectToResource(dataObject) : null;
 }
 
-export async function createResources(
-	resourcesToCreate: SetOptional<Resource, 'id'>[]
-) {
-	let resources: Record<string, DataObject> = {};
+export async function createResources(resourcesToCreate: Resource[]) {
+	let resources: Record<string, Resource> = {};
 
 	for (const resource of resourcesToCreate) {
 		const createdObject = await upsertResource(resource);
@@ -261,14 +222,83 @@ export async function createResources(
 }
 
 export async function createResource(
-	resourcesToCreate: SetOptional<Resource, 'id'>[]
+	resource: Except<Resource, 'id'>
+): Promise<Resource> {
+	const dataObject = await db.dataObject.create({
+		data: {
+			title: resource.title,
+			type: resource.type,
+			thumbnailFileId: resource.thumbnail?.id || null,
+		},
+	});
+
+	await upsertValues({ ...resource, id: dataObject.id });
+
+	const fullObject = await db.dataObject.findUnique({
+		where: {
+			id: dataObject.id,
+		},
+		include: {
+			remotes: true,
+			values: true,
+			thumbnail: true,
+		},
+	});
+
+	invariant(fullObject, 'Could not create resource');
+
+	return dataObjectToResource(fullObject);
+}
+export async function getResourceByRemoteUri(
+	api: SourceType,
+	uri: DataObjectRemote['uri']
 ) {
-	let resources: Record<string, DataObject> = {};
+	console.log('api', api, uri);
+	const remote = await db.dataObjectRemote.findUnique({
+		where: {
+			api_uri: {
+				api,
+				uri,
+			},
+		},
+	});
 
-	for (const resource of resourcesToCreate) {
-		const createdObject = await upsertResource(resource);
-		resources[createdObject.id] = createdObject;
-	}
+	if (!remote) return null;
 
-	return resources;
+	return getResourceById(remote.dataObjectId);
+}
+
+export async function attachRemoteUri(
+	resourceId: Resource['id'],
+	api: SourceType,
+	uri: DataObjectRemote['uri']
+) {
+	return db.dataObjectRemote.create({
+		// where: {
+		// 	api_uri: {
+		// 		api,
+		// 		uri,
+		// 	},
+		// },
+		// update: {},
+		data: {
+			dataObjectId: resourceId,
+			api,
+			uri,
+		},
+	});
+}
+
+export function attachFileToResource(
+	resourceId: string,
+	fileRef: FileReference
+) {
+	return db.dataObject.update({
+		where: {
+			id: resourceId,
+		},
+		data: {
+			thumbnailFileId: fileRef.id,
+		},
+	});
 }

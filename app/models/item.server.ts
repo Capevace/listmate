@@ -27,11 +27,8 @@ async function getRawItemsInList(listId: List['id']) {
 			dataObject: {
 				include: {
 					remotes: true,
-					values: {
-						include: {
-							valueDataObject: true,
-						},
-					},
+					thumbnail: true,
+					values: true
 				},
 			},
 		},

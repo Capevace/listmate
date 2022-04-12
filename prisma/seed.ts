@@ -133,7 +133,7 @@ const seed = async () => {
 		await fs.readFile('/Users/mat/Downloads/album.webp')
 	);
 
-	const library = await generateLibrary(user.id, 10);
+	const library = await generateLibrary(user.id, 3);
 
 	await createResources(library.artists);
 	await createResources(library.albums);

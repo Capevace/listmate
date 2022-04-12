@@ -75,17 +75,16 @@ function ListHeader({ list }: { list: List }) {
 					</Form>
 				</nav>
 			</div>
-			<aside className="h-48 justify-end">
-				<img
-					className="h-full rounded-xl shadow-lg"
-					src={
+			<aside
+				className="relative aspect-square h-48 justify-end rounded-lg bg-cover bg-center shadow-lg"
+				style={{
+					backgroundImage: `url(${
 						list.coverFileReferenceId
 							? `/media/${list.coverFileReferenceId}`
 							: `https://dummyimage.com/500x500/374151/d1d5db.png&text=%20%20%20%20%20%20${list.id}`
-					}
-					alt="List"
-				/>
-			</aside>
+					})`,
+				}}
+			></aside>
 		</div>
 	);
 }

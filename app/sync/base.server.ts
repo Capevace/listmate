@@ -22,7 +22,7 @@ type ExternalList = {
 type CollectionImportTask = {};
 
 interface ExternalService {
-	importResource(foreignId: string, type: ResourceType): Promise<ImportResult>;
+	importResource(uri: string, type: ResourceType): Promise<ImportResult>;
 	// import data ABOUT a single resource
 	// e.g.
 	// - import a single song
@@ -108,15 +108,22 @@ interface ExternalService {
 	================================================================================
  */
 
-class SpotifyService implements ExternalService {
-	importResource(foreignId: string, type: ResourceType): Promise<ImportResult> {
+export class SpotifyService implements ExternalService {
+	fetchAvailableCollections(): Promise<ExternalList[]> {
+		throw new Error('Method not implemented.');
+	}
+	importCollection(id: string): Promise<CollectionImportTask> {
+		throw new Error('Method not implemented.');
+	}
+	importResource(uri: string, type: ResourceType): Promise<ImportResult> {
 		return Promise.resolve({
 			resource: {
 				id: '1',
-				foreignId: '2',
+				uri: '2',
 				title: '3',
 				type: ResourceType.SONG,
 				api: SourceType.SPOTIFY,
+				values: {},
 			},
 			other: [],
 		});

@@ -77,9 +77,22 @@ function ConnectRow({
 				<div className="grid grid-cols-3 items-center justify-end gap-4 font-semibold text-gray-400">
 					{token ? (
 						<>
-							<span className="col-span-2 text-xs">
+							<span className="text-xs opacity-0 xl:opacity-100">
 								{capitalize(type)} is configured ✅
 							</span>
+							<Link
+								to={`/connections/${type}/import`}
+								className="col-span-1 block"
+							>
+								<Button
+									type="submit"
+									variant={'light'}
+									fullWidth={true}
+									size="xs"
+								>
+									Import
+								</Button>
+							</Link>
 							<Link
 								to={`/connections/${type}/unlink`}
 								className="col-span-1 block"

@@ -35,7 +35,7 @@ function ResourceDetails({ resource }: { resource: Resource }) {
 
 export function ResourceHeader({ resource }: { resource: Resource }) {
 	return (
-		<div className="flex items-end">
+		<div className="mb-5 flex items-start">
 			<div className="flex-1 items-stretch">
 				<div className="relative mb-5 flex flex-col">
 					<h1 className="mb-2 text-4xl font-bold text-gray-100">
@@ -66,13 +66,16 @@ export function ResourceHeader({ resource }: { resource: Resource }) {
 					</Form> */}
 				</nav>
 			</div>
-			<aside className="flex h-full w-1/5 ">
-				<img
-					className="h-full rounded-xl shadow-lg"
-					src="https://i0.wp.com/909originals.com/wp-content/uploads/2019/01/DaftPunk_HomeworkLP.jpg?fit=1500%2C1500&ssl=1"
-					alt="List"
-				/>
-			</aside>
+			<aside
+				className="relative aspect-square h-48 justify-end rounded-lg bg-cover bg-center shadow-lg"
+				style={{
+					backgroundImage: `url(${
+						resource.thumbnail
+							? `/media/${resource.thumbnail.id}`
+							: `https://dummyimage.com/500x500/374151/d1d5db.png&text=%20%20%20%20%20%20${resource.id}`
+					})`,
+				}}
+			></aside>
 		</div>
 	);
 }

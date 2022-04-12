@@ -28,6 +28,9 @@ export type Artist = Resource &
 export type AlbumData = {
 	name: RawValue<string>;
 	artist: ValueRef<string> | null;
+	// release_date: '1976-10-14';
+	// release_date_precision: 'day';
+	// total_tracks: 13;
 };
 
 export type Album = Resource &
@@ -44,6 +47,15 @@ export type Song = Resource &
 
 export type CreateAlbumParameters = AlbumData & {
 	artist?: ArtistData | Artist;
+	// external_ids: {
+	// 	isrc: 'USNPD0600583';
+	// };
+	// disc_number: 1;
+	// duration_ms: 158506;
+	// explicit: false;
+	// "popularity": 60,
+	// track_number: 3;
+	// preview_url: 'https://p.scdn.co/mp3-preview/41ae355019aaf741e2d9bfe9c03bb44229af9173?cid=774b29d4f13844c495f206cafdad9c86';
 };
 
 export async function dataObjectToAlbum(

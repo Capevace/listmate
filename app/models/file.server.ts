@@ -55,3 +55,20 @@ export async function saveFile(filename: string, content: Buffer) {
 
 	return fileRef;
 }
+
+export async function createFileStream(filename: string) {
+	const mimeType = mime.lookup(filename) || 'application/octet-stream';
+
+	const fileRef = await prisma.fileReference.create({
+		data: {
+			mimeType: mimeType,
+		},
+	});
+
+	const newFilename = uniqueFilename(fileRef.id, mimeType);
+	const filepath = path.join(
+		process.env.STORAGE_PATH || process.cwd() + '/storage',
+		newFilename
+	);
+	return fs.createWriteStream(filepath);
+}

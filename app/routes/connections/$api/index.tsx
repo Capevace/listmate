@@ -6,7 +6,7 @@ import {
 } from '~/models/resource/base/resource';
 import { createToken, findToken } from '~/models/source-token.server';
 import { requireUserId } from '~/session.server';
-import { authorizeClient, createApi } from '~/sync/spotify';
+import { authorizeClient, createApi } from '~/sync/spotify.server';
 
 type LoaderData = {
 	isConnected: boolean;

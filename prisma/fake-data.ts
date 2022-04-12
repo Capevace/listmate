@@ -13,6 +13,7 @@ export function generateArtist(): Artist {
 		id: faker.datatype.uuid(),
 		type: ResourceType.ARTIST,
 		title: name,
+		thumbnail: null,
 		values: {
 			name: { value: name },
 		},
@@ -26,6 +27,7 @@ export function generateSong(artist: Artist, album: Album): Song {
 		id: faker.datatype.uuid(),
 		type: ResourceType.SONG,
 		title: name,
+		thumbnail: null,
 		values: {
 			name: { value: name },
 			artist: composeRefFromResource<string>(artist),
@@ -44,6 +46,7 @@ export function generateAlbum(artist: Artist): {
 		id: faker.datatype.uuid(),
 		type: ResourceType.ALBUM,
 		title: name,
+		thumbnail: null,
 		values: {
 			name: { value: name },
 			artist: composeRefFromResource<string>(artist),

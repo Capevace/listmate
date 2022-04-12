@@ -1,4 +1,9 @@
-import { DataObject, DataObjectRemote, DataObjectValue } from '@prisma/client';
+import {
+	DataObject,
+	DataObjectRemote,
+	DataObjectValue,
+	FileReference,
+} from '@prisma/client';
 import {
 	dataObjectToAlbum,
 	dataObjectToArtist,
@@ -15,6 +20,7 @@ export type CompleteDataObjectValue = DataObjectValue & {
 export type CompleteDataObject = DataObject & {
 	remotes: DataObjectRemote[];
 	values: DataObjectValue[];
+	thumbnail: FileReference | null;
 };
 
 export function valueListToMap(values: DataObjectValue[]): ValueMap {
@@ -56,6 +62,7 @@ export function composeResourceBase<ForcedType extends ResourceType>(
 		id: dataObject.id,
 		title: dataObject.title,
 		type: stringToResourceType(dataObject.type) as ForcedType,
+		thumbnail: dataObject.thumbnail,
 		// api: stringToSourceType('local' /*api */) as ForcedSource,
 		values: {},
 	};

@@ -43,13 +43,20 @@ export async function upsertList({
 	description,
 	userId,
 	coverFileReferenceId,
-}: SetOptional<List, 'id' | 'coverFileReferenceId'>) {
+}: SetOptional<
+	List,
+	'id' | 'coverFileReferenceId' | 'createdAt' | 'updatedAt'
+>) {
+	/* If a ID is passed, we have this IF here.
+	 * Upsert requires the ID value, so it can be only called IF there is a ID.
+	 * Otherwise .create HAS to be used instead. */
 	if (id) {
 		return await prisma.list.upsert({
 			where: { id },
 			update: {
 				title,
 				description,
+				coverFileReferenceId,
 			},
 			create: {
 				id,
@@ -65,6 +72,7 @@ export async function upsertList({
 				id,
 				title,
 				description,
+				coverFileReferenceId,
 				userId: userId ?? undefined,
 			},
 		});

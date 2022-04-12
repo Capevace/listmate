@@ -1,0 +1,800 @@
+{
+	"href": "https://api.spotify.com/v1/users/capevace/playlists?offset=0&limit=20",
+	"items": [
+		{
+			"collaborative": false,
+			"description": "Chill music mix to study to.",
+			"external_urls": {
+				"spotify": "https://open.spotify.com/playlist/471N195f5jAVs086lzYglw"
+			},
+			"href": "https://api.spotify.com/v1/playlists/471N195f5jAVs086lzYglw",
+			"id": "471N195f5jAVs086lzYglw",
+			"images": [
+				{
+					"height": null,
+					"url": "https://i.scdn.co/image/ab67706c0000bebba957aa6e58da8418fcdc03b7",
+					"width": null
+				}
+			],
+			"name": "Study Music 2022",
+			"owner": {
+				"display_name": "Naeleck",
+				"external_urls": {
+					"spotify": "https://open.spotify.com/user/11124443444"
+				},
+				"href": "https://api.spotify.com/v1/users/11124443444",
+				"id": "11124443444",
+				"type": "user",
+				"uri": "spotify:user:11124443444"
+			},
+			"primary_color": null,
+			"public": false,
+			"snapshot_id": "MTc0MSxmNGIwYzZlNTg3OWIzM2UxMzZlYTAwZTMyZmU3ODhkN2EyNDM4Nzky",
+			"tracks": {
+				"href": "https://api.spotify.com/v1/playlists/471N195f5jAVs086lzYglw/tracks",
+				"total": 468
+			},
+			"type": "playlist",
+			"uri": "spotify:playlist:471N195f5jAVs086lzYglw"
+		},
+		{
+			"collaborative": false,
+			"description": "",
+			"external_urls": {
+				"spotify": "https://open.spotify.com/playlist/4BQK7tF1g66fC2dHikdasT"
+			},
+			"href": "https://api.spotify.com/v1/playlists/4BQK7tF1g66fC2dHikdasT",
+			"id": "4BQK7tF1g66fC2dHikdasT",
+			"images": [
+				{
+					"height": 640,
+					"url": "https://mosaic.scdn.co/640/ab67616d0000b27331ac4ea81876d18519e4b6ebab67616d0000b2735f9c08c7c4d2f37d5d73ce44ab67616d0000b273aa22899360d8ba6704732decab67616d0000b273f82c7e4376cf8267fb396b7d",
+					"width": 640
+				},
+				{
+					"height": 300,
+					"url": "https://mosaic.scdn.co/300/ab67616d0000b27331ac4ea81876d18519e4b6ebab67616d0000b2735f9c08c7c4d2f37d5d73ce44ab67616d0000b273aa22899360d8ba6704732decab67616d0000b273f82c7e4376cf8267fb396b7d",
+					"width": 300
+				},
+				{
+					"height": 60,
+					"url": "https://mosaic.scdn.co/60/ab67616d0000b27331ac4ea81876d18519e4b6ebab67616d0000b2735f9c08c7c4d2f37d5d73ce44ab67616d0000b273aa22899360d8ba6704732decab67616d0000b273f82c7e4376cf8267fb396b7d",
+					"width": 60
+				}
+			],
+			"name": "ultimate car ride",
+			"owner": {
+				"display_name": "capevace",
+				"external_urls": {
+					"spotify": "https://open.spotify.com/user/capevace"
+				},
+				"href": "https://api.spotify.com/v1/users/capevace",
+				"id": "capevace",
+				"type": "user",
+				"uri": "spotify:user:capevace"
+			},
+			"primary_color": null,
+			"public": false,
+			"snapshot_id": "MjEsYzA2MmIyM2MyZTk3MGM5YjUxMjgzMGYxMTE2NjJmOGFlZTU2ZTc4YQ==",
+			"tracks": {
+				"href": "https://api.spotify.com/v1/playlists/4BQK7tF1g66fC2dHikdasT/tracks",
+				"total": 18
+			},
+			"type": "playlist",
+			"uri": "spotify:playlist:4BQK7tF1g66fC2dHikdasT"
+		},
+		{
+			"collaborative": false,
+			"description": "",
+			"external_urls": {
+				"spotify": "https://open.spotify.com/playlist/4hFHiKS9FlqTQj9pvUQami"
+			},
+			"href": "https://api.spotify.com/v1/playlists/4hFHiKS9FlqTQj9pvUQami",
+			"id": "4hFHiKS9FlqTQj9pvUQami",
+			"images": [
+				{
+					"height": 640,
+					"url": "https://i.scdn.co/image/ab67616d0000b273423fc787b53e081679cfc4c0",
+					"width": 640
+				}
+			],
+			"name": "restin‘ ma balls",
+			"owner": {
+				"display_name": "capevace",
+				"external_urls": {
+					"spotify": "https://open.spotify.com/user/capevace"
+				},
+				"href": "https://api.spotify.com/v1/users/capevace",
+				"id": "capevace",
+				"type": "user",
+				"uri": "spotify:user:capevace"
+			},
+			"primary_color": null,
+			"public": false,
+			"snapshot_id": "NCw1YmIwOWI2NjcxNWY2ZWRiMWVhNjliZmFkMjg4MmNjN2NmZDY3ZWY2",
+			"tracks": {
+				"href": "https://api.spotify.com/v1/playlists/4hFHiKS9FlqTQj9pvUQami/tracks",
+				"total": 3
+			},
+			"type": "playlist",
+			"uri": "spotify:playlist:4hFHiKS9FlqTQj9pvUQami"
+		},
+		{
+			"collaborative": true,
+			"description": "für die brennende lunte im mund",
+			"external_urls": {
+				"spotify": "https://open.spotify.com/playlist/4Ih76FCCl6uZtN6bJNnXeh"
+			},
+			"href": "https://api.spotify.com/v1/playlists/4Ih76FCCl6uZtN6bJNnXeh",
+			"id": "4Ih76FCCl6uZtN6bJNnXeh",
+			"images": [
+				{
+					"height": null,
+					"url": "https://i.scdn.co/image/ab67706c0000bebb5803ee1eadfca1a250ca98f9",
+					"width": null
+				}
+			],
+			"name": "elegant kush puffen",
+			"owner": {
+				"display_name": "capevace",
+				"external_urls": {
+					"spotify": "https://open.spotify.com/user/capevace"
+				},
+				"href": "https://api.spotify.com/v1/users/capevace",
+				"id": "capevace",
+				"type": "user",
+				"uri": "spotify:user:capevace"
+			},
+			"primary_color": null,
+			"public": false,
+			"snapshot_id": "MTE2LGE1OTY2YzEwN2Y1Y2RmMDMwMTQ2YTI1YmYxN2FlNThjOGJiMjA4ZTU=",
+			"tracks": {
+				"href": "https://api.spotify.com/v1/playlists/4Ih76FCCl6uZtN6bJNnXeh/tracks",
+				"total": 74
+			},
+			"type": "playlist",
+			"uri": "spotify:playlist:4Ih76FCCl6uZtN6bJNnXeh"
+		},
+		{
+			"collaborative": false,
+			"description": "",
+			"external_urls": {
+				"spotify": "https://open.spotify.com/playlist/2wedd7RSWZizHaLCFsuy4s"
+			},
+			"href": "https://api.spotify.com/v1/playlists/2wedd7RSWZizHaLCFsuy4s",
+			"id": "2wedd7RSWZizHaLCFsuy4s",
+			"images": [
+				{
+					"height": 640,
+					"url": "https://mosaic.scdn.co/640/ab67616d0000b273163f08b7c440bf63093f172bab67616d0000b2732cfee669a03b506945c9ca1fab67616d0000b27342b60af393781ecdec90519aab67616d0000b273f5da2c149c9b9d25ed41a87d",
+					"width": 640
+				},
+				{
+					"height": 300,
+					"url": "https://mosaic.scdn.co/300/ab67616d0000b273163f08b7c440bf63093f172bab67616d0000b2732cfee669a03b506945c9ca1fab67616d0000b27342b60af393781ecdec90519aab67616d0000b273f5da2c149c9b9d25ed41a87d",
+					"width": 300
+				},
+				{
+					"height": 60,
+					"url": "https://mosaic.scdn.co/60/ab67616d0000b273163f08b7c440bf63093f172bab67616d0000b2732cfee669a03b506945c9ca1fab67616d0000b27342b60af393781ecdec90519aab67616d0000b273f5da2c149c9b9d25ed41a87d",
+					"width": 60
+				}
+			],
+			"name": "mmmh",
+			"owner": {
+				"display_name": "capevace",
+				"external_urls": {
+					"spotify": "https://open.spotify.com/user/capevace"
+				},
+				"href": "https://api.spotify.com/v1/users/capevace",
+				"id": "capevace",
+				"type": "user",
+				"uri": "spotify:user:capevace"
+			},
+			"primary_color": null,
+			"public": false,
+			"snapshot_id": "MzMsYjc1ODMwYTBiMzYzNDIwMGM2YmZlOGNkODQxNzYzNTk2MTAxNTg0ZA==",
+			"tracks": {
+				"href": "https://api.spotify.com/v1/playlists/2wedd7RSWZizHaLCFsuy4s/tracks",
+				"total": 28
+			},
+			"type": "playlist",
+			"uri": "spotify:playlist:2wedd7RSWZizHaLCFsuy4s"
+		},
+		{
+			"collaborative": false,
+			"description": "songs and their samples",
+			"external_urls": {
+				"spotify": "https://open.spotify.com/playlist/01CuRRoxPKmDgIXdGlLT0i"
+			},
+			"href": "https://api.spotify.com/v1/playlists/01CuRRoxPKmDgIXdGlLT0i",
+			"id": "01CuRRoxPKmDgIXdGlLT0i",
+			"images": [
+				{
+					"height": 640,
+					"url": "https://mosaic.scdn.co/640/ab67616d0000b2732acb820332d5f37cd536cc98ab67616d0000b273408c6751331cf3f40efb0c05ab67616d0000b2737de8fc83b1738ae5e41d970bab67616d0000b273b6f3ee6d2e2d45c0c34ff300",
+					"width": 640
+				},
+				{
+					"height": 300,
+					"url": "https://mosaic.scdn.co/300/ab67616d0000b2732acb820332d5f37cd536cc98ab67616d0000b273408c6751331cf3f40efb0c05ab67616d0000b2737de8fc83b1738ae5e41d970bab67616d0000b273b6f3ee6d2e2d45c0c34ff300",
+					"width": 300
+				},
+				{
+					"height": 60,
+					"url": "https://mosaic.scdn.co/60/ab67616d0000b2732acb820332d5f37cd536cc98ab67616d0000b273408c6751331cf3f40efb0c05ab67616d0000b2737de8fc83b1738ae5e41d970bab67616d0000b273b6f3ee6d2e2d45c0c34ff300",
+					"width": 60
+				}
+			],
+			"name": "samples",
+			"owner": {
+				"display_name": "capevace",
+				"external_urls": {
+					"spotify": "https://open.spotify.com/user/capevace"
+				},
+				"href": "https://api.spotify.com/v1/users/capevace",
+				"id": "capevace",
+				"type": "user",
+				"uri": "spotify:user:capevace"
+			},
+			"primary_color": null,
+			"public": true,
+			"snapshot_id": "ODAsOWE3OGZhMGUwYWExNDU2OWFiODViNzkyMzYyODUxMGI1YzM4YjM3Nw==",
+			"tracks": {
+				"href": "https://api.spotify.com/v1/playlists/01CuRRoxPKmDgIXdGlLT0i/tracks",
+				"total": 74
+			},
+			"type": "playlist",
+			"uri": "spotify:playlist:01CuRRoxPKmDgIXdGlLT0i"
+		},
+		{
+			"collaborative": false,
+			"description": "",
+			"external_urls": {
+				"spotify": "https://open.spotify.com/playlist/1KOQCQxxx5spoc8Cfrr8fw"
+			},
+			"href": "https://api.spotify.com/v1/playlists/1KOQCQxxx5spoc8Cfrr8fw",
+			"id": "1KOQCQxxx5spoc8Cfrr8fw",
+			"images": [
+				{
+					"height": 640,
+					"url": "https://mosaic.scdn.co/640/ab67616d0000b27350b5922bdf87ba4213b25234ab67616d0000b273aaedcd61fea6d0764fbbdcfdab67616d0000b273b219cfdd901872b475f422f6ab67616d0000b273bfa2701e56e8908d27c2b422",
+					"width": 640
+				},
+				{
+					"height": 300,
+					"url": "https://mosaic.scdn.co/300/ab67616d0000b27350b5922bdf87ba4213b25234ab67616d0000b273aaedcd61fea6d0764fbbdcfdab67616d0000b273b219cfdd901872b475f422f6ab67616d0000b273bfa2701e56e8908d27c2b422",
+					"width": 300
+				},
+				{
+					"height": 60,
+					"url": "https://mosaic.scdn.co/60/ab67616d0000b27350b5922bdf87ba4213b25234ab67616d0000b273aaedcd61fea6d0764fbbdcfdab67616d0000b273b219cfdd901872b475f422f6ab67616d0000b273bfa2701e56e8908d27c2b422",
+					"width": 60
+				}
+			],
+			"name": "fucked",
+			"owner": {
+				"display_name": "capevace",
+				"external_urls": {
+					"spotify": "https://open.spotify.com/user/capevace"
+				},
+				"href": "https://api.spotify.com/v1/users/capevace",
+				"id": "capevace",
+				"type": "user",
+				"uri": "spotify:user:capevace"
+			},
+			"primary_color": null,
+			"public": true,
+			"snapshot_id": "MjY4LGI1Yzc2ODgxYWQzYjNiZTAwNWYyYjU5MmRkYjU2NDJlMzVmOGU1ZjE=",
+			"tracks": {
+				"href": "https://api.spotify.com/v1/playlists/1KOQCQxxx5spoc8Cfrr8fw/tracks",
+				"total": 253
+			},
+			"type": "playlist",
+			"uri": "spotify:playlist:1KOQCQxxx5spoc8Cfrr8fw"
+		},
+		{
+			"collaborative": false,
+			"description": "The best tunes in jazz history. Cover: Ella Fitzgerald",
+			"external_urls": {
+				"spotify": "https://open.spotify.com/playlist/37i9dQZF1DXbITWG1ZJKYt"
+			},
+			"href": "https://api.spotify.com/v1/playlists/37i9dQZF1DXbITWG1ZJKYt",
+			"id": "37i9dQZF1DXbITWG1ZJKYt",
+			"images": [
+				{
+					"height": null,
+					"url": "https://i.scdn.co/image/ab67706f00000003b57ed5615313d29417b5ccdd",
+					"width": null
+				}
+			],
+			"name": "Jazz Classics",
+			"owner": {
+				"display_name": "Spotify",
+				"external_urls": {
+					"spotify": "https://open.spotify.com/user/spotify"
+				},
+				"href": "https://api.spotify.com/v1/users/spotify",
+				"id": "spotify",
+				"type": "user",
+				"uri": "spotify:user:spotify"
+			},
+			"primary_color": null,
+			"public": false,
+			"snapshot_id": "MTY0OTc1NDUxOCwwMDAwMDAwMGQ0MWQ4Y2Q5OGYwMGIyMDRlOTgwMDk5OGVjZjg0Mjdl",
+			"tracks": {
+				"href": "https://api.spotify.com/v1/playlists/37i9dQZF1DXbITWG1ZJKYt/tracks",
+				"total": 200
+			},
+			"type": "playlist",
+			"uri": "spotify:playlist:37i9dQZF1DXbITWG1ZJKYt"
+		},
+		{
+			"collaborative": false,
+			"description": "The bluesy side of jazz",
+			"external_urls": {
+				"spotify": "https://open.spotify.com/playlist/37i9dQZF1DX9GSZDbrndTa"
+			},
+			"href": "https://api.spotify.com/v1/playlists/37i9dQZF1DX9GSZDbrndTa",
+			"id": "37i9dQZF1DX9GSZDbrndTa",
+			"images": [
+				{
+					"height": null,
+					"url": "https://i.scdn.co/image/ab67706f00000003bdb3039e7c602922e4e1edcc",
+					"width": null
+				}
+			],
+			"name": "Jazz-Blues",
+			"owner": {
+				"display_name": "Spotify",
+				"external_urls": {
+					"spotify": "https://open.spotify.com/user/spotify"
+				},
+				"href": "https://api.spotify.com/v1/users/spotify",
+				"id": "spotify",
+				"type": "user",
+				"uri": "spotify:user:spotify"
+			},
+			"primary_color": null,
+			"public": false,
+			"snapshot_id": "MTY0OTc1NDUxOCwwMDAwMDAwMGQ0MWQ4Y2Q5OGYwMGIyMDRlOTgwMDk5OGVjZjg0Mjdl",
+			"tracks": {
+				"href": "https://api.spotify.com/v1/playlists/37i9dQZF1DX9GSZDbrndTa/tracks",
+				"total": 50
+			},
+			"type": "playlist",
+			"uri": "spotify:playlist:37i9dQZF1DX9GSZDbrndTa"
+		},
+		{
+			"collaborative": false,
+			"description": "The perfect backdrop to an evening spent relaxing in solitude.",
+			"external_urls": {
+				"spotify": "https://open.spotify.com/playlist/37i9dQZF1DX4wta20PHgwo"
+			},
+			"href": "https://api.spotify.com/v1/playlists/37i9dQZF1DX4wta20PHgwo",
+			"id": "37i9dQZF1DX4wta20PHgwo",
+			"images": [
+				{
+					"height": null,
+					"url": "https://i.scdn.co/image/ab67706f000000038dd2476df0b6af9c2a519ef6",
+					"width": null
+				}
+			],
+			"name": "Late Night Jazz",
+			"owner": {
+				"display_name": "Spotify",
+				"external_urls": {
+					"spotify": "https://open.spotify.com/user/spotify"
+				},
+				"href": "https://api.spotify.com/v1/users/spotify",
+				"id": "spotify",
+				"type": "user",
+				"uri": "spotify:user:spotify"
+			},
+			"primary_color": null,
+			"public": true,
+			"snapshot_id": "MTY0OTc1NDUxOCwwMDAwMDAwMGQ0MWQ4Y2Q5OGYwMGIyMDRlOTgwMDk5OGVjZjg0Mjdl",
+			"tracks": {
+				"href": "https://api.spotify.com/v1/playlists/37i9dQZF1DX4wta20PHgwo/tracks",
+				"total": 100
+			},
+			"type": "playlist",
+			"uri": "spotify:playlist:37i9dQZF1DX4wta20PHgwo"
+		},
+		{
+			"collaborative": false,
+			"description": "",
+			"external_urls": {
+				"spotify": "https://open.spotify.com/playlist/20lXmbSikUCeIqgngLrEEl"
+			},
+			"href": "https://api.spotify.com/v1/playlists/20lXmbSikUCeIqgngLrEEl",
+			"id": "20lXmbSikUCeIqgngLrEEl",
+			"images": [
+				{
+					"height": 640,
+					"url": "https://mosaic.scdn.co/640/ab67616d0000b27319b9fae8d9f602068a5a5557ab67616d0000b27358fbe9173dc784bc1f7f992fab67616d0000b2739a88a61e9fb51cce727b0f52ab67616d0000b273c6ab6ad6c392e4f8d1b5220b",
+					"width": 640
+				},
+				{
+					"height": 300,
+					"url": "https://mosaic.scdn.co/300/ab67616d0000b27319b9fae8d9f602068a5a5557ab67616d0000b27358fbe9173dc784bc1f7f992fab67616d0000b2739a88a61e9fb51cce727b0f52ab67616d0000b273c6ab6ad6c392e4f8d1b5220b",
+					"width": 300
+				},
+				{
+					"height": 60,
+					"url": "https://mosaic.scdn.co/60/ab67616d0000b27319b9fae8d9f602068a5a5557ab67616d0000b27358fbe9173dc784bc1f7f992fab67616d0000b2739a88a61e9fb51cce727b0f52ab67616d0000b273c6ab6ad6c392e4f8d1b5220b",
+					"width": 60
+				}
+			],
+			"name": "Blues Brothers",
+			"owner": {
+				"display_name": "capevace",
+				"external_urls": {
+					"spotify": "https://open.spotify.com/user/capevace"
+				},
+				"href": "https://api.spotify.com/v1/users/capevace",
+				"id": "capevace",
+				"type": "user",
+				"uri": "spotify:user:capevace"
+			},
+			"primary_color": null,
+			"public": true,
+			"snapshot_id": "MjcsMWNlZDQ2MzBiMjc4ZjE4YTBkOTg5MmMxZThjMGFjNWNkOWY0MTU1YQ==",
+			"tracks": {
+				"href": "https://api.spotify.com/v1/playlists/20lXmbSikUCeIqgngLrEEl/tracks",
+				"total": 21
+			},
+			"type": "playlist",
+			"uri": "spotify:playlist:20lXmbSikUCeIqgngLrEEl"
+		},
+		{
+			"collaborative": false,
+			"description": "A daily selection of relaxing Jazz &amp; Bossa Nova music - perfect to help you relax, study, work ",
+			"external_urls": {
+				"spotify": "https://open.spotify.com/playlist/3Rmm2mSbNVPtBZUqF3rBiN"
+			},
+			"href": "https://api.spotify.com/v1/playlists/3Rmm2mSbNVPtBZUqF3rBiN",
+			"id": "3Rmm2mSbNVPtBZUqF3rBiN",
+			"images": [
+				{
+					"height": null,
+					"url": "https://i.scdn.co/image/ab67706c0000bebbadc395e43d368cf9285af524",
+					"width": null
+				}
+			],
+			"name": "Relaxing Jazz Music",
+			"owner": {
+				"display_name": "Relax Music Records",
+				"external_urls": {
+					"spotify": "https://open.spotify.com/user/21uqxcssnyrcwtp7piwhjdm6y"
+				},
+				"href": "https://api.spotify.com/v1/users/21uqxcssnyrcwtp7piwhjdm6y",
+				"id": "21uqxcssnyrcwtp7piwhjdm6y",
+				"type": "user",
+				"uri": "spotify:user:21uqxcssnyrcwtp7piwhjdm6y"
+			},
+			"primary_color": null,
+			"public": false,
+			"snapshot_id": "MTg0LDVlMjViYmJkZmJjYjFlMzQ5OTc2MGFlZDE4OTdmNjkxNmM4MjI0ZmY=",
+			"tracks": {
+				"href": "https://api.spotify.com/v1/playlists/3Rmm2mSbNVPtBZUqF3rBiN/tracks",
+				"total": 74
+			},
+			"type": "playlist",
+			"uri": "spotify:playlist:3Rmm2mSbNVPtBZUqF3rBiN"
+		},
+		{
+			"collaborative": false,
+			"description": "fast jazz",
+			"external_urls": {
+				"spotify": "https://open.spotify.com/playlist/44ZRDviARnxXcX19cSrqK6"
+			},
+			"href": "https://api.spotify.com/v1/playlists/44ZRDviARnxXcX19cSrqK6",
+			"id": "44ZRDviARnxXcX19cSrqK6",
+			"images": [
+				{
+					"height": 640,
+					"url": "https://mosaic.scdn.co/640/ab67616d0000b27348927a22386a05c3491183f7ab67616d0000b273596c08aa51b71a1d0c4c630aab67616d0000b273a88281be332bee611196517aab67616d0000b273bb3ca42fa0a3f2f39143c9ab",
+					"width": 640
+				},
+				{
+					"height": 300,
+					"url": "https://mosaic.scdn.co/300/ab67616d0000b27348927a22386a05c3491183f7ab67616d0000b273596c08aa51b71a1d0c4c630aab67616d0000b273a88281be332bee611196517aab67616d0000b273bb3ca42fa0a3f2f39143c9ab",
+					"width": 300
+				},
+				{
+					"height": 60,
+					"url": "https://mosaic.scdn.co/60/ab67616d0000b27348927a22386a05c3491183f7ab67616d0000b273596c08aa51b71a1d0c4c630aab67616d0000b273a88281be332bee611196517aab67616d0000b273bb3ca42fa0a3f2f39143c9ab",
+					"width": 60
+				}
+			],
+			"name": "fast paced jazz",
+			"owner": {
+				"display_name": "Buğra Sarıaltun",
+				"external_urls": {
+					"spotify": "https://open.spotify.com/user/devemeve"
+				},
+				"href": "https://api.spotify.com/v1/users/devemeve",
+				"id": "devemeve",
+				"type": "user",
+				"uri": "spotify:user:devemeve"
+			},
+			"primary_color": null,
+			"public": false,
+			"snapshot_id": "MTI3LDgzZmJiMzcxOWQxNDZkMzFjZTFmOWIyYjU2MDFhNDUyNmU4ZmM5MTE=",
+			"tracks": {
+				"href": "https://api.spotify.com/v1/playlists/44ZRDviARnxXcX19cSrqK6/tracks",
+				"total": 89
+			},
+			"type": "playlist",
+			"uri": "spotify:playlist:44ZRDviARnxXcX19cSrqK6"
+		},
+		{
+			"collaborative": false,
+			"description": "Big bands, big sounds.",
+			"external_urls": {
+				"spotify": "https://open.spotify.com/playlist/37i9dQZF1DX6G7arXBXa3A"
+			},
+			"href": "https://api.spotify.com/v1/playlists/37i9dQZF1DX6G7arXBXa3A",
+			"id": "37i9dQZF1DX6G7arXBXa3A",
+			"images": [
+				{
+					"height": null,
+					"url": "https://i.scdn.co/image/ab67706f00000003978b67e2dce16fe7df5f2dc4",
+					"width": null
+				}
+			],
+			"name": "Big Band",
+			"owner": {
+				"display_name": "Spotify",
+				"external_urls": {
+					"spotify": "https://open.spotify.com/user/spotify"
+				},
+				"href": "https://api.spotify.com/v1/users/spotify",
+				"id": "spotify",
+				"type": "user",
+				"uri": "spotify:user:spotify"
+			},
+			"primary_color": null,
+			"public": false,
+			"snapshot_id": "MTY0OTc1NDUxOCwwMDAwMDAwMGQ0MWQ4Y2Q5OGYwMGIyMDRlOTgwMDk5OGVjZjg0Mjdl",
+			"tracks": {
+				"href": "https://api.spotify.com/v1/playlists/37i9dQZF1DX6G7arXBXa3A/tracks",
+				"total": 50
+			},
+			"type": "playlist",
+			"uri": "spotify:playlist:37i9dQZF1DX6G7arXBXa3A"
+		},
+		{
+			"collaborative": false,
+			"description": "",
+			"external_urls": {
+				"spotify": "https://open.spotify.com/playlist/2zlXTy3Y1KmzYZSM4Bu6V5"
+			},
+			"href": "https://api.spotify.com/v1/playlists/2zlXTy3Y1KmzYZSM4Bu6V5",
+			"id": "2zlXTy3Y1KmzYZSM4Bu6V5",
+			"images": [
+				{
+					"height": 640,
+					"url": "https://i.scdn.co/image/ab67616d0000b273a93a02d8fbe0c68d22859506",
+					"width": 640
+				}
+			],
+			"name": "solobelike",
+			"owner": {
+				"display_name": "capevace",
+				"external_urls": {
+					"spotify": "https://open.spotify.com/user/capevace"
+				},
+				"href": "https://api.spotify.com/v1/users/capevace",
+				"id": "capevace",
+				"type": "user",
+				"uri": "spotify:user:capevace"
+			},
+			"primary_color": null,
+			"public": false,
+			"snapshot_id": "NCxjNjUxMjFkOTVlNDE4Mjg2Nzk3NTVmYmMzZWJiMTIyMWFjYTQ1MzI0",
+			"tracks": {
+				"href": "https://api.spotify.com/v1/playlists/2zlXTy3Y1KmzYZSM4Bu6V5/tracks",
+				"total": 2
+			},
+			"type": "playlist",
+			"uri": "spotify:playlist:2zlXTy3Y1KmzYZSM4Bu6V5"
+		},
+		{
+			"collaborative": false,
+			"description": "a careful selection of funky basslines",
+			"external_urls": {
+				"spotify": "https://open.spotify.com/playlist/1mn5VqjkwqpixoJJAbd7qw"
+			},
+			"href": "https://api.spotify.com/v1/playlists/1mn5VqjkwqpixoJJAbd7qw",
+			"id": "1mn5VqjkwqpixoJJAbd7qw",
+			"images": [
+				{
+					"height": 640,
+					"url": "https://mosaic.scdn.co/640/ab67616d0000b273059c578abc8ca0d4c70cd467ab67616d0000b27332705f2d1763b4e63b8f2817ab67616d0000b2737ad7f144e38bfb9df2ad283eab67616d0000b273bb5b612ba6a4a1e4a8f38453",
+					"width": 640
+				},
+				{
+					"height": 300,
+					"url": "https://mosaic.scdn.co/300/ab67616d0000b273059c578abc8ca0d4c70cd467ab67616d0000b27332705f2d1763b4e63b8f2817ab67616d0000b2737ad7f144e38bfb9df2ad283eab67616d0000b273bb5b612ba6a4a1e4a8f38453",
+					"width": 300
+				},
+				{
+					"height": 60,
+					"url": "https://mosaic.scdn.co/60/ab67616d0000b273059c578abc8ca0d4c70cd467ab67616d0000b27332705f2d1763b4e63b8f2817ab67616d0000b2737ad7f144e38bfb9df2ad283eab67616d0000b273bb5b612ba6a4a1e4a8f38453",
+					"width": 60
+				}
+			],
+			"name": "bassbassbass",
+			"owner": {
+				"display_name": "capevace",
+				"external_urls": {
+					"spotify": "https://open.spotify.com/user/capevace"
+				},
+				"href": "https://api.spotify.com/v1/users/capevace",
+				"id": "capevace",
+				"type": "user",
+				"uri": "spotify:user:capevace"
+			},
+			"primary_color": null,
+			"public": false,
+			"snapshot_id": "MTcsYjkxM2MxOGU0Zjg0MDlmYTMzODg1YzJiNGE5YmEyYmE3NWQxNGM5Ng==",
+			"tracks": {
+				"href": "https://api.spotify.com/v1/playlists/1mn5VqjkwqpixoJJAbd7qw/tracks",
+				"total": 9
+			},
+			"type": "playlist",
+			"uri": "spotify:playlist:1mn5VqjkwqpixoJJAbd7qw"
+		},
+		{
+			"collaborative": false,
+			"description": "",
+			"external_urls": {
+				"spotify": "https://open.spotify.com/playlist/5AfR9yOAIFKdPooWKU2Yy9"
+			},
+			"href": "https://api.spotify.com/v1/playlists/5AfR9yOAIFKdPooWKU2Yy9",
+			"id": "5AfR9yOAIFKdPooWKU2Yy9",
+			"images": [
+				{
+					"height": null,
+					"url": "https://i.scdn.co/image/ab67706c0000bebb86442c1b0460f8af87403129",
+					"width": null
+				}
+			],
+			"name": "disko sessel",
+			"owner": {
+				"display_name": "capevace",
+				"external_urls": {
+					"spotify": "https://open.spotify.com/user/capevace"
+				},
+				"href": "https://api.spotify.com/v1/users/capevace",
+				"id": "capevace",
+				"type": "user",
+				"uri": "spotify:user:capevace"
+			},
+			"primary_color": null,
+			"public": true,
+			"snapshot_id": "OTIsNmUzMzExMDQyYTM4MGJlZWUxNmExMzM1YzFlZmFlMWZmYWRmZTQ5Mg==",
+			"tracks": {
+				"href": "https://api.spotify.com/v1/playlists/5AfR9yOAIFKdPooWKU2Yy9/tracks",
+				"total": 82
+			},
+			"type": "playlist",
+			"uri": "spotify:playlist:5AfR9yOAIFKdPooWKU2Yy9"
+		},
+		{
+			"collaborative": false,
+			"description": "funky songs to hit them pedals to",
+			"external_urls": {
+				"spotify": "https://open.spotify.com/playlist/36cv57L5QowQ7sDG456SIG"
+			},
+			"href": "https://api.spotify.com/v1/playlists/36cv57L5QowQ7sDG456SIG",
+			"id": "36cv57L5QowQ7sDG456SIG",
+			"images": [
+				{
+					"height": null,
+					"url": "https://i.scdn.co/image/ab67706c0000bebbca4a6c7f746d40edfab7fddb",
+					"width": null
+				}
+			],
+			"name": "funky riding",
+			"owner": {
+				"display_name": "capevace",
+				"external_urls": {
+					"spotify": "https://open.spotify.com/user/capevace"
+				},
+				"href": "https://api.spotify.com/v1/users/capevace",
+				"id": "capevace",
+				"type": "user",
+				"uri": "spotify:user:capevace"
+			},
+			"primary_color": null,
+			"public": true,
+			"snapshot_id": "MjA0LDFkOWIwZGI4ZGIxOTQyOWE2YWRhOTNhZThlOTJmMDdmMGJiOTg0MTY=",
+			"tracks": {
+				"href": "https://api.spotify.com/v1/playlists/36cv57L5QowQ7sDG456SIG/tracks",
+				"total": 121
+			},
+			"type": "playlist",
+			"uri": "spotify:playlist:36cv57L5QowQ7sDG456SIG"
+		},
+		{
+			"collaborative": false,
+			"description": "~Brazil~French~African~Classics~Funk~ The feel good sound inspired from 70s disco combined with the warm kick drum of modern house &amp; techno music. _____suggest? email to scholtenmyron@gmail.com",
+			"external_urls": {
+				"spotify": "https://open.spotify.com/playlist/58Yr7nIOxiOPT64NujfiXP"
+			},
+			"href": "https://api.spotify.com/v1/playlists/58Yr7nIOxiOPT64NujfiXP",
+			"id": "58Yr7nIOxiOPT64NujfiXP",
+			"images": [
+				{
+					"height": null,
+					"url": "https://i.scdn.co/image/ab67706c0000bebba1f86c202072fa30843048e2",
+					"width": null
+				}
+			],
+			"name": "Funky Disco House",
+			"owner": {
+				"display_name": "Myron Scholten",
+				"external_urls": {
+					"spotify": "https://open.spotify.com/user/1152012194"
+				},
+				"href": "https://api.spotify.com/v1/users/1152012194",
+				"id": "1152012194",
+				"type": "user",
+				"uri": "spotify:user:1152012194"
+			},
+			"primary_color": null,
+			"public": false,
+			"snapshot_id": "MjMxNiw4NzBkYjA4YjQ1ZDk2ZDhlMjRiM2ZhZTZmMmIxODdjMjliMTU3YzJj",
+			"tracks": {
+				"href": "https://api.spotify.com/v1/playlists/58Yr7nIOxiOPT64NujfiXP/tracks",
+				"total": 511
+			},
+			"type": "playlist",
+			"uri": "spotify:playlist:58Yr7nIOxiOPT64NujfiXP"
+		},
+		{
+			"collaborative": false,
+			"description": "New funky songs with a classic funky sound.",
+			"external_urls": {
+				"spotify": "https://open.spotify.com/playlist/37i9dQZF1DX4WgZiuR77Ef"
+			},
+			"href": "https://api.spotify.com/v1/playlists/37i9dQZF1DX4WgZiuR77Ef",
+			"id": "37i9dQZF1DX4WgZiuR77Ef",
+			"images": [
+				{
+					"height": null,
+					"url": "https://i.scdn.co/image/ab67706f000000031ef7bd677c0a00cb77f1b6e3",
+					"width": null
+				}
+			],
+			"name": "All Funked Up",
+			"owner": {
+				"display_name": "Spotify",
+				"external_urls": {
+					"spotify": "https://open.spotify.com/user/spotify"
+				},
+				"href": "https://api.spotify.com/v1/users/spotify",
+				"id": "spotify",
+				"type": "user",
+				"uri": "spotify:user:spotify"
+			},
+			"primary_color": null,
+			"public": false,
+			"snapshot_id": "MTY0OTM5MDUyMCwwMDAwMDA4YjAwMDAwMTgwMDc1NjA3MTAwMDAwMDE2ZDE1MjkwMTY0",
+			"tracks": {
+				"href": "https://api.spotify.com/v1/playlists/37i9dQZF1DX4WgZiuR77Ef/tracks",
+				"total": 75
+			},
+			"type": "playlist",
+			"uri": "spotify:playlist:37i9dQZF1DX4WgZiuR77Ef"
+		}
+	],
+	"limit": 20,
+	"next": "https://api.spotify.com/v1/users/capevace/playlists?offset=20&limit=20",
+	"offset": 0,
+	"previous": null,
+	"total": 128
+}
