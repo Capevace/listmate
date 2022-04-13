@@ -1,7 +1,6 @@
 import { prisma } from '~/db.server';
-import type { SourceType } from '~/models/resource/resource.server';
 import { User } from '~/models/user.server';
-
+import type { SourceType } from './resource/resource.types';
 export type { SourceToken } from '@prisma/client';
 
 export function createToken(userId: User['id'], api: SourceType) {

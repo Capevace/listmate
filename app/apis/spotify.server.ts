@@ -14,6 +14,7 @@ import {
 import {
 	Resource,
 	ResourceType,
+	ResourceWithoutDefaults,
 	SourceType,
 } from '~/models/resource/resource.types';
 import {
@@ -68,7 +69,7 @@ export function updateAPITokens(
 export async function importResource<RType extends Resource = Resource>(
 	api: SourceType,
 	uri: DataObjectRemote['uri'],
-	data: SetOptional<RType, 'id'>
+	data: ResourceWithoutDefaults
 ): Promise<RType> {
 	console.log('import', api, uri, data);
 

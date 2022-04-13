@@ -7,7 +7,7 @@ import {
 	DataObjectValueMap,
 	valuesToObject,
 } from '~/models/resource/adapters/adapters.server';
-import { ResourceType } from '~/models/resource/resource.server';
+import { ResourceType } from '~/models/resource/resource.types';
 import type { Song } from '~/models/resource/adapters/song/type';
 
 export async function dataObjectToSong(

@@ -82,6 +82,7 @@ export function composeResourceBase<ForcedType extends ResourceType>(
 		title: dataObject.title,
 		type: stringToResourceType(dataObject.type) as ForcedType,
 		thumbnail: dataObject.thumbnail,
+		isFavourite: dataObject.isFavourite,
 		// api: stringToSourceType('local' /*api */) as ForcedSource,
 		values: {},
 	};

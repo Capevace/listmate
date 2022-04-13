@@ -1,8 +1,8 @@
 import type { List, DataObjectRemote } from '@prisma/client';
+import type { Resource } from '~/models/resource/resource.types';
 
 import { prisma } from '~/db.server';
 import { dataObjectToResource } from '~/models/resource/adapters/adapters.server';
-import { Resource } from '~/models/resource/resource.server';
 
 export type { ListItem } from '@prisma/client';
 

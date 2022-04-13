@@ -7,7 +7,7 @@ import {
 	DataObjectValueMap,
 	valuesToObject,
 } from '~/models/resource/adapters/adapters.server';
-import { ResourceType } from '~/models/resource/resource.server';
+import { ResourceType } from '~/models/resource/resource.types';
 import type { Album } from '~/models/resource/adapters/album/type';
 
 export async function dataObjectToAlbum(

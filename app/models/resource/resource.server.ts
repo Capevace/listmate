@@ -4,7 +4,11 @@ import type {
 	FileReference,
 } from '@prisma/client';
 import type { Except } from 'type-fest';
-import type { Resource, SourceType } from '~/models/resource/resource.types';
+import type {
+	Resource,
+	ResourceWithoutDefaults,
+	SourceType,
+} from '~/models/resource/resource.types';
 
 import invariant from 'tiny-invariant';
 import { prisma as db } from '~/db.server';
@@ -79,13 +83,20 @@ export async function findResourceByRemoteUri(
  * @returns Promise<Resource>
  */
 export async function createResource(
-	resource: Except<Resource, 'id'>
+	customResource: ResourceWithoutDefaults
 ): Promise<Resource> {
+	const resource: Except<Resource, 'id'> = {
+		isFavourite: false,
+		thumbnail: null,
+		...customResource,
+	};
+
 	const dataObject = await db.dataObject.create({
 		data: {
 			title: resource.title,
 			type: resource.type,
 			thumbnailFileId: resource.thumbnail?.id || null,
+			isFavourite: resource.isFavourite,
 		},
 	});
 
@@ -129,12 +140,14 @@ export async function upsertResource(resource: Resource): Promise<Resource> {
 		update: {
 			title: resource.title,
 			type: resource.type,
+			isFavourite: resource.isFavourite,
 			thumbnailFileId: resource.thumbnail?.id || null,
 		},
 		create: {
 			id: resource.id,
 			title: resource.title,
 			type: resource.type,
+			isFavourite: resource.isFavourite,
 			thumbnailFileId: resource.thumbnail?.id || null,
 		},
 		include: {
@@ -258,6 +271,27 @@ export function attachThumbnailToResource(
 		},
 		data: {
 			thumbnailFileId: fileRef.id,
+		},
+	});
+}
+
+/**
+ * Attach a FileReference to a resource as a thumbnail
+ *
+ * @param resourceId The ID of the Resource to add
+ * @param isFavourite Wether to set the resource as a favourite or not
+ * @returns Promise<DataObject>
+ */
+export function setFavouriteStatus(
+	resourceId: string,
+	isFavourite: boolean
+): Promise<DataObject> {
+	return db.dataObject.update({
+		where: {
+			id: resourceId,
+		},
+		data: {
+			isFavourite,
 		},
 	});
 }

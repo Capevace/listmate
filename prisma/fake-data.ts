@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker';
 import type { List } from '~/models/list.server';
 import { composeRefFromResource } from '~/models/resource/adapters/adapters.server';
 import type { Album, Artist, Song } from '~/models/resource/adapters/types';
-import { ResourceType } from '~/models/resource/resource.server';
+import { ResourceType } from '~/models/resource/resource.types';
 
 export function generateArtist(): Artist {
 	const name = faker.name.findName();
@@ -11,6 +11,7 @@ export function generateArtist(): Artist {
 		id: faker.datatype.uuid(),
 		type: ResourceType.ARTIST,
 		title: name,
+		isFavourite: false,
 		thumbnail: null,
 		values: {
 			name: { value: name },
@@ -26,6 +27,7 @@ export function generateSong(artist: Artist, album: Album): Song {
 		type: ResourceType.SONG,
 		title: name,
 		thumbnail: null,
+		isFavourite: false,
 		values: {
 			name: { value: name },
 			artist: composeRefFromResource<string>(artist),
@@ -45,6 +47,7 @@ export function generateAlbum(artist: Artist): {
 		type: ResourceType.ALBUM,
 		title: name,
 		thumbnail: null,
+		isFavourite: false,
 		values: {
 			name: { value: name },
 			artist: composeRefFromResource<string>(artist),

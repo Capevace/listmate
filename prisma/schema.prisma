@@ -96,8 +96,9 @@ model DataObject {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    title String
-    type  String // song, video, file 
+    title       String
+    type        String // song, video, file 
+    isFavourite Boolean @default(false)
 
     thumbnail       FileReference? @relation(fields: [thumbnailFileId], references: [id])
     thumbnailFileId String?

@@ -1,3 +1,5 @@
+import { Except, SetOptional } from 'type-fest';
+
 export * from '~/models/resource/adapters/types';
 
 /**
@@ -10,9 +12,19 @@ export type Resource = {
 	id: string;
 	title: string; // always available string, most basic representation of item
 	type: ResourceType;
+	isFavourite: boolean;
 	values: ResourceValues;
 	thumbnail: ResourceFile | null;
 };
+
+/**
+ * This type of Resource makes certain properties optional.
+ * Functions can use this to provide default values for some properties.
+ */
+export type ResourceWithoutDefaults = SetOptional<
+	Except<Resource, 'id'>,
+	'isFavourite' | 'thumbnail'
+>;
 
 /**
  * ResourceType expresses what kind of resource it is.
