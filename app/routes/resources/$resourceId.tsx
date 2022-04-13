@@ -3,8 +3,9 @@ import { redirect } from 'remix';
 import { json, useLoaderData, useCatch } from 'remix';
 import invariant from 'tiny-invariant';
 import { requireUserId } from '~/session.server';
-import ResourceViewer from '~/components/resource/resource-viewer';
-import { findResourceById, Resource } from '~/models/resource/resource.server';
+import ResourceView from '~/components/views/resource-view';
+import { findResourceById } from '~/models/resource/resource.server';
+import { Resource } from '~/models/resource/resource.types';
 
 type LoaderData = {
 	resource: Resource;
@@ -38,7 +39,7 @@ export default function ResourceDetailsPage() {
 
 	return (
 		<div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-			<ResourceViewer resource={data.resource} />
+			<ResourceView resource={data.resource} />
 		</div>
 	);
 }
