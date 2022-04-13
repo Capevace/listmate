@@ -3,7 +3,7 @@ import invariant from 'tiny-invariant';
 import {
 	SourceType,
 	stringToSourceType,
-} from '~/models/resource/resource.server';
+} from '~/models/resource/resource.types';
 import { createToken, findToken } from '~/models/source-token.server';
 import { requireUserId } from '~/session.server';
 import { authorizeClient, createApi } from '~/apis/spotify.server';

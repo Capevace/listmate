@@ -10,15 +10,6 @@ import invariant from 'tiny-invariant';
 import { prisma as db } from '~/db.server';
 import { dataObjectToResource } from '~/models/resource/adapters/adapters.server';
 
-export type {
-	RawValue,
-	Resource,
-	ValueRef,
-	ResourceValues,
-	ResourceFile,
-} from '~/models/resource/resource.types';
-export * from '~/models/resource/resource.types';
-
 //
 // READ
 //

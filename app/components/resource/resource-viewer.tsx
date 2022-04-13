@@ -2,7 +2,7 @@ import {
 	Resource,
 	ResourceType,
 	ValueRef,
-} from '~/models/resource/resource.server';
+} from '~/models/resource/resource.types';
 import capitalize from '~/utilities/capitalize';
 import ResourceValueLabel from '~/components/common/resource-value-label';
 

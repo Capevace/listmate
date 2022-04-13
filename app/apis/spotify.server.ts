@@ -10,10 +10,12 @@ import {
 	attachRemoteUri,
 	createResource,
 	findResourceByRemoteUri,
+} from '~/models/resource/resource.server';
+import {
 	Resource,
 	ResourceType,
 	SourceType,
-} from '~/models/resource/resource.server';
+} from '~/models/resource/resource.types';
 import {
 	findToken,
 	SourceToken,

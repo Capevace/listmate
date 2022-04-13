@@ -17,7 +17,7 @@ import {
 	ResourceType,
 	stringToResourceType,
 	ValueRef,
-} from '~/models/resource/resource.server';
+} from '~/models/resource/resource.types';
 
 /**
  * Convert a DataObject to a resource.

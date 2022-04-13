@@ -7,7 +7,7 @@ import {
 	ALL_SOURCE_TYPES,
 	SourceType,
 	stringToSourceType,
-} from '~/models/resource/resource.server';
+} from '~/models/resource/resource.types';
 
 type Token = {
 	id: SourceToken['id'];

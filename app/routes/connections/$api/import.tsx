@@ -24,7 +24,7 @@ import { requireUserId } from '~/session.server';
 import {
 	SourceType,
 	stringToSourceType,
-} from '~/models/resource/resource.server';
+} from '~/models/resource/resource.types';
 import {
 	authorizeClient,
 	createApi,
