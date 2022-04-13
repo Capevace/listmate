@@ -1,13 +1,13 @@
 import { Button } from '@mantine/core';
 import { Link, LoaderFunction, useLoaderData, json, Outlet } from 'remix';
+import capitalize from '~/utilities/capitalize';
+import { requireUserId } from '~/session.server';
+import { findTokens, SourceToken } from '~/models/source-token.server';
 import {
 	ALL_SOURCE_TYPES,
 	SourceType,
 	stringToSourceType,
-} from '~/models/resource/base/resource';
-import { findTokens, SourceToken } from '~/models/source-token.server';
-import { requireUserId } from '~/session.server';
-import capitalize from '~/utilities/capitalize';
+} from '~/models/resource/resource.server';
 
 type Token = {
 	id: SourceToken['id'];

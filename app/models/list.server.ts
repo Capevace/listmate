@@ -1,7 +1,7 @@
 import type { User, List } from '@prisma/client';
 import { SetOptional } from 'type-fest';
 import { prisma } from '~/db.server';
-import { ListItemData } from './item.server';
+import { ListItemData } from '~/models/item.server';
 
 export type { List } from '@prisma/client';
 

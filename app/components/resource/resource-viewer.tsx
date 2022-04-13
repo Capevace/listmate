@@ -2,9 +2,9 @@ import {
 	Resource,
 	ResourceType,
 	ValueRef,
-} from '~/models/resource/base/resource';
+} from '~/models/resource/resource.server';
 import capitalize from '~/utilities/capitalize';
-import ResourceValueLabel from '../common/resource-value-label';
+import ResourceValueLabel from '~/components/common/resource-value-label';
 
 function GenericDetails({ resource }: { resource: Resource }) {
 	const valueList = Object.entries(resource.values);

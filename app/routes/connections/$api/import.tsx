@@ -6,25 +6,30 @@ import {
 	useLoaderData,
 	Form,
 } from 'remix';
+import {
+	Modal,
+	Button,
+	Group,
+	TransferList,
+	TransferListData,
+	TransferListItem,
+} from '@mantine/core';
+import { useState } from 'react';
+import { useNavigate } from 'react-router';
 import invariant from 'tiny-invariant';
+
+import capitalize from '~/utilities/capitalize';
+import { findToken } from '~/models/source-token.server';
+import { requireUserId } from '~/session.server';
 import {
 	SourceType,
 	stringToSourceType,
-} from '~/models/resource/base/resource';
-import { findToken, invalidateToken } from '~/models/source-token.server';
-import { requireUserId } from '~/session.server';
-import { Modal, Button, Group, TransferListItem } from '@mantine/core';
-import { useNavigate } from 'react-router';
-import capitalize from '~/utilities/capitalize';
+} from '~/models/resource/resource.server';
 import {
 	authorizeClient,
 	createApi,
 	importPlaylist,
-} from '~/sync/spotify.server';
-import { TransferList, TransferListData } from '@mantine/core';
-
-import { SpotifyPlaylist } from '~/sync/types';
-import { useState } from 'react';
+} from '~/apis/spotify.server';
 
 type LoaderData = {
 	type: SourceType;
@@ -70,12 +75,13 @@ export const action: ActionFunction = async ({ request, params }) => {
 
 	const playlistIds = formData.getAll('playlistIds[]');
 
+	let lastPlaylist = null;
 	for (const id of playlistIds) {
-		const playlist = await importPlaylist(api, userId, String(id));
-		console.log(playlist, id);
+		lastPlaylist = await importPlaylist(api, userId, String(id));
+		console.log('Imported playlist', lastPlaylist, id);
 	}
 
-	return redirect('/connections');
+	return redirect(lastPlaylist ? `/lists/${lastPlaylist.id}` : '/connections');
 };
 
 export default function ResourcesPage() {

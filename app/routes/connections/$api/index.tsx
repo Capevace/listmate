@@ -3,10 +3,10 @@ import invariant from 'tiny-invariant';
 import {
 	SourceType,
 	stringToSourceType,
-} from '~/models/resource/base/resource';
+} from '~/models/resource/resource.server';
 import { createToken, findToken } from '~/models/source-token.server';
 import { requireUserId } from '~/session.server';
-import { authorizeClient, createApi } from '~/sync/spotify.server';
+import { authorizeClient, createApi } from '~/apis/spotify.server';
 
 type LoaderData = {
 	isConnected: boolean;

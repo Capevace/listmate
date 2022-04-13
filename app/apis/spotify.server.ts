@@ -5,15 +5,15 @@ import { SetOptional } from 'type-fest';
 import { saveFile } from '~/models/file.server';
 import { addResourceToList } from '~/models/item.server';
 import { upsertList } from '~/models/list.server';
-import { Album, Artist, Song } from '~/models/resource/base/music';
+import { Album, Artist, Song } from '~/models/resource/adapters/types';
 import {
 	attachRemoteUri,
 	createResource,
-	getResourceByRemoteUri,
+	findResourceByRemoteUri,
 	Resource,
 	ResourceType,
 	SourceType,
-} from '~/models/resource/base/resource';
+} from '~/models/resource/resource.server';
 import {
 	findToken,
 	SourceToken,
@@ -70,7 +70,7 @@ export async function importResource<RType extends Resource = Resource>(
 ): Promise<RType> {
 	console.log('import', api, uri, data);
 
-	let previousResource = await getResourceByRemoteUri(api, uri);
+	let previousResource = await findResourceByRemoteUri(api, uri);
 
 	if (previousResource) {
 		return previousResource as RType;

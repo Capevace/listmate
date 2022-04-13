@@ -1,6 +1,6 @@
 import { prisma } from '~/db.server';
-import type { SourceType } from './resource/base/resource';
-import { User } from './user.server';
+import type { SourceType } from '~/models/resource/resource.server';
+import { User } from '~/models/user.server';
 
 export type { SourceToken } from '@prisma/client';
 

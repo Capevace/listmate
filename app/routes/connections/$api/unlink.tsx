@@ -10,7 +10,7 @@ import invariant from 'tiny-invariant';
 import {
 	SourceType,
 	stringToSourceType,
-} from '~/models/resource/base/resource';
+} from '~/models/resource/resource.server';
 import { findToken, invalidateToken } from '~/models/source-token.server';
 import { requireUserId } from '~/session.server';
 import { Modal, Button, Group } from '@mantine/core';

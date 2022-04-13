@@ -1,15 +1,10 @@
 import type { LoaderFunction, ActionFunction } from 'remix';
 import { redirect } from 'remix';
-import { json, useLoaderData, useCatch, Form } from 'remix';
+import { json, useLoaderData, useCatch } from 'remix';
 import invariant from 'tiny-invariant';
-import { getList } from '~/models/list.server';
-import { getItemsForList } from '~/models/item.server';
 import { requireUserId } from '~/session.server';
-import ResourceViewer, {
-	ResourceHeader,
-} from '~/components/resource/resource-viewer';
-import { getResourceById, Resource } from '~/models/resource/base/resource';
-import capitalize from '~/utilities/capitalize';
+import ResourceViewer from '~/components/resource/resource-viewer';
+import { findResourceById, Resource } from '~/models/resource/resource.server';
 
 type LoaderData = {
 	resource: Resource;
@@ -20,7 +15,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
 	invariant(params.resourceId, 'resourceId not found');
 
-	const resource = await getResourceById(params.resourceId);
+	const resource = await findResourceById(params.resourceId);
 
 	if (!resource) {
 		throw new Response('Not Found', { status: 404 });
@@ -30,7 +25,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 };
 
 export const action: ActionFunction = async ({ request, params }) => {
-	const userId = await requireUserId(request);
+	await requireUserId(request);
 	invariant(params.listId, 'listId not found');
 
 	// await c({ userId, id: params.listId });

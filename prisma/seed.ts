@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { addResourceToList } from '~/models/item.server';
 import { upsertList } from '~/models/list.server';
-import { createResources } from '~/models/resource/base/resource';
+import { upsertResources } from '~/models/resource/resource.server';
 import { generateLibrary } from './fake-data';
 import fs from 'fs/promises';
 import { saveFile } from '~/models/file.server';
@@ -135,9 +135,9 @@ const seed = async () => {
 
 	const library = await generateLibrary(user.id, 3);
 
-	await createResources(library.artists);
-	await createResources(library.albums);
-	await createResources(library.songs);
+	await upsertResources(library.artists);
+	await upsertResources(library.albums);
+	await upsertResources(library.songs);
 
 	for (const playlist of library.lists) {
 		const list = await upsertList({

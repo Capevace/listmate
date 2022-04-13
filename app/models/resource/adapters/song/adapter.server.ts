@@ -1,0 +1,33 @@
+import invariant from 'tiny-invariant';
+
+import {
+	CompleteDataObject,
+	composeRefFromValue,
+	composeResourceBase,
+	DataObjectValueMap,
+	valuesToObject,
+} from '~/models/resource/adapters/adapters.server';
+import { ResourceType } from '~/models/resource/resource.server';
+import type { Song } from '~/models/resource/adapters/song/type';
+
+export async function dataObjectToSong(
+	dataObject: CompleteDataObject,
+	values?: DataObjectValueMap
+): Promise<Song> {
+	values = values ?? valuesToObject(dataObject.values);
+
+	const name = composeRefFromValue<string>(values.name);
+
+	invariant(name, 'Missing name');
+
+	return {
+		...composeResourceBase<ResourceType.SONG>(dataObject),
+		// additional spotify-specific fields
+		values: {
+			name,
+			artist: composeRefFromValue<string>(values.artist),
+			album: composeRefFromValue<string>(values.album),
+		},
+		// artist: values.has('artist') ? values.get('artist') : undefined,
+	};
+}

@@ -1,10 +1,8 @@
 import { faker } from '@faker-js/faker';
 import type { List } from '~/models/list.server';
-import type { Album, Artist, Song } from '~/models/resource/base/music';
-import {
-	composeRefFromResource,
-	ResourceType,
-} from '~/models/resource/base/resource';
+import { composeRefFromResource } from '~/models/resource/adapters/adapters.server';
+import type { Album, Artist, Song } from '~/models/resource/adapters/types';
+import { ResourceType } from '~/models/resource/resource.server';
 
 export function generateArtist(): Artist {
 	const name = faker.name.findName();

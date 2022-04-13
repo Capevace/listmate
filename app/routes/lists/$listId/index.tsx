@@ -7,8 +7,8 @@ import type { ListItemData } from '~/models/item.server';
 import { getList } from '~/models/list.server';
 import { getItemsForList } from '~/models/item.server';
 import { requireUserId } from '~/session.server';
-import { ResourceType } from '~/models/resource/base/resource';
-import { Song } from '~/models/resource/base/music';
+import { ResourceType } from '~/models/resource/resource.server';
+import { Song } from '~/models/resource/adapters/types';
 import { Button } from '@mantine/core';
 
 import { PlayIcon, PlusIcon, DotsHorizontalIcon } from '@heroicons/react/solid';

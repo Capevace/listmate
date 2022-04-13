@@ -1,5 +1,5 @@
 import { Link } from 'remix';
-import type { ValueRef } from '~/models/resource/base/resource';
+import type { ValueRef } from '~/models/resource/resource.server';
 
 export type ResourceValueLabelProps = {
 	valueRef: ValueRef<string> | null;
