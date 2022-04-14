@@ -1,4 +1,4 @@
-# Listmate
+# Listmate (alpha pre-release)
 
 ![Early listmate build](resources/header.png)
 
