@@ -7,9 +7,10 @@ import SongRow from './rows/song-row';
 export type ItemListProps = {
 	list: List;
 	items: ListItemData[];
+	onFavourite: (item: ListItemData) => void;
 };
 
-export default function ItemList({ list, items }: ItemListProps) {
+export default function ItemList({ list, items, onFavourite }: ItemListProps) {
 	return (
 		<ul className="flex w-full flex-col px-10">
 			{items.map((item) => {
@@ -20,6 +21,7 @@ export default function ItemList({ list, items }: ItemListProps) {
 								key={item.id}
 								list={list}
 								item={item as ListItemData<Song>}
+								onFavourite={onFavourite}
 							/>
 						);
 					default:

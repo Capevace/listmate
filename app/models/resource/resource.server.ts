@@ -282,18 +282,25 @@ export function attachThumbnailToResource(
  * @param isFavourite Wether to set the resource as a favourite or not
  * @returns Promise<DataObject>
  */
-export function setFavouriteStatus(
+export async function setFavouriteStatus(
 	resourceId: string,
 	isFavourite: boolean
-): Promise<DataObject> {
-	return db.dataObject.update({
-		where: {
-			id: resourceId,
-		},
-		data: {
-			isFavourite,
-		},
-	});
+): Promise<Resource> {
+	return dataObjectToResource(
+		await db.dataObject.update({
+			where: {
+				id: resourceId,
+			},
+			data: {
+				isFavourite,
+			},
+			include: {
+				remotes: true,
+				values: true,
+				thumbnail: true,
+			},
+		})
+	);
 }
 
 //##
