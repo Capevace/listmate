@@ -6,6 +6,10 @@
 
 <br>
 
+---
+
+<br>
+
 ## Concepts
 
 ### Everything is a DataObject / Resource
@@ -57,6 +61,8 @@ _In the future, we may provide two-way syncing with selected providers, as not a
   ```
 
 This starts your app in development mode, rebuilding assets on file changes.
+
+<br><br>
 
 ## GitHub Actions
 
