@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { Form, useNavigate } from 'remix';
+import { Form, useNavigate, useTransition } from 'remix';
 import { SourceType } from '~/models/resource/resource.types';
 import capitalize from '~/utilities/capitalize';
 import {
 	Button,
 	Group,
+	LoadingOverlay,
 	Modal,
 	TransferList,
 	TransferListData,
@@ -18,6 +19,9 @@ export type ImportModalProps = {
 
 export default function ImportModal({ type, playlists }: ImportModalProps) {
 	const navigate = useNavigate();
+	const transition = useTransition();
+	const isLoading = transition.state !== 'idle';
+
 	const [userPlaylists, setUserPlaylists] = useState(
 		playlists.map((playlist) => ({
 			label: playlist.name,
@@ -48,14 +52,15 @@ export default function ImportModal({ type, playlists }: ImportModalProps) {
 	return (
 		<Modal
 			opened={true}
-			onClose={() => navigate(-1)}
+			onClose={() => (!isLoading ? navigate(-1) : null)}
 			title={`${capitalize(type)} Resources`}
 			size="100%"
 			classNames={{
-				modal: 'w-full max-w-2xl',
+				modal: 'w-full max-w-2xl relative',
 			}}
 		>
-			<pre>{JSON.stringify(selectedPlaylists, null, 2)}</pre>
+			<LoadingOverlay visible={isLoading} />
+
 			<TransferList
 				value={[userPlaylists, selectedPlaylists]}
 				searchPlaceholder="Search..."
@@ -64,6 +69,7 @@ export default function ImportModal({ type, playlists }: ImportModalProps) {
 				breakpoint="sm"
 				onChange={updatePlaylists}
 				className="mb-5"
+				aria-disabled={true}
 			/>
 
 			<Group position="right">
@@ -81,7 +87,7 @@ export default function ImportModal({ type, playlists }: ImportModalProps) {
 						/>
 					))}
 
-					<Button type="submit" variant="filled">
+					<Button type="submit" variant="filled" loading={isLoading}>
 						Import playlists
 					</Button>
 				</Form>

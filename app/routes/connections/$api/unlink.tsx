@@ -5,6 +5,7 @@ import {
 	json,
 	useLoaderData,
 	Form,
+	useNavigate,
 } from 'remix';
 import invariant from 'tiny-invariant';
 import {
@@ -14,7 +15,6 @@ import {
 import { findToken, invalidateToken } from '~/models/source-token.server';
 import { requireUserId } from '~/session.server';
 import { Modal, Button, Group } from '@mantine/core';
-import { useNavigate } from 'react-router';
 
 type LoaderData = {
 	type: SourceType;
@@ -53,23 +53,25 @@ export default function UnlinkPage() {
 	const navigate = useNavigate();
 
 	return (
-		<Modal
-			opened={true}
-			onClose={() => navigate(-1)}
-			title={`Unlink ${data.type}`}
-		>
-			<p className="mb-4">Are you sure you want to unlink this connection?</p>
+		<div>
+			<Modal
+				opened={true}
+				onClose={() => navigate(-1)}
+				title={`Unlink ${data.type}`}
+			>
+				<p className="mb-4">Are you sure you want to unlink this connection?</p>
 
-			<Group position="right">
-				<Button variant="subtle" color="gray" onClick={() => navigate(-1)}>
-					No, go back
-				</Button>
-				<Form method="post">
-					<Button type="submit" variant="filled" color="red">
-						Yes, unlink
+				<Group position="right">
+					<Button variant="subtle" color="gray" onClick={() => navigate(-1)}>
+						No, go back
 					</Button>
-				</Form>
-			</Group>
-		</Modal>
+					<Form method="post">
+						<Button type="submit" variant="filled" color="red">
+							Yes, unlink
+						</Button>
+					</Form>
+				</Group>
+			</Modal>
+		</div>
 	);
 }

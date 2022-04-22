@@ -1,24 +1,7 @@
-import {
-	redirect,
-	ActionFunction,
-	LoaderFunction,
-	json,
-	useLoaderData,
-} from 'remix';
+import { redirect, ActionFunction, json } from 'remix';
 import invariant from 'tiny-invariant';
 
 import { requireUserId } from '~/session.server';
-import ImportModal from '~/components/views/import-modal';
-import { findToken } from '~/models/source-token.server';
-import {
-	SourceType,
-	stringToSourceType,
-} from '~/models/resource/resource.types';
-import {
-	authorizeClient,
-	createApi,
-	importPlaylist,
-} from '~/apis/spotify.server';
 import {
 	findResourceById,
 	setFavouriteStatus,
@@ -36,7 +19,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 	}
 
 	const formData = await request.formData();
-	const isFavourite = formData.get('favourite');
+	const isFavourite = formData.get('isFavourite');
 	const redirectTo = formData.get('redirectTo');
 
 	invariant(isFavourite, 'You need to specify favourite status');

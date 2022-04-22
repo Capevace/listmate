@@ -30,7 +30,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 	const userId = await requireUserId(request);
 
 	let data: LoaderData = {
-		activeType: !params.api ? undefined : stringToSourceType(params.api),
 		tokens: ALL_SOURCE_TYPES.reduce((all, type) => {
 			all[type] = {
 				type: stringToSourceType(type),
@@ -44,13 +43,10 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
 	for (const token of tokens) {
 		if (token && token.data) {
-			let tokenData = {
+			data.tokens[token.api].token = {
 				id: token.id,
-				api: token.api,
 				expiresAt: token.expiresAt || null,
 			};
-
-			data.tokens[token.api].token = tokenData;
 		}
 	}
 
@@ -60,18 +56,15 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 function ConnectRow({
 	type,
 	token,
-	active,
 }: {
 	type: SourceType;
 	token: Token | null;
-	active?: boolean;
 }) {
 	return (
 		<div className="flex flex-col rounded-xl border border-gray-800  px-5 py-3">
 			<div className="flex items-center justify-between">
 				<div className="flex flex-col gap-3">
 					<h1 className="text-xl font-bold">{capitalize(type)} Settings</h1>
-					{active ? <Outlet /> : null}
 				</div>
 
 				<div className="grid grid-cols-3 items-center justify-end gap-4 font-semibold text-gray-400">
@@ -130,7 +123,7 @@ function ConnectRow({
 }
 
 export default function ConnectIndexPage() {
-	const { tokens, activeType } = useLoaderData() as LoaderData;
+	const { tokens } = useLoaderData() as LoaderData;
 
 	return (
 		<div className="flex flex-col gap-5 px-10 py-8">
@@ -144,11 +137,11 @@ export default function ConnectIndexPage() {
 							key={token.type}
 							type={token.type}
 							token={token.token}
-							active={type === activeType}
 						/>
 					);
 				})}
 			</div>
+			<Outlet />
 		</div>
 	);
 }
