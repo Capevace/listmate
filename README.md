@@ -1,8 +1,12 @@
-# Listmate
+# Listmate (alpha pre-release)
 
 ![Early listmate build](resources/header.png)
 
 > A web application to manage your **_music, videos, bookmarks and more_** by synchornizing your lists with external services like **_YouTube, Spotify or Pocket_**.
+
+<br>
+
+---
 
 <br>
 
@@ -57,6 +61,8 @@ _In the future, we may provide two-way syncing with selected providers, as not a
   ```
 
 This starts your app in development mode, rebuilding assets on file changes.
+
+<br><br>
 
 ## GitHub Actions
 
