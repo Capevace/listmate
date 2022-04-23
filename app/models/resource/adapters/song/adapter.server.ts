@@ -10,10 +10,10 @@ import {
 import { ResourceType } from '~/models/resource/resource.types';
 import type { Song } from '~/models/resource/adapters/song/type';
 
-export async function dataObjectToSong(
+export function dataObjectToSong(
 	dataObject: CompleteDataObject,
 	values?: DataObjectValueMap
-): Promise<Song> {
+): Song {
 	values = values ?? valuesToObject(dataObject.values);
 
 	const name = composeRefFromValue<string>(values.name);

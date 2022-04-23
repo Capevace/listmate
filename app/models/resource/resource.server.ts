@@ -6,6 +6,7 @@ import type {
 import type { Except } from 'type-fest';
 import type {
 	Resource,
+	ResourceType,
 	ResourceWithoutDefaults,
 	SourceType,
 } from '~/models/resource/resource.types';
@@ -67,6 +68,35 @@ export async function findResourceByRemoteUri(
 	if (!remote) return null;
 
 	return findResourceById(remote.dataObjectId);
+}
+
+/**
+ * Find multiple Resource by their type.
+ *
+ * @param type The type of the Resource
+ */
+export async function findResourcesByType(
+	type: ResourceType
+): Promise<Resource[]> {
+	console.time('byType');
+	const dataObjects = await db.dataObject.findMany({
+		where: {
+			type,
+		},
+		include: {
+			remotes: true,
+			values: true,
+			thumbnail: true,
+		},
+		take: 500,
+	});
+	console.timeEnd('byType');
+
+	console.time('resources');
+	const resources = dataObjects.map(dataObjectToResource);
+	console.timeEnd('resources');
+
+	return resources;
 }
 
 //##

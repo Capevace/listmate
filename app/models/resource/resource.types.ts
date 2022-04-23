@@ -1,6 +1,7 @@
 import { Except, SetOptional } from 'type-fest';
 
 export * from '~/models/resource/adapters/types';
+export * from '~/models/resource/group-type';
 
 /**
  * Resource's are used as an abstraction for data objects.
@@ -69,6 +70,19 @@ export function stringToResourceType(type: string): ResourceType {
 			return ResourceType.PLAYLIST;
 		default:
 			throw new Error(`Unknown resource type: ${type}`);
+	}
+}
+
+/**
+ * Convert a string to a ResourceType, returning null if the string is invalid instead of throwing an error.
+ */
+export function stringToResourceTypeOptional(
+	type: string
+): ResourceType | null {
+	try {
+		return stringToResourceType(type);
+	} catch {
+		return null;
 	}
 }
 

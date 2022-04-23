@@ -6,6 +6,7 @@ import { requireUserId } from '~/session.server';
 import ResourceView from '~/components/views/resource-view';
 import { findResourceById } from '~/models/resource/resource.server';
 import { Resource } from '~/models/resource/resource.types';
+import MainView from '~/components/views/main-view';
 
 type LoaderData = {
 	resource: Resource;
@@ -38,9 +39,9 @@ export default function ResourceDetailsPage() {
 	const data = useLoaderData() as LoaderData;
 
 	return (
-		<div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+		<MainView>
 			<ResourceView resource={data.resource} />
-		</div>
+		</MainView>
 	);
 }
 

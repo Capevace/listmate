@@ -2,21 +2,19 @@ import type { ListItemData } from '~/models/item.server';
 import type { List } from '~/models/list.server';
 import type { Song } from '~/models/resource/resource.types';
 
-import {
-	DotsHorizontalIcon,
-	HeartIcon,
-	PlayIcon,
-} from '@heroicons/react/solid';
+import { HeartIcon, PlayIcon } from '@heroicons/react/solid';
 import ResourceValueLabel from '~/components/common/resource-value-label';
-import { Form, useFormAction, useLocation, useTransition } from 'remix';
-import { useEffect, useState } from 'react';
+import { Form, useLocation, useTransition } from 'remix';
+import { useState } from 'react';
+import ResourceContextMenu from '../resource-context-menu';
 
 export default function SongRow({
-	list,
 	item,
+	style,
 }: {
 	list: List;
 	item: ListItemData<Song>;
+	style: React.CSSProperties;
 }) {
 	const location = useLocation();
 
@@ -47,6 +45,7 @@ export default function SongRow({
 		<li
 			key={item.id}
 			className="grid w-full grid-cols-12 items-center py-1  text-sm text-gray-200"
+			style={style}
 		>
 			<div className="col-span-1 grid grid-cols-2 justify-start">
 				<Form
@@ -84,9 +83,7 @@ export default function SongRow({
 				<ResourceValueLabel valueRef={item.resource.values.album} />
 			</div>
 			<div className="col-span-1 flex justify-end">
-				<button className="text-gray-700 hover:text-gray-400 ">
-					<DotsHorizontalIcon className="w-6 " />
-				</button>
+				<ResourceContextMenu />
 			</div>
 		</li>
 	);

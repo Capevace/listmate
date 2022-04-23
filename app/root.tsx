@@ -11,6 +11,7 @@ import {
 import type { MetaFunction, LoaderFunction } from 'remix';
 
 import tailwindStylesheetUrl from '~/styles/tailwind.css';
+import metaStylesheetUrl from '~/styles/meta-styles.css';
 import { getUser } from '~/session.server';
 import MainAppLayout from '~/components/layout/main';
 import type { User } from '~/models/user.server';
@@ -52,8 +53,15 @@ export default function App() {
 			<head>
 				<Meta />
 				<Links />
+				<link rel="stylesheet" href={metaStylesheetUrl} />
 			</head>
-			<body className="h-full text-gray-100">
+			<body className="no-js h-full text-gray-100">
+				<script
+					type="text/javascript"
+					dangerouslySetInnerHTML={{
+						__html: "document.body.classList.remove('no-js');",
+					}}
+				></script>
 				<MantineProvider theme={theme}>
 					{user ? (
 						<MainAppLayout user={user} lists={lists}>

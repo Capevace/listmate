@@ -8,15 +8,20 @@ import { getList } from '~/models/list.server';
 import { getItemsForList } from '~/models/item.server';
 import { requireUserId } from '~/session.server';
 import ListView from '~/components/views/list-view';
+import MainView from '~/components/views/main-view';
+import { findOptionalPageQuery } from '~/utilities/paginate';
 
 type LoaderData = {
 	list: List;
 	items: ListItemData[];
+	page?: number;
 };
 
 export const loader: LoaderFunction = async ({ request, params }) => {
 	await requireUserId(request);
 	invariant(params.listId, 'listId not found');
+
+	const page = findOptionalPageQuery(request.url);
 
 	const list = await getList({ id: params.listId });
 	const items = await getItemsForList({ id: params.listId });
@@ -25,7 +30,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 		throw new Response('Not Found', { status: 404 });
 	}
 
-	return json<LoaderData>({ list, items });
+	return json<LoaderData>({ list, items, page });
 };
 
 export const action: ActionFunction = async ({ request, params }) => {
@@ -40,11 +45,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 export default function ListPage() {
 	const data = useLoaderData<LoaderData>();
 
-	return (
-		<div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-			<ListView list={data.list} items={data.items} />
-		</div>
-	);
+	return <ListView list={data.list} items={data.items} page={data.page} />;
 }
 
 export function ErrorBoundary({ error }: { error: Error }) {

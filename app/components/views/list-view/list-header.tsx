@@ -1,7 +1,7 @@
 import type { List } from '~/models/list.server';
 
-import { PlayIcon, PlusIcon } from '@heroicons/react/solid';
-import { Button } from '@mantine/core';
+import { PlayIcon, PlusIcon, TrashIcon } from '@heroicons/react/solid';
+import { Button, Menu } from '@mantine/core';
 import { Form } from 'remix';
 
 export default function ListHeader({ list }: { list: List }) {
@@ -14,7 +14,7 @@ export default function ListHeader({ list }: { list: List }) {
 					</h1>
 					<p className="text-xl text-gray-300">{list.description}</p>
 				</div>
-				<nav className="flex flex-shrink-0 gap-3">
+				<nav className="flex flex-shrink-0 items-center gap-3">
 					<Form method="post">
 						<Button
 							type="submit"
@@ -35,6 +35,17 @@ export default function ListHeader({ list }: { list: List }) {
 							Add item to list
 						</Button>
 					</Form>
+					<Menu
+						color="blue"
+						classNames={{
+							body: 'bg-blue-500',
+						}}
+					>
+						<Menu.Label>Danger zone</Menu.Label>
+						<Menu.Item color="red" icon={<TrashIcon className="w-4" />}>
+							Delete list
+						</Menu.Item>
+					</Menu>
 				</nav>
 			</div>
 			<aside

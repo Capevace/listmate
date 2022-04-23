@@ -24,18 +24,16 @@ import {
  *
  * @param dataObject The data object to convert
  */
-export async function dataObjectToResource(
-	dataObject: CompleteDataObject
-): Promise<Resource> {
+export function dataObjectToResource(dataObject: CompleteDataObject): Resource {
 	const values = valuesToObject(dataObject.values);
 
 	switch (dataObject.type) {
 		case ResourceType.ALBUM:
-			return await dataObjectToAlbum(dataObject, values);
+			return dataObjectToAlbum(dataObject, values);
 		case ResourceType.ARTIST:
-			return await dataObjectToArtist(dataObject, values);
+			return dataObjectToArtist(dataObject, values);
 		case ResourceType.SONG:
-			return await dataObjectToSong(dataObject, values);
+			return dataObjectToSong(dataObject, values);
 		default:
 			throw new Error('Unknown resource type');
 	}

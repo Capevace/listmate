@@ -3,6 +3,7 @@ import type { Resource } from '~/models/resource/resource.types';
 
 import { prisma } from '~/db.server';
 import { dataObjectToResource } from '~/models/resource/adapters/adapters.server';
+import paginate, { PaginateResult } from '~/utilities/paginate';
 
 export type { ListItem } from '@prisma/client';
 
@@ -20,8 +21,14 @@ export type ListItemData<ResourceKind extends Resource = Resource> = {
  *
  * @private
  */
-async function getRawItemsInList(listId: List['id']) {
-	return await prisma.listItem.findMany({
+function getRawItemsInList(listId: List['id'], options?: ListItemOptions) {
+	// We make skip and take undefined if no page is passed, so
+	// that the query is not paginated in that case!
+	const { skip, take }: PaginateResult = options?.page
+		? paginate(options?.page)
+		: {};
+
+	return prisma.listItem.findMany({
 		where: { listId },
 		include: {
 			dataObject: {
@@ -32,6 +39,8 @@ async function getRawItemsInList(listId: List['id']) {
 				},
 			},
 		},
+		skip,
+		take,
 	});
 }
 
@@ -80,19 +89,22 @@ export async function addResourceToList(
 	});
 }
 
-export async function getItemsForList({
-	id,
-}: Pick<List, 'id'>): Promise<ListItemData<Resource>[]> {
-	const rawItems = await getRawItemsInList(id);
-	let items: ListItemData<Resource>[] = [];
+type ListItemOptions = {
+	page?: number;
+};
 
-	// TODO: performance could suffer because every conversion is done waited for
-	for (const listItem of rawItems) {
-		items.push({
-			...listItem,
-			resource: await dataObjectToResource(listItem.dataObject),
-		});
-	}
+export async function getItemsForList(
+	{ id }: Pick<List, 'id'>,
+	options?: ListItemOptions
+): Promise<ListItemData<Resource>[]> {
+	const rawItems = await getRawItemsInList(id, options);
+
+	let items: ListItemData<Resource>[] = await Promise.all(
+		rawItems.map(async (item) => ({
+			...item,
+			resource: await dataObjectToResource(item.dataObject),
+		}))
+	);
 
 	return items;
 }

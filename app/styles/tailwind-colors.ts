@@ -2,12 +2,20 @@ import type { Tuple } from '@mantine/core';
 
 type ColorTuple = Tuple<string, 10>;
 
-export function fixColors(colors: ColorTuple): ColorTuple {
+export function fixColors(
+	colors: ColorTuple,
+	opposite: boolean = false
+): ColorTuple {
 	// TODO: Properly fix the colors
 	// This is just a quick hack to align the color steps from tailwind to mantine
 
-	colors.unshift(colors[0]); // duplicate first color
-	colors.pop(); // remove last color
+	if (opposite) {
+		colors.push(colors[colors.length - 1]); // duplicate last color
+		colors.shift(); // remove first color
+	} else {
+		colors.unshift(colors[0]); // duplicate first color
+		colors.pop(); // remove last color
+	}
 
 	return colors;
 }
@@ -36,6 +44,7 @@ export const gray: ColorTuple = [
 	'#1f2937',
 	'#111827',
 ];
+
 export const zinc: ColorTuple = [
 	'#fafafa',
 	'#f4f4f5',

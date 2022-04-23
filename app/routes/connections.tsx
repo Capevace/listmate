@@ -8,6 +8,7 @@ import {
 	SourceType,
 	stringToSourceType,
 } from '~/models/resource/resource.types';
+import MainView from '~/components/views/main-view';
 
 type Token = {
 	id: SourceToken['id'];
@@ -126,7 +127,7 @@ export default function ConnectIndexPage() {
 	const { tokens } = useLoaderData() as LoaderData;
 
 	return (
-		<div className="flex flex-col gap-5 px-10 py-8">
+		<MainView className="flex flex-col gap-5 px-10 py-8">
 			<h1>Connections</h1>
 			<div className="flex flex-col gap-8">
 				{Object.keys(tokens).map((type) => {
@@ -142,6 +143,6 @@ export default function ConnectIndexPage() {
 				})}
 			</div>
 			<Outlet />
-		</div>
+		</MainView>
 	);
 }
