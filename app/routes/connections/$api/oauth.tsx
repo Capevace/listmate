@@ -1,9 +1,10 @@
 import { LoaderFunction, redirect } from 'remix';
 import invariant from 'tiny-invariant';
-import { SourceType } from '~/models/resource/resource.types';
-import { findToken } from '~/models/source-token.server';
+
 import { requireUserId } from '~/session.server';
+import { findToken } from '~/models/source-token.server';
 import { createApi, updateAPITokens } from '~/apis/spotify.server';
+import { SourceType } from '~/models/resource/types';
 
 /**
  * Function to add seconds to date

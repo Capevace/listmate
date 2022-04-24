@@ -1,7 +1,9 @@
-import type { ValueRef } from '~/models/resource/resource.types';
+import type { ValueRef } from '~/models/resource/types';
 import type { ResourceDetailsProps } from '../resource-details';
-import ResourceValueLabel from '~/components/common/resource-value-label';
+
 import capitalize from '~/utilities/capitalize';
+
+import ResourceValueLabel from '~/components/common/resource-value-label';
 
 export default function GenericDetails({ resource }: ResourceDetailsProps) {
 	const valueList = Object.entries(resource.values);

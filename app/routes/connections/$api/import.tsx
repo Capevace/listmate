@@ -10,10 +10,7 @@ import invariant from 'tiny-invariant';
 import { requireUserId } from '~/session.server';
 import ImportModal from '~/components/views/import-modal';
 import { findToken } from '~/models/source-token.server';
-import {
-	SourceType,
-	stringToSourceType,
-} from '~/models/resource/resource.types';
+import { SourceType, stringToSourceType } from '~/models/resource/types';
 import {
 	authorizeClient,
 	createApi,

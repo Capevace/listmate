@@ -1,7 +1,5 @@
 import { useState } from 'react';
 import { Form, useNavigate, useTransition } from 'remix';
-import { SourceType } from '~/models/resource/resource.types';
-import capitalize from '~/utilities/capitalize';
 import {
 	Button,
 	Group,
@@ -11,6 +9,9 @@ import {
 	TransferListData,
 	TransferListItem,
 } from '@mantine/core';
+
+import { SourceType } from '~/models/resource/types';
+import capitalize from '~/utilities/capitalize';
 
 export type ImportModalProps = {
 	type: SourceType;

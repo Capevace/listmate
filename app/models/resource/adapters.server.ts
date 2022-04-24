@@ -5,9 +5,9 @@ import {
 	FileReference,
 } from '@prisma/client';
 
-import { dataObjectToArtist } from '~/models/resource/adapters/artist/adapter.server';
-import { dataObjectToAlbum } from '~/models/resource/adapters/album/adapter.server';
-import { dataObjectToSong } from '~/models/resource/adapters/song/adapter.server';
+import { dataObjectToArtist } from '~/adapters/artist/adapter.server';
+import { dataObjectToAlbum } from '~/adapters/album/adapter.server';
+import { dataObjectToSong } from '~/adapters/song/adapter.server';
 
 // export * from '~/models/resource/adapters/types';
 
@@ -17,7 +17,7 @@ import {
 	ResourceType,
 	stringToResourceType,
 	ValueRef,
-} from '~/models/resource/resource.types';
+} from '~/models/resource/types';
 
 /**
  * Convert a DataObject to a resource.

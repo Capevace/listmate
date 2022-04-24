@@ -3,7 +3,7 @@ import type {
 	RawValue,
 	ForceResourceType,
 	ResourceType,
-} from '~/models/resource/resource.types';
+} from '~/models/resource/types';
 
 export type ArtistData = {
 	name: RawValue<string>;

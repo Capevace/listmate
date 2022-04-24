@@ -1,12 +1,14 @@
+import type { Resource } from '~/models/resource/types';
 import type { LoaderFunction, ActionFunction } from 'remix';
-import { redirect } from 'remix';
-import { json, useLoaderData, useCatch } from 'remix';
+
+import { json, useLoaderData, useCatch, redirect } from 'remix';
 import invariant from 'tiny-invariant';
+
 import { requireUserId } from '~/session.server';
-import ResourceView from '~/components/views/resource-view';
 import { findResourceById } from '~/models/resource/resource.server';
-import { Resource } from '~/models/resource/resource.types';
+
 import MainView from '~/components/views/main-view';
+import ResourceView from '~/components/views/resource-view';
 
 type LoaderData = {
 	resource: Resource;

@@ -4,7 +4,7 @@ import type {
 	ForceResourceType,
 	ResourceType,
 	ValueRef,
-} from '~/models/resource/resource.types';
+} from '~/models/resource/types';
 
 export type AlbumData = {
 	name: RawValue<string>;

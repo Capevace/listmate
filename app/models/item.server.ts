@@ -1,8 +1,8 @@
 import type { List, DataObjectRemote } from '@prisma/client';
-import type { Resource } from '~/models/resource/resource.types';
+import type { Resource } from '~/models/resource/types';
 
 import { prisma } from '~/db.server';
-import { dataObjectToResource } from '~/models/resource/adapters/adapters.server';
+import { dataObjectToResource } from '~/models/resource/adapters.server';
 import paginate, { PaginateResult } from '~/utilities/paginate';
 
 export type { ListItem } from '@prisma/client';

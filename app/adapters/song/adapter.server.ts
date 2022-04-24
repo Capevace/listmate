@@ -6,9 +6,9 @@ import {
 	composeResourceBase,
 	DataObjectValueMap,
 	valuesToObject,
-} from '~/models/resource/adapters/adapters.server';
-import { ResourceType } from '~/models/resource/resource.types';
-import type { Song } from '~/models/resource/adapters/song/type';
+} from '~/models/resource/adapters.server';
+import { ResourceType } from '~/models/resource/types';
+import type { Song } from '~/adapters/song/type';
 
 export function dataObjectToSong(
 	dataObject: CompleteDataObject,

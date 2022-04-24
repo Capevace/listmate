@@ -1,11 +1,9 @@
 import { redirect, LoaderFunction, json } from 'remix';
 import invariant from 'tiny-invariant';
-import {
-	SourceType,
-	stringToSourceType,
-} from '~/models/resource/resource.types';
-import { createToken, findToken } from '~/models/source-token.server';
+
 import { requireUserId } from '~/session.server';
+import { SourceType, stringToSourceType } from '~/models/resource/types';
+import { createToken, findToken } from '~/models/source-token.server';
 import { authorizeClient, createApi } from '~/apis/spotify.server';
 
 type LoaderData = {

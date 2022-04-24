@@ -4,7 +4,7 @@ import type {
 	ValueRef,
 	ForceResourceType,
 	ResourceType,
-} from '~/models/resource/resource.types';
+} from '~/models/resource/types';
 
 export type SongData = {
 	name: RawValue<string>;

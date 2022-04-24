@@ -9,15 +9,38 @@ import type {
 	ResourceType,
 	ResourceWithoutDefaults,
 	SourceType,
-} from '~/models/resource/resource.types';
+} from '~/models/resource/types';
 
 import invariant from 'tiny-invariant';
 import { prisma as db } from '~/db.server';
-import { dataObjectToResource } from '~/models/resource/adapters/adapters.server';
+import { dataObjectToResource } from './adapters.server';
 
 //
 // READ
 //
+
+/**
+ * Search for resources that contain the given text
+ *
+ * @param text The text to search for
+ */
+export async function searchResources(text: string): Promise<Resource[]> {
+	const dataObjects = await db.dataObject.findMany({
+		where: {
+			OR: [
+				{ title: { contains: text } },
+				{ values: { some: { value: { contains: text } } } },
+			],
+		},
+		include: {
+			remotes: true,
+			values: true,
+			thumbnail: true,
+		},
+	});
+
+	return dataObjects.map(dataObjectToResource);
+}
 
 /**
  * Find a resource by a given Resource / DataObject ID.
@@ -39,7 +62,7 @@ export async function findResourceById(
 		},
 	});
 
-	return dataObject ? await dataObjectToResource(dataObject) : null;
+	return dataObject ? dataObjectToResource(dataObject) : null;
 }
 
 /**
@@ -78,7 +101,6 @@ export async function findResourceByRemoteUri(
 export async function findResourcesByType(
 	type: ResourceType
 ): Promise<Resource[]> {
-	console.time('byType');
 	const dataObjects = await db.dataObject.findMany({
 		where: {
 			type,
@@ -90,13 +112,8 @@ export async function findResourcesByType(
 		},
 		take: 500,
 	});
-	console.timeEnd('byType');
 
-	console.time('resources');
-	const resources = dataObjects.map(dataObjectToResource);
-	console.timeEnd('resources');
-
-	return resources;
+	return dataObjects.map(dataObjectToResource);
 }
 
 //##

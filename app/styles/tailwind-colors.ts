@@ -3,9 +3,11 @@ import type { Tuple } from '@mantine/core';
 type ColorTuple = Tuple<string, 10>;
 
 export function fixColors(
-	colors: ColorTuple,
+	_colors: ColorTuple,
 	opposite: boolean = false
 ): ColorTuple {
+	let colors = [..._colors] as ColorTuple;
+
 	// TODO: Properly fix the colors
 	// This is just a quick hack to align the color steps from tailwind to mantine
 

@@ -7,14 +7,12 @@ import {
 	Form,
 	useNavigate,
 } from 'remix';
-import invariant from 'tiny-invariant';
-import {
-	SourceType,
-	stringToSourceType,
-} from '~/models/resource/resource.types';
-import { findToken, invalidateToken } from '~/models/source-token.server';
-import { requireUserId } from '~/session.server';
 import { Modal, Button, Group } from '@mantine/core';
+import invariant from 'tiny-invariant';
+
+import { requireUserId } from '~/session.server';
+import { findToken, invalidateToken } from '~/models/source-token.server';
+import { SourceType, stringToSourceType } from '~/models/resource/types';
 
 type LoaderData = {
 	type: SourceType;

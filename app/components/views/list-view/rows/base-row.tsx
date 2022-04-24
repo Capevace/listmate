@@ -1,21 +1,9 @@
-/* {items.map((item) => {
-				switch (item.resource.type) {
-					case ResourceType.SONG:
-						return (
-							<SongRow
-								key={item.id}
-								list={list}
-								item={item as ListItemData<Song>}
-							/>
-						);
-					default:
-						return <GenericRow key={item.id} list={list} item={item} />;
-				}
-			})} */
-
+import type { List } from '~/models/list.server';
 import type { ListItemData } from '~/models/item.server';
-import { List } from '~/models/list.server';
-import { ResourceType, Song } from '~/models/resource/resource.types';
+import type { Song } from '~/models/resource/types';
+
+import { ResourceType } from '~/models/resource/types';
+
 import GenericRow from './generic-row';
 import SongRow from './song-row';
 

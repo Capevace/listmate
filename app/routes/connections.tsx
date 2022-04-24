@@ -1,13 +1,15 @@
-import { Button } from '@mantine/core';
 import { Link, LoaderFunction, useLoaderData, json, Outlet } from 'remix';
-import capitalize from '~/utilities/capitalize';
+import { Button } from '@mantine/core';
+
 import { requireUserId } from '~/session.server';
 import { findTokens, SourceToken } from '~/models/source-token.server';
 import {
 	ALL_SOURCE_TYPES,
 	SourceType,
 	stringToSourceType,
-} from '~/models/resource/resource.types';
+} from '~/models/resource/types';
+import capitalize from '~/utilities/capitalize';
+
 import MainView from '~/components/views/main-view';
 
 type Token = {

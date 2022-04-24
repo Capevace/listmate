@@ -1,6 +1,6 @@
 import type { MantineThemeOverride } from '@mantine/core';
 import { DEFAULT_THEME } from '@mantine/core';
-import { fixColors, zinc, blue, green, teal } from './tailwind-colors';
+import { fixColors, gray, red, blue, green, teal } from './tailwind-colors';
 
 // Set mantine to use tailwind colors
 export const theme: MantineThemeOverride = {
@@ -15,9 +15,10 @@ export const theme: MantineThemeOverride = {
 	colorScheme: 'dark',
 	primaryColor: 'blue',
 	colors: {
-		gray: fixColors(zinc),
-		// dark: fixColors(z, true),
+		gray: fixColors(gray),
+		dark: fixColors(gray, true),
 		blue: fixColors(blue),
+		red: fixColors(red),
 		green: fixColors(green),
 		teal: fixColors(teal),
 	},

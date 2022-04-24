@@ -1,4 +1,5 @@
-import { ResourceType, Resource } from '~/models/resource/resource.types';
+import { ResourceType, Resource } from '~/models/resource/types';
+
 import GenericDetails from './details/generic-details';
 
 export type ResourceDetailsProps = {

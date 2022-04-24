@@ -1,21 +1,25 @@
+import type { List } from '~/models/list.server';
+import type { User } from '~/models/user.server';
+
+import React, { useState } from 'react';
+import { Form, NavLink } from 'remix';
+
+import {
+	GroupType,
+	GROUP_TYPES,
+	GROUP_TYPE_ITEMS,
+	ResourceType,
+} from '~/models/resource/types';
+import capitalize from '~/utilities/capitalize';
+
 import {
 	BookmarkIcon,
 	CollectionIcon,
 	MusicNoteIcon,
 	UsersIcon,
 } from '@heroicons/react/solid';
-import { InputVariant, Select } from '@mantine/core';
-import React, { useState } from 'react';
-import { Form, Link, NavLink } from 'remix';
-import { List } from '~/models/list.server';
-import {
-	GroupType,
-	GROUP_TYPES,
-	GROUP_TYPE_ITEMS,
-	ResourceType,
-} from '~/models/resource/resource.types';
-import { User } from '~/models/user.server';
-import capitalize from '~/utilities/capitalize';
+import { Select } from '@mantine/core';
+import SearchBox from '~/components/views/search-box';
 
 type SidebarProps = {
 	user: User;
@@ -23,12 +27,12 @@ type SidebarProps = {
 };
 
 const listItemBaseClass =
-	'flex items-center justify-start gap-2 rounded py-1 px-2 text-sm outline hover:text-gray-200 hover:bg-gray-700 focus:outline-gray-600 focus:outline-gray-600';
+	'flex items-center justify-start gap-2 rounded py-1 px-2 text-sm border hover:text-gray-200 hover:bg-gray-700 focus:bg-gray-700 focus:border-gray-600 focus:border-gray-600';
 
 const listItemClassName = ({ isActive }: { isActive: boolean }) =>
 	isActive
-		? `${listItemBaseClass} outline-gray-600 bg-gray-700 text-gray-200`
-		: `${listItemBaseClass} outline-transparent bg-transparent text-gray-400`;
+		? `${listItemBaseClass} border-gray-600 bg-gray-700 text-gray-200`
+		: `${listItemBaseClass} border-transparent bg-transparent text-gray-400`;
 
 function SidebarListItem({
 	to,
@@ -56,17 +60,21 @@ export default function Sidebar({ user, lists }: SidebarProps) {
 
 	return (
 		<aside className="flex max-w-sm flex-col justify-between border-r-2 border-gray-800 bg-gray-900">
+			<SearchBox className="py-2 px-2" />
 			<div className="flex flex-1 flex-col gap-5 overflow-y-scroll px-2 py-2">
 				<section>
-					<h2 className="text-xs text-gray-400">
-						<span>Library</span>
+					<h2 className="mb-2 text-xs text-gray-400">
+						<span className="mb-2 block">Library</span>
 						{/* TODO: replace Mantine component with own one, this is for prototyping */}
 						<Select
 							styles={{
 								input: {
-									fontSize: '17px',
+									fontSize: 'inherit',
+									color: 'inherit',
+									fontWeight: 'inherit',
 								},
 							}}
+							className="w-full text-lg font-bold text-gray-400"
 							color="gray"
 							variant="unstyled"
 							value={typeGroup}

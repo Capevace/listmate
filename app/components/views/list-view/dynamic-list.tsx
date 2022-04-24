@@ -1,20 +1,10 @@
-import { useCallback, useRef } from 'react';
-import type { ListItemData } from '~/models/item.server';
 import type { List } from '~/models/list.server';
-import BaseRow from './rows/base-row';
+import type { ListItemData } from '~/models/item.server';
 
+import { useCallback, useRef } from 'react';
 import { useVirtual } from 'react-virtual';
-import SongRow from './rows/song-row';
-import { Song } from '~/models/resource/resource.types';
 
-const getItemSize = (index: number) => {
-	switch (index) {
-		case 0:
-			return 300;
-		default:
-			return 35;
-	}
-};
+import BaseRow from './rows/base-row';
 
 export type DynamicListProps = {
 	list: List;
@@ -42,11 +32,7 @@ export default function DynamicList({ list, items, Header }: DynamicListProps) {
 		<div
 			ref={parentRef}
 			className="h-full max-h-screen w-full px-5"
-			style={{
-				// height: `200px`,
-				// width: `400px`,
-				overflow: 'auto',
-			}}
+			style={{ overflow: 'auto' }}
 		>
 			<div
 				className="mx-auto block max-w-7xl"

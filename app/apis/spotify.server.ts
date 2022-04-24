@@ -1,11 +1,10 @@
 import { DataObjectRemote } from '@prisma/client';
 import SpotifyWebApi from 'spotify-web-api-node';
 import invariant from 'tiny-invariant';
-import { SetOptional } from 'type-fest';
 import { saveFile } from '~/models/file.server';
 import { addResourceToList } from '~/models/item.server';
 import { upsertList } from '~/models/list.server';
-import { Album, Artist, Song } from '~/models/resource/adapters/types';
+import { Album, Artist, Song } from '~/models/resource/types';
 import {
 	attachRemoteUri,
 	createResource,
@@ -16,7 +15,7 @@ import {
 	ResourceType,
 	ResourceWithoutDefaults,
 	SourceType,
-} from '~/models/resource/resource.types';
+} from '~/models/resource/types';
 import {
 	findToken,
 	SourceToken,

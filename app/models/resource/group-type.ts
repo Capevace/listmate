@@ -1,4 +1,4 @@
-import { ResourceType } from './resource.types';
+import { ResourceType } from './types';
 
 export enum GroupType {
 	MUSIC = 'music',

@@ -1,7 +1,11 @@
 import { Except, SetOptional } from 'type-fest';
 
-export * from '~/models/resource/adapters/types';
-export * from '~/models/resource/group-type';
+export * from './group-type';
+
+// Adapter Types
+export * from '~/adapters/album/type';
+export * from '~/adapters/artist/type';
+export * from '~/adapters/song/type';
 
 /**
  * Resource's are used as an abstraction for data objects.

@@ -1,19 +1,19 @@
 import type { LoaderFunction } from 'remix';
-import { json, useLoaderData } from 'remix';
-import invariant from 'tiny-invariant';
 import type { List } from '~/models/list.server';
 import type { ListItemData } from '~/models/item.server';
+import type { Resource } from '~/models/resource/types';
+
+import { json, useLoaderData } from 'remix';
+import invariant from 'tiny-invariant';
+
 import { requireUserId } from '~/session.server';
-import ListView from '~/components/views/list-view';
-import MainView from '~/components/views/main-view';
-import { stringToGroupTypeOptional } from '~/models/resource/group-type';
-import capitalize from '~/utilities/capitalize';
-import {
-	Resource,
-	stringToResourceTypeOptional,
-} from '~/models/resource/resource.types';
 import { findResourcesByType } from '~/models/resource/resource.server';
+import { stringToGroupTypeOptional } from '~/models/resource/group-type';
+import { stringToResourceTypeOptional } from '~/models/resource/types';
 import { findOptionalPageQuery } from '~/utilities/paginate';
+import capitalize from '~/utilities/capitalize';
+
+import ListView from '~/components/views/list-view';
 
 type LoaderData = {
 	list: List;

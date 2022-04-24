@@ -6,14 +6,14 @@ import {
 	composeResourceBase,
 	DataObjectValueMap,
 	valuesToObject,
-} from '~/models/resource/adapters/adapters.server';
-import { ResourceType } from '~/models/resource/resource.types';
-import type { Album } from '~/models/resource/adapters/album/type';
+} from '~/models/resource/adapters.server';
+import { ResourceType } from '~/models/resource/types';
+import type { Artist } from '~/adapters/artist/type';
 
-export function dataObjectToAlbum(
+export function dataObjectToArtist(
 	dataObject: CompleteDataObject,
 	values?: DataObjectValueMap
-): Album {
+): Artist {
 	values = values ?? valuesToObject(dataObject.values);
 
 	const name = composeRefFromValue<string>(values.name);
@@ -21,11 +21,10 @@ export function dataObjectToAlbum(
 	invariant(name, 'Missing name');
 
 	return {
-		...composeResourceBase<ResourceType.ALBUM>(dataObject),
+		...composeResourceBase<ResourceType.ARTIST>(dataObject),
 		// additional spotify-specific fields
 		values: {
 			name,
-			artist: composeRefFromValue<string>(values.artist),
 		},
 	};
 }

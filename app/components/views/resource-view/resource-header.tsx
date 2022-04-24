@@ -1,4 +1,4 @@
-import { Resource } from '~/models/resource/resource.types';
+import type { Resource } from '~/models/resource/types';
 import capitalize from '~/utilities/capitalize';
 
 export default function ResourceHeader({ resource }: { resource: Resource }) {
