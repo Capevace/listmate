@@ -704,3 +704,16 @@ export async function setFavouriteStatus(
 //##
 // Delete Resources \\
 //####
+
+/**
+ * Delete a resource
+ *
+ * @param resourceId The ID of the Resource to delete
+ */
+export async function deleteResource(resourceId: string): Promise<void> {
+	await db.dataObject.delete({
+		where: {
+			id: resourceId,
+		}
+	});
+}

@@ -14,7 +14,7 @@ export function HeaderContent(props: HeaderContentProps) {
 					</h1>
 					<p className="text-xl text-gray-300">{props.subtitle}</p>
 				</div>
-				<nav className="flex items-end gap-3">{props.actions}</nav>
+				<nav className="flex items-center gap-3">{props.actions}</nav>
 			</div>
 			{props.coverUrl && (
 				<aside
