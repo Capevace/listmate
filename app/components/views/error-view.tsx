@@ -3,6 +3,7 @@ import { Link } from 'remix';
 type ErrorViewProps = {
 	message?: string;
 	status?: number;
+	className?: string;
 };
 
 function getBaseMessage(status?: number) {
@@ -16,9 +17,15 @@ function getBaseMessage(status?: number) {
 	}
 }
 
-export default function ErrorView({ message, status }: ErrorViewProps) {
+export default function ErrorView({
+	message,
+	status,
+	className,
+}: ErrorViewProps) {
 	return (
-		<div className="mx-auto block flex max-w-xl flex-col items-center justify-center gap-8">
+		<div
+			className={`mx-auto block flex max-w-xl flex-col items-center justify-center gap-8 ${className}`}
+		>
 			<h1 className="text-center text-3xl font-bold">
 				{getBaseMessage(status)}
 			</h1>

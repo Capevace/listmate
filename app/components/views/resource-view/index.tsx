@@ -1,25 +1,24 @@
-import type { Resource } from '~/models/resource/types';
-import ResourceHeader from './resource-header';
-import ResourceDetails from './resource-details';
-import { Button } from '@mantine/core';
+import type { Album } from '~/models/resource/types';
+import type { AlbumDetails } from '~/adapters/album/adapter.server';
 
-export type ResourceViewProps = {
-	resource: Resource;
-};
+import { ResourceDetailsProps, ResourceType } from '~/models/resource/types';
 
-export default function ResourceView({ resource }: ResourceViewProps) {
-	return (
-		<div className="relative my-5 border border-gray-700 bg-gray-800 px-10 py-8 shadow-xl sm:overflow-hidden sm:rounded-2xl">
-			<ResourceHeader resource={resource} />
-			<ResourceDetails resource={resource} />
-			aaa
-			<details>
-				<summary>
-					<Button>Toggle Raw</Button>
-				</summary>
+import GenericDetails from './generic-details';
+import AlbumDetailsView from '~/adapters/album/details-view';
 
-				<pre>{JSON.stringify(resource, null, 2)}</pre>
-			</details>
-		</div>
-	);
+export default function ResourceView({
+	resource,
+	details,
+}: ResourceDetailsProps) {
+	switch (resource.type) {
+		case ResourceType.ALBUM:
+			return (
+				<AlbumDetailsView
+					resource={resource as Album}
+					details={details as AlbumDetails}
+				/>
+			);
+		default:
+			return <GenericDetails resource={resource} details={details} />;
+	}
 }

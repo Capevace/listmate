@@ -21,11 +21,6 @@ import {
 import { Select } from '@mantine/core';
 import SearchBox from '~/components/views/search-box';
 
-type SidebarProps = {
-	user: User;
-	lists: List[];
-};
-
 const listItemBaseClass =
 	'flex items-center justify-start gap-2 rounded py-1 px-2 text-sm border hover:text-gray-200 hover:bg-gray-700 focus:bg-gray-700 focus:border-gray-600 focus:border-gray-600';
 
@@ -55,11 +50,16 @@ const LIBRARY_ICONS: { [key in ResourceType]?: React.ReactNode } = {
 	[ResourceType.BOOKMARK]: <BookmarkIcon />,
 };
 
-export default function Sidebar({ user, lists }: SidebarProps) {
+type SidebarProps = {
+	user?: User;
+	lists?: List[];
+};
+
+export default function Sidebar({ user, lists = [] }: SidebarProps) {
 	const [typeGroup, setTypeGroup] = useState(GroupType.MUSIC);
 
 	return (
-		<aside className="flex max-w-sm flex-col justify-between border-r-2 border-gray-800 bg-gray-900">
+		<aside className="flex h-full max-w-sm flex-col justify-between border-r-2 border-gray-800 bg-gray-900">
 			<SearchBox className="py-2 px-2" />
 			<div className="flex flex-1 flex-col gap-5 overflow-y-scroll px-2 py-2">
 				<section>
@@ -102,9 +102,9 @@ export default function Sidebar({ user, lists }: SidebarProps) {
 					</nav>
 				</section>
 				<hr className="border-gray-700" />
-				<section>
+				<section className="flex flex-col">
 					<h2 className="mb-2 text-xs text-gray-400">Lists</h2>
-					<nav className="flex flex-col gap-1">
+					<nav className="flex flex-1 flex-col gap-1">
 						{lists.map((list) => (
 							<SidebarListItem key={list.id} to={`/lists/${list.id}`}>
 								{list.title}
@@ -113,43 +113,30 @@ export default function Sidebar({ user, lists }: SidebarProps) {
 					</nav>
 				</section>
 			</div>
-			<footer className="flex w-full items-center justify-start gap-5 bg-gray-800 px-5 py-3">
-				<div className="flex items-center">
-					<img
-						src="https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80"
-						alt="User"
-						className="mr-4 h-8 w-8 rounded-full"
-					/>
-					<div className="text-lg text-white">
-						<span className="font-bold">{user.name}</span>
+			{user && (
+				<footer className="flex w-full items-center justify-start gap-5 bg-gray-800 px-5 py-3">
+					<div className="flex items-center">
+						<img
+							src="https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80"
+							alt="User"
+							className="mr-4 h-8 w-8 rounded-full"
+						/>
+						<div className="text-lg text-white">
+							<span className="font-bold">{user.name}</span>
+						</div>
 					</div>
-				</div>
-				<div className="flex items-center">
-					<Form action="/logout" method="post">
-						<button
-							type="submit"
-							className="rounded-full bg-gray-700 px-4 py-1 text-sm font-semibold text-white"
-						>
-							Logout
-						</button>
-					</Form>
-				</div>
-			</footer>
-			{/* <div className="flex flex-1 flex-col">
-				<div className="flex flex-1 flex-col overflow-y-scroll">
-					{lists.map((list) => (
-						<ListRow key={list.id} list={list} />
-					))}
-				</div>
-				<div className="flex flex-col">
-					<Link
-						to="/connections"
-						className="flex items-center px-5 py-3 text-gray-500 hover:bg-gray-800 hover:text-gray-400"
-					>
-						Connections
-					</Link>
-				</div>
-			</div> */}
+					<div className="flex items-center">
+						<Form action="/logout" method="post">
+							<button
+								type="submit"
+								className="rounded-full bg-gray-700 px-4 py-1 text-sm font-semibold text-white"
+							>
+								Logout
+							</button>
+						</Form>
+					</div>
+				</footer>
+			)}
 		</aside>
 	);
 }

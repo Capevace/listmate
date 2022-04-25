@@ -6,18 +6,39 @@ import {
 } from '@prisma/client';
 
 import { dataObjectToArtist } from '~/adapters/artist/adapter.server';
-import { dataObjectToAlbum } from '~/adapters/album/adapter.server';
+import {
+	dataObjectToAlbum,
+	getAlbumDetails,
+} from '~/adapters/album/adapter.server';
 import { dataObjectToSong } from '~/adapters/song/adapter.server';
 
 // export * from '~/models/resource/adapters/types';
 
 import {
+	Album,
 	RawValue,
 	Resource,
+	ResourceDetails,
+	ResourceRemotes,
 	ResourceType,
 	stringToResourceType,
+	stringToSourceType,
 	ValueRef,
 } from '~/models/resource/types';
+
+/**
+ * A DataObject will all required properties to be a valid Resource.
+ */
+export type CompleteDataObject = DataObject & {
+	remotes: DataObjectRemote[];
+	values: DataObjectValue[];
+	thumbnail: FileReference | null;
+};
+
+/**
+ * Map of DataObjectValue.
+ */
+export type DataObjectValueMap = { [key: string]: DataObjectValue };
 
 /**
  * Convert a DataObject to a resource.
@@ -35,23 +56,28 @@ export function dataObjectToResource(dataObject: CompleteDataObject): Resource {
 		case ResourceType.SONG:
 			return dataObjectToSong(dataObject, values);
 		default:
-			throw new Error('Unknown resource type');
+			throw new Error(`Unknown resource type ${dataObject.type}`);
 	}
 }
 
 /**
- * A DataObject will all required properties to be a valid Resource.
+ * Get additional details for a resource, that are not contained in the actual DataObject.
+ *
+ * For example, the songs of an album.
+ *
+ * @param resource The resource to find additional details for
  */
-export type CompleteDataObject = DataObject & {
-	remotes: DataObjectRemote[];
-	values: DataObjectValue[];
-	thumbnail: FileReference | null;
-};
+export async function getResourceDetails(
+	resource: Resource
+): Promise<ResourceDetails> {
+	switch (resource.type) {
+		case ResourceType.ALBUM:
+			return getAlbumDetails(resource as Album);
 
-/**
- * Map of DataObjectValue.
- */
-export type DataObjectValueMap = { [key: string]: DataObjectValue };
+		default:
+			return {};
+	}
+}
 
 /**
  * Convert a DataObjectValue array to a map.
@@ -75,7 +101,14 @@ export function valuesToObject(values: DataObjectValue[]): DataObjectValueMap {
 export function composeResourceBase<ForcedType extends ResourceType>(
 	dataObject: CompleteDataObject
 ): Resource & { type: ForcedType } {
-	let resource = {
+	let remotes: ResourceRemotes = {};
+
+	for (const remote of dataObject.remotes) {
+		const sourceType = stringToSourceType(remote.api);
+		remotes[sourceType] = remote.uri;
+	}
+
+	let resource: Resource & { type: ForcedType } = {
 		id: dataObject.id,
 		title: dataObject.title,
 		type: stringToResourceType(dataObject.type) as ForcedType,
@@ -83,6 +116,7 @@ export function composeResourceBase<ForcedType extends ResourceType>(
 		isFavourite: dataObject.isFavourite,
 		// api: stringToSourceType('local' /*api */) as ForcedSource,
 		values: {},
+		remotes,
 	};
 
 	// TODO: check if types actually match and this works?

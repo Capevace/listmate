@@ -1,12 +1,9 @@
-import type { ValueRef } from '~/models/resource/types';
-import type { ResourceDetailsProps } from '../resource-details';
-
+import type { Resource, ValueRef } from '~/models/resource/types';
 import capitalize from '~/utilities/capitalize';
-
 import ResourceValueLabel from '~/components/common/resource-value-label';
 
-export default function GenericDetails({ resource }: ResourceDetailsProps) {
-	const valueList = Object.entries(resource.values);
+export default function ValueGrid({ values }: { values: Resource['values'] }) {
+	const valueList = Object.entries(values);
 
 	return (
 		<dl className="grid grid-cols-6">

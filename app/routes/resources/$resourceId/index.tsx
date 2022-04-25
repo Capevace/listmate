@@ -1,4 +1,4 @@
-import type { Resource } from '~/models/resource/types';
+import type { Resource, ResourceDetails } from '~/models/resource/types';
 import type { LoaderFunction, ActionFunction } from 'remix';
 
 import { json, useLoaderData, useCatch, redirect } from 'remix';
@@ -9,9 +9,11 @@ import { findResourceById } from '~/models/resource/resource.server';
 
 import MainView from '~/components/views/main-view';
 import ResourceView from '~/components/views/resource-view';
+import { getResourceDetails } from '~/models/resource/adapters.server';
 
 type LoaderData = {
 	resource: Resource;
+	details: ResourceDetails;
 };
 
 export const loader: LoaderFunction = async ({ request, params }) => {
@@ -25,7 +27,9 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 		throw new Response('Not Found', { status: 404 });
 	}
 
-	return json<LoaderData>({ resource });
+	const details = await getResourceDetails(resource);
+
+	return json<LoaderData>({ resource, details });
 };
 
 export const action: ActionFunction = async ({ request, params }) => {
@@ -42,23 +46,7 @@ export default function ResourceDetailsPage() {
 
 	return (
 		<MainView>
-			<ResourceView resource={data.resource} />
+			<ResourceView resource={data.resource} details={data.details} />
 		</MainView>
 	);
-}
-
-export function ErrorBoundary({ error }: { error: Error }) {
-	console.error(error);
-
-	return <div>An unexpected error occurred: {error.message}</div>;
-}
-
-export function CatchBoundary() {
-	const caught = useCatch();
-
-	if (caught.status === 404) {
-		return <div>Resource not found</div>;
-	}
-
-	throw new Error(`Unexpected caught response with status: ${caught.status}`);
 }

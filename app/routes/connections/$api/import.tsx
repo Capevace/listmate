@@ -63,7 +63,11 @@ export const action: ActionFunction = async ({ request, params }) => {
 
 	let lastPlaylist = null;
 	for (const id of playlistIds) {
-		lastPlaylist = await importPlaylist(api, userId, String(id));
+		lastPlaylist = await importPlaylist({
+			api,
+			userId,
+			playlistId: String(id),
+		});
 		console.log('Imported playlist', lastPlaylist, id);
 	}
 

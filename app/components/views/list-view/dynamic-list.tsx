@@ -1,5 +1,4 @@
-import type { List } from '~/models/list.server';
-import type { ListItemData } from '~/models/item.server';
+import type { Resource } from '~/models/resource/types';
 
 import { useCallback, useRef } from 'react';
 import { useVirtual } from 'react-virtual';
@@ -7,15 +6,14 @@ import { useVirtual } from 'react-virtual';
 import BaseRow from './rows/base-row';
 
 export type DynamicListProps = {
-	list: List;
-	items: ListItemData[];
-	Header: React.ReactNode;
+	items: Resource[];
+	header: React.ReactNode;
 	page?: number;
 };
 
 // TODO: Bundle optimization – Here we could bundle split the different type of lists
 
-export default function DynamicList({ list, items, Header }: DynamicListProps) {
+export default function DynamicList({ items, header }: DynamicListProps) {
 	const parentRef = useRef<HTMLDivElement>(null);
 
 	const rowVirtualizer = useVirtual({
@@ -42,26 +40,27 @@ export default function DynamicList({ list, items, Header }: DynamicListProps) {
 					position: 'relative',
 				}}
 			>
-				{Header}
+				{header}
 				{rowVirtualizer.virtualItems.map((virtualRow) => {
-					const item = items[virtualRow.index];
+					switch (virtualRow.index) {
+						default:
+							const item = items[virtualRow.index];
 
-					return (
-						<BaseRow
-							key={item.id}
-							list={list}
-							item={item}
-							index={virtualRow.index}
-							style={{
-								position: 'absolute',
-								top: 0,
-								left: 0,
-								width: '100%',
-								height: `${items[virtualRow.index]}px`,
-								transform: `translateY(${virtualRow.start}px)`,
-							}}
-						/>
-					);
+							return (
+								<BaseRow
+									key={item.id}
+									resource={item}
+									style={{
+										position: 'absolute',
+										top: 0,
+										left: 0,
+										width: '100%',
+										height: `${items[virtualRow.index]}px`,
+										transform: `translateY(${virtualRow.start}px)`,
+									}}
+								/>
+							);
+					}
 				})}
 			</div>
 		</div>

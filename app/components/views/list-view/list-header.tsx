@@ -4,17 +4,20 @@ import {
 	PencilIcon,
 	PlayIcon,
 	PlusIcon,
+	RefreshIcon,
 	TrashIcon,
 } from '@heroicons/react/solid';
 import { Button, Divider } from '@mantine/core';
 import { Form, Link } from 'remix';
 import Menu from '~/components/common/menu';
+import RefreshButton from '~/components/resource/refresh-button';
 
 export type ListActions = {
 	canPlay?: boolean;
 	canEdit?: boolean;
 	canDelete?: boolean;
 	canAddItems?: boolean;
+	canRefresh?: boolean;
 };
 
 export default function ListHeader({
@@ -24,7 +27,11 @@ export default function ListHeader({
 	list: List;
 	actions?: ListActions;
 }) {
-	const subMenuActions = { ...actions, canPlay: undefined };
+	const subMenuActions = {
+		...actions,
+		canPlay: undefined,
+		canAddItems: undefined,
+	};
 
 	return (
 		<div className="relative my-5 flex border border-gray-700 bg-gray-800 px-10 py-9 shadow-xl sm:overflow-hidden sm:rounded-2xl">
@@ -71,6 +78,20 @@ export default function ListHeader({
 										Edit list
 									</Menu.Item>
 								</Link>
+							)}
+							{actions.canRefresh && (
+								<RefreshButton>
+									{({ loading }) => (
+										<Menu.Item
+											color="green"
+											icon={<RefreshIcon className="w-4" />}
+											type="submit"
+											disabled={loading}
+										>
+											{loading ? `Refreshing...` : `Refresh list`}
+										</Menu.Item>
+									)}
+								</RefreshButton>
 							)}
 							{actions.canDelete && (
 								<Form action="delete" method="post">

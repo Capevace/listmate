@@ -1,10 +1,11 @@
-import type { ListItemData } from '~/models/item.server';
-import type { List } from '~/models/list.server';
-import BaseRow from './rows/base-row';
-import { PropsWithChildren } from 'react';
+import type { Resource } from '~/models/resource/types';
+import type { PropsWithChildren } from 'react';
+
 import { Link } from 'remix';
 import { usePagination } from '@mantine/hooks';
 import paginate, { pageSize } from '~/utilities/paginate';
+
+import BaseRow from './rows/base-row';
 
 const PageLink = ({
 	page,
@@ -27,17 +28,12 @@ const PageLink = ({
 	);
 
 export type PaginatedListPops = {
-	list: List;
-	items: ListItemData[];
+	items: Resource[];
 	page?: number;
 };
 
 // TODO: Bundle optimization – Here we could bundle split the different type of lists
-export default function PaginatedList({
-	list,
-	items,
-	page,
-}: PaginatedListPops) {
+export default function PaginatedList({ items, page }: PaginatedListPops) {
 	const currentPage = page || 1;
 	const pagination = usePagination({
 		total: Math.ceil(items.length / pageSize),
@@ -50,14 +46,8 @@ export default function PaginatedList({
 	return (
 		<>
 			<ul>
-				{paginatedItems.map((item, index) => (
-					<BaseRow
-						key={item.id}
-						list={list}
-						item={item}
-						index={index}
-						style={{}}
-					/>
+				{paginatedItems.map((item) => (
+					<BaseRow key={item.id} resource={item} style={{}} />
 				))}
 			</ul>
 			<footer className="mt-5 flex justify-center">

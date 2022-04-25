@@ -20,6 +20,7 @@ export type Resource = {
 	isFavourite: boolean;
 	values: ResourceValues;
 	thumbnail: ResourceFile | null;
+	remotes: ResourceRemotes;
 };
 
 /**
@@ -143,6 +144,8 @@ export function stringToSourceType(type: string): SourceType {
  */
 export type ResourceValues = { [key: string]: ValueRef<any> | null };
 
+export type ResourceRemotes = { [key in SourceType]?: string };
+
 /**
  * ValueRef's are the representation for DataObjectValues that link to a DataObject.
  *
@@ -182,4 +185,20 @@ export type ResourceFile = {
  */
 export type ForceResourceType<T extends ResourceType> = Resource & {
 	type: T;
+};
+
+/**
+ * Base type for Resource details
+ */
+export type ResourceDetails = {};
+
+/**
+ * Base type for DetailViewProps
+ */
+export type ResourceDetailsProps<
+	TResource extends Resource = Resource,
+	TResourceDetails extends ResourceDetails = ResourceDetails
+> = {
+	resource: TResource;
+	details: TResourceDetails;
 };

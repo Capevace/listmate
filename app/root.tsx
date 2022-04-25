@@ -41,9 +41,14 @@ export const loader: LoaderFunction = async ({ request }) => {
 	});
 };
 
-export default function App() {
-	const { user, lists } = useLoaderData() as LoaderData;
+type FrameProps = {
+	children: React.ReactNode;
+	hideSidebar?: boolean;
+	user?: User;
+	lists?: List[];
+};
 
+function Frame({ children, hideSidebar, user, lists }: FrameProps) {
 	return (
 		<html lang="en" className="h-full">
 			{/* 
@@ -57,21 +62,18 @@ export default function App() {
 				<Links />
 				<link rel="stylesheet" href={metaStylesheetUrl} />
 			</head>
-			<body className="no-js h-full bg-gray-900 text-gray-100">
+			<body className="no-js h-screen bg-gray-900 text-gray-100">
 				<script
 					type="text/javascript"
 					dangerouslySetInnerHTML={{
 						__html: "document.body.classList.remove('no-js');",
 					}}
 				></script>
+
 				<MantineProvider theme={theme}>
-					{user ? (
-						<MainAppLayout user={user} lists={lists}>
-							<Outlet />
-						</MainAppLayout>
-					) : (
-						<Outlet />
-					)}
+					<MainAppLayout hideSidebar={hideSidebar} user={user} lists={lists}>
+						{children}
+					</MainAppLayout>
 				</MantineProvider>
 
 				<ScrollRestoration />
@@ -82,23 +84,23 @@ export default function App() {
 	);
 }
 
+export default function App() {
+	const { user, lists } = useLoaderData() as LoaderData;
+
+	return (
+		<Frame user={user || undefined} lists={lists}>
+			<Outlet />
+		</Frame>
+	);
+}
+
 export function ErrorBoundary({ error }: { error: Error }) {
 	console.error(error);
 
 	return (
-		<html>
-			<head>
-				<title>Oh no! – Listmate</title>
-				<Meta />
-				<Links />
-				<link rel="stylesheet" href={tailwindStylesheetUrl} />
-			</head>
-			<body className="flex h-screen flex-col items-center justify-center bg-red-600 text-red-100">
-				{/* Error view without message/status shows unknown error */}
-				<ErrorView message={error.message} />
-				<Scripts />
-			</body>
-		</html>
+		<Frame hideSidebar>
+			<ErrorView message={error.message} className="mt-20" />
+		</Frame>
 	);
 }
 
@@ -106,7 +108,11 @@ export function CatchBoundary() {
 	const caught = useCatch();
 
 	if (caught.status === 404) {
-		return <div>Resource not found</div>;
+		return (
+			<Frame hideSidebar>
+				<ErrorView status={caught.status} className="mt-20" />
+			</Frame>
+		);
 	}
 
 	throw new Error(`Unexpected caught response with status: ${caught.status}`);

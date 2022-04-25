@@ -110,7 +110,145 @@ export async function findResourcesByType(
 			values: true,
 			thumbnail: true,
 		},
-		take: 500,
+	});
+
+	return dataObjects.map(dataObjectToResource);
+}
+
+/**
+ * Find multiple Resource by their value.
+ *
+ * @param type The type of the Resource
+ */
+export async function findResourcesByValue(
+	key: string,
+	value: string
+): Promise<Resource[]> {
+	const dataObjects = await db.dataObject.findMany({
+		where: {
+			values: {
+				some: {
+					key,
+					value: {
+						contains: value ?? '',
+					},
+				},
+			},
+		},
+		include: {
+			remotes: true,
+			values: true,
+			thumbnail: true,
+		},
+	});
+
+	return dataObjects.map(dataObjectToResource);
+}
+
+/**
+ * Find multiple Resource by their value reference.
+ *
+ * For example, you can find all songs that have a reference to a specific artist or album.
+ *
+ * @param type The type of the Resource
+ */
+export async function findResourcesByValueRef(
+	key: string,
+	ref: string
+): Promise<Resource[]> {
+	const dataObjects = await db.dataObject.findMany({
+		where: {
+			values: {
+				some: {
+					key,
+					valueDataObjectId: ref,
+				},
+			},
+		},
+		include: {
+			remotes: true,
+			values: true,
+			thumbnail: true,
+		},
+	});
+
+	return dataObjects.map(dataObjectToResource);
+}
+
+type ResourceQuery = {
+	id: Resource['id'];
+	type: ResourceType;
+	value: {
+		key: string;
+		value: string;
+	};
+	valueRef: {
+		key: string;
+		ref: string;
+	};
+};
+type ObjectKeys<T> = T extends object
+	? (keyof T)[]
+	: T extends number
+	? []
+	: T extends Array<any> | string
+	? string[]
+	: never;
+
+export async function findResources(
+	query: Partial<ResourceQuery>,
+	comparator: 'AND' | 'OR' = 'AND'
+): Promise<Resource[]> {
+	const dataObjects = await db.dataObject.findMany({
+		where: {
+			// AND: [{ type: query.type }],
+			[comparator]: (Object.keys(query) as ObjectKeys<ResourceQuery>)
+				.map((key) => {
+					const value = query[key];
+
+					if (!value) return null;
+
+					switch (key) {
+						case 'id':
+							return { id: value };
+						case 'type':
+							return { type: value };
+						case 'value':
+							const { key: valueRefKey, value: valueRefValue } =
+								value as ResourceQuery['value'];
+
+							return {
+								values: {
+									some: {
+										key: valueRefKey,
+										value: {
+											contains: valueRefValue,
+										},
+									},
+								},
+							};
+						case 'valueRef':
+							const { key: refKey, ref } = value as ResourceQuery['valueRef'];
+
+							return {
+								values: {
+									some: {
+										key: refKey,
+										valueDataObjectId: ref,
+									},
+								},
+							};
+						default:
+							return null;
+					}
+				})
+				.filter((predicate) => predicate !== null),
+		},
+		include: {
+			remotes: true,
+			values: true,
+			thumbnail: true,
+		},
 	});
 
 	return dataObjects.map(dataObjectToResource);
@@ -144,6 +282,20 @@ export async function createResource(
 			type: resource.type,
 			thumbnailFileId: resource.thumbnail?.id || null,
 			isFavourite: resource.isFavourite,
+			remotes: {
+				connectOrCreate: Object.entries(resource.remotes).map(([api, uri]) => ({
+					where: {
+						api_uri: {
+							api,
+							uri,
+						},
+					},
+					create: {
+						api,
+						uri,
+					},
+				})),
+			},
 		},
 	});
 
@@ -189,6 +341,26 @@ export async function upsertResource(resource: Resource): Promise<Resource> {
 			type: resource.type,
 			isFavourite: resource.isFavourite,
 			thumbnailFileId: resource.thumbnail?.id || null,
+			remotes: {
+				connectOrCreate: Object.entries(resource.remotes).map(([api, uri]) => ({
+					where: {
+						api_uri: {
+							api,
+							uri,
+						},
+					},
+					create: {
+						api,
+						uri,
+					},
+				})),
+				// disconnect: Object.keys(resource.remotes).map(([api]) => ({
+				// 	dataObjectId_api: {
+				// 		dataObjectId: resource.id,
+				// 		api,
+				// 	},
+				// })),
+			},
 		},
 		create: {
 			id: resource.id,
@@ -196,6 +368,20 @@ export async function upsertResource(resource: Resource): Promise<Resource> {
 			type: resource.type,
 			isFavourite: resource.isFavourite,
 			thumbnailFileId: resource.thumbnail?.id || null,
+			remotes: {
+				connectOrCreate: Object.entries(resource.remotes).map(([api, uri]) => ({
+					where: {
+						api_uri: {
+							api,
+							uri,
+						},
+					},
+					create: {
+						api,
+						uri,
+					},
+				})),
+			},
 		},
 		include: {
 			remotes: true,

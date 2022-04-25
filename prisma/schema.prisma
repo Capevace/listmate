@@ -101,12 +101,17 @@ model DataObject {
     isFavourite Boolean @default(false)
 
     thumbnail       FileReference? @relation(fields: [thumbnailFileId], references: [id])
-    thumbnailFileId String?
+    thumbnailFileId String?        @unique
 
     values     DataObjectValue[]  @relation("DataObjectValues")
     remotes    DataObjectRemote[]
     references DataObjectValue[]  @relation("DataObjectReferences")
     placements ListItem[]
+    list       List?
+
+    @@index([type])
+    @@index([isFavourite])
+    @@index([type, isFavourite])
 }
 
 model DataObjectRemote {
@@ -135,6 +140,7 @@ model DataObjectValue {
     valueDataObjectId String?
 
     @@id([dataObjectId, key])
+    @@index([key])
 }
 
 model FileReference {
@@ -144,13 +150,16 @@ model FileReference {
 
     coverReferences List[] @relation("FileCoverReferences")
 
-    thumbnailReferences DataObject[]
+    thumbnailReference DataObject?
 }
 
 model List {
     id        String   @id @default(uuid())
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+
+    dataObject   DataObject @relation(fields: [dataObjectId], references: [id], onDelete: Cascade)
+    dataObjectId String     @unique
 
     user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId String?

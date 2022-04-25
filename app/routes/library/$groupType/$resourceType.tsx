@@ -14,6 +14,7 @@ import { findOptionalPageQuery } from '~/utilities/paginate';
 import capitalize from '~/utilities/capitalize';
 
 import ListView from '~/components/views/list-view';
+import ListHeader from '~/components/views/list-view/list-header';
 
 type LoaderData = {
 	list: List;
@@ -65,5 +66,13 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 export default function ListPage() {
 	const data = useLoaderData<LoaderData>();
 
-	return <ListView list={data.list} items={data.items} page={data.page} />;
+	const resources = data.items.map((item) => item.resource);
+
+	return (
+		<ListView
+			items={resources}
+			page={data.page}
+			header={<ListHeader list={data.list} />}
+		/>
+	);
 }

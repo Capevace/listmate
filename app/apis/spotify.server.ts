@@ -9,6 +9,7 @@ import {
 	attachRemoteUri,
 	createResource,
 	findResourceByRemoteUri,
+	upsertResource,
 } from '~/models/resource/resource.server';
 import {
 	Resource,
@@ -23,6 +24,10 @@ import {
 } from '~/models/source-token.server';
 import { User } from '~/models/user.server';
 import retry from '~/utilities/retry';
+
+function logEvent(type: ResourceType, ...messages: string[]) {
+	console.log(`IMPORT – Spotify – ${type}`, ...messages);
+}
 
 export type SpotifyTokenData = {
 	accessToken: string;
@@ -70,16 +75,19 @@ export async function importResource<RType extends Resource = Resource>(
 	uri: DataObjectRemote['uri'],
 	data: ResourceWithoutDefaults
 ): Promise<RType> {
-	console.log('import', api, uri, data);
+	logEvent(data.type, `Importing ${uri}`);
 
 	let previousResource = await findResourceByRemoteUri(api, uri);
 
 	if (previousResource) {
-		return previousResource as RType;
+		return (await upsertResource({
+			...previousResource,
+			...data,
+		})) as RType;
 	}
 
 	const createdResource = await createResource(data);
-	await attachRemoteUri(createdResource.id, SourceType.SPOTIFY, uri);
+	// await attachRemoteUri(createdResource.id, SourceType.SPOTIFY, uri);
 
 	return createdResource as RType;
 }
@@ -96,78 +104,205 @@ export async function importImage(url: string, name: string) {
 	}
 }
 
-export async function importArtist(artist: SpotifyApi.ArtistObjectFull) {
+function retryImport<T>(fn: () => Promise<T>) {
+	return retry(fn, 5);
+}
+
+type ImportParameters = {
+	api: SpotifyWebApi;
+	userId: User['id'];
+};
+
+type ResourceRefreshParameters = ImportParameters & {
+	resource: Resource;
+};
+export async function refreshResourceData({
+	api,
+	userId,
+	resource,
+}: ResourceRefreshParameters) {
+	const spotifyUri = resource.remotes[SourceType.SPOTIFY];
+
+	if (!spotifyUri) {
+		throw new Error('Resource is not connected with Spotify');
+	}
+
+	switch (resource.type) {
+		case ResourceType.SONG:
+			return importSong({
+				api,
+				userId,
+				songId: spotifyUri.replace('spotify:track:', ''),
+			});
+
+		case ResourceType.ARTIST:
+			return importArtist({
+				api,
+				userId,
+				artistId: spotifyUri.replace('spotify:artist:', ''),
+			});
+
+		case ResourceType.ALBUM:
+			return importAlbum({
+				api,
+				userId,
+				albumId: spotifyUri.replace('spotify:album:', ''),
+			});
+
+		case ResourceType.PLAYLIST:
+			return importPlaylist({
+				api,
+				userId,
+				playlistId: spotifyUri.replace('spotify:playlist:', ''),
+			});
+
+		default:
+			throw new Error(
+				`Resource type not supported by Spotify API: ${resource.type}`
+			);
+	}
+}
+
+type ArtistImportParameters = ImportParameters & {
+	artistId: string;
+};
+export async function importArtist({
+	api,
+	userId,
+	artistId,
+}: ArtistImportParameters) {
+	const { body: artistData } = await retryImport(() => api.getArtist(artistId));
+
 	const thumbnail =
-		artist.images.length > 0
+		artistData.images.length > 0
 			? await importImage(
-					artist.images[0].url,
-					`artist-cover-${artist.uri}.jpg`
+					artistData.images[0].url,
+					`artist-cover-${artistData.uri}.jpg`
 			  )
 			: null;
 
-	return importResource<Artist>(SourceType.SPOTIFY, artist.uri, {
-		title: artist.name,
+	return importResource<Artist>(SourceType.SPOTIFY, artistData.uri, {
+		title: artistData.name,
 		type: ResourceType.ARTIST,
 		thumbnail: thumbnail,
 		values: {
-			name: { value: artist.name },
+			name: { value: artistData.name },
+		},
+		remotes: {
+			[SourceType.SPOTIFY]: artistData.uri,
 		},
 	});
 }
 
+type AlbumImportParameters = ImportParameters & {
+	albumId: string;
+};
 export async function importAlbum(
-	album: SpotifyApi.AlbumObjectSimplified,
-	artist: Artist
+	{ api, userId, albumId }: AlbumImportParameters,
+	{ artistResource }: { artistResource?: Artist } = {}
 ) {
-	const thumbnail =
-		album.images.length > 0
-			? await importImage(album.images[0].url, `album-cover-${album.uri}.jpg`)
+	const { body: albumData } = await retryImport(() => api.getAlbum(albumId));
+
+	const artist =
+		artistResource || albumData.artists.length > 0
+			? await importArtist({ api, userId, artistId: albumData.artists[0].id })
 			: null;
 
-	return importResource<Album>(SourceType.SPOTIFY, album.uri, {
-		title: album.name,
+	const thumbnail =
+		albumData.images.length > 0
+			? await importImage(
+					albumData.images[0].url,
+					`album-cover-${albumData.uri}.jpg`
+			  )
+			: null;
+
+	const album = await importResource<Album>(SourceType.SPOTIFY, albumData.uri, {
+		title: albumData.name,
 		type: ResourceType.ALBUM,
 		thumbnail: thumbnail,
 		values: {
-			name: { value: album.name },
+			name: { value: albumData.name },
 			artist: artist ? { value: artist.title, ref: artist.id } : null,
 		},
+		remotes: {
+			[SourceType.SPOTIFY]: albumData.uri,
+		},
 	});
+
+	for (const track of albumData.tracks.items) {
+		// Catch the local track edge case
+		try {
+			await importSong(
+				{
+					api,
+					userId,
+					songId: track.id,
+				},
+				{ albumResource: album, artistResource: artist || undefined }
+			);
+		} catch (e) {
+			// TODO: Proper import error handling
+			console.error(e);
+		}
+	}
+
+	return album;
 }
 
-export async function importTrack(
-	api: SpotifyWebApi,
-	track: SpotifyApi.TrackObjectFull
+type SongImportParameters = ImportParameters & {
+	songId: string;
+};
+export async function importSong(
+	{ api, userId, songId }: SongImportParameters,
+	{
+		artistResource,
+		albumResource,
+	}: { artistResource?: Artist; albumResource?: Album } = {}
 ) {
-	const { body: artistData } = await retry(
-		() => api.getArtist(track.artists[0].id),
-		5
-	);
-	const artist = await importArtist(artistData);
+	const { body: songData } = await retryImport(() => api.getTrack(songId));
 
-	const { body: albumData } = await retry(
-		() => api.getAlbum(track.album.id),
-		5
-	);
-	const album = await importAlbum(albumData, artist);
+	// This is a weird edge case, that we don't support just yet, as some important data is missing
+	// TODO: support spotify local tracks
+	if (songData.is_local)
+		throw new Error(
+			`Local tracks are not supported, ${songId} – ${songData.name}`
+		);
 
-	return importResource<Song>(SourceType.SPOTIFY, track.uri, {
-		title: track.name,
+	const artist =
+		artistResource || songData.artists.length > 0
+			? await importArtist({ api, userId, artistId: songData.artists[0].id })
+			: null;
+
+	const album =
+		albumResource ||
+		(await importAlbum(
+			{ api, userId, albumId: songData.album.id },
+			{ artistResource: artist || undefined }
+		));
+
+	return importResource<Song>(SourceType.SPOTIFY, songData.uri, {
+		title: songData.name,
 		type: ResourceType.SONG,
 		thumbnail: album.thumbnail,
 		values: {
-			name: { value: track.name },
+			name: { value: songData.name },
 			artist: artist ? { value: artist.title, ref: artist.id } : null,
 			album: album ? { value: album.title, ref: album.id } : null,
+		},
+		remotes: {
+			[SourceType.SPOTIFY]: songData.uri,
 		},
 	});
 }
 
-export async function importPlaylist(
-	api: SpotifyWebApi,
-	userId: User['id'],
-	playlistId: string
-) {
+type PlaylistImportParameters = ImportParameters & {
+	playlistId: string;
+};
+export async function importPlaylist({
+	api,
+	userId,
+	playlistId,
+}: PlaylistImportParameters) {
 	try {
 		const { body: playlist } = await retry(
 			() => api.getPlaylist(playlistId),
@@ -198,8 +333,11 @@ export async function importPlaylist(
 			(item) => !item.track.is_local
 		)) {
 			try {
-				const resource = await importTrack(api, track);
-				await addResourceToList(list.id, resource.id);
+				if (await findResourceByRemoteUri(SourceType.SPOTIFY, track.uri))
+					continue;
+
+				const song = await importSong({ api, userId, songId: track.id });
+				await addResourceToList(list.id, song.id);
 			} catch (e) {
 				console.error('Error fetching track', e);
 			}

@@ -1,15 +1,18 @@
-import type { LoaderFunction, ActionFunction } from 'remix';
-import { redirect } from 'remix';
-import { json, useLoaderData, useCatch } from 'remix';
-import invariant from 'tiny-invariant';
+import type { Resource } from '~/models/resource/types';
 import type { List } from '~/models/list.server';
-import type { ListItemData } from '~/models/item.server';
-import { getList } from '~/models/list.server';
-import { getItemsForList } from '~/models/item.server';
+import type { LoaderFunction, ActionFunction } from 'remix';
+
+import { redirect, json, useLoaderData, useCatch } from 'remix';
+import invariant from 'tiny-invariant';
+
 import { requireUserId } from '~/session.server';
-import ListView from '~/components/views/list-view';
-import MainView from '~/components/views/main-view';
+import { getList } from '~/models/list.server';
+import { getItemsForList, ListItemData } from '~/models/item.server';
 import { findOptionalPageQuery } from '~/utilities/paginate';
+
+import ListView from '~/components/views/list-view';
+import ListHeader from '~/components/views/list-view/list-header';
+import RefreshButton from '~/components/resource/refresh-button';
 
 type LoaderData = {
 	list: List;
@@ -45,7 +48,20 @@ export const action: ActionFunction = async ({ request, params }) => {
 export default function ListPage() {
 	const data = useLoaderData<LoaderData>();
 
-	return <ListView list={data.list} items={data.items} page={data.page} />;
+	const resources = data.items.map((item) => item.resource);
+
+	return (
+		<ListView
+			items={resources}
+			page={data.page}
+			header={
+				<ListHeader
+					list={data.list}
+					actions={{ canRefresh: true, canPlay: true, canAddItems: true }}
+				/>
+			}
+		/>
+	);
 }
 
 export function ErrorBoundary({ error }: { error: Error }) {
