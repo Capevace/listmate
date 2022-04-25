@@ -7,6 +7,7 @@ export * from '~/adapters/collection/type';
 export * from '~/adapters/album/type';
 export * from '~/adapters/artist/type';
 export * from '~/adapters/song/type';
+export * from '~/adapters/playlist/type';
 
 /**
  * Resource's are used as an abstraction for data objects.

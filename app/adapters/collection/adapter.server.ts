@@ -14,14 +14,18 @@ import {
 	Resource,
 	ResourceDetails,
 	ResourceType,
-	stringToResourceType,
+	SourceType,
+	stringToSourceType,
 } from '~/models/resource/types';
 import { resolveValueRefArray } from '~/models/resource/resource.server';
 
-export function dataObjectToCollection(
+export function dataObjectToCollection<
+	TResource extends Resource = Resource,
+	TResourceType extends ResourceType = ResourceType.COLLECTION
+>(
 	dataObject: CompleteDataObject,
 	values?: DataObjectValueMap
-): Collection {
+): Collection<TResource, TResourceType> {
 	values = values ?? valuesToObject(dataObject.values);
 
 	const name = composeRefFromValue(values.name);
@@ -29,13 +33,13 @@ export function dataObjectToCollection(
 	invariant(name, 'Missing name');
 
 	return {
-		...composeResourceBase<ResourceType.COLLECTION>(dataObject),
+		...composeResourceBase<TResourceType>(dataObject),
 		// additional spotify-specific fields
 		values: {
 			name,
-			source: composeRefFromValue<ResourceType>(
+			source: composeRefFromValue<SourceType>(
 				values.source,
-				stringToResourceType
+				stringToSourceType
 			),
 			description: composeRefFromValue(values.description),
 			items: composeRefArrayFromValue<string>(values.items),
@@ -43,13 +47,17 @@ export function dataObjectToCollection(
 	};
 }
 
-export type CollectionDetails<TResource extends Resource> = ResourceDetails & {
-	items: TResource[];
-};
+export type CollectionDetails<TResource extends Resource = Resource> =
+	ResourceDetails & {
+		items: TResource[];
+	};
 
 export async function getCollectionDetails<
-	TResource extends Resource = Resource
->(collection: Collection<TResource>): Promise<CollectionDetails<TResource>> {
+	TResource extends Resource = Resource,
+	TResourceType extends ResourceType = ResourceType.COLLECTION
+>(
+	collection: Collection<TResource, TResourceType>
+): Promise<CollectionDetails<TResource>> {
 	const items = await resolveValueRefArray(collection.id, 'items');
 
 	return { items: items as TResource[] };

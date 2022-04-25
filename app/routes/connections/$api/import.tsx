@@ -71,7 +71,9 @@ export const action: ActionFunction = async ({ request, params }) => {
 		console.log('Imported playlist', lastPlaylist, id);
 	}
 
-	return redirect(lastPlaylist ? `/lists/${lastPlaylist.id}` : '/connections');
+	return redirect(
+		lastPlaylist ? `/resources/${lastPlaylist.id}` : '/connections'
+	);
 };
 
 export default function ResourcesPage() {

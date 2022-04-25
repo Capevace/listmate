@@ -1,10 +1,10 @@
-import type { List } from '~/models/list.server';
 import type { User } from '~/models/user.server';
 
 import React, { useState } from 'react';
 import { Form, NavLink } from 'remix';
 
 import {
+	Collection,
 	GroupType,
 	GROUP_TYPES,
 	GROUP_TYPE_ITEMS,
@@ -52,10 +52,10 @@ const LIBRARY_ICONS: { [key in ResourceType]?: React.ReactNode } = {
 
 type SidebarProps = {
 	user?: User;
-	lists?: List[];
+	collections?: Collection[];
 };
 
-export default function Sidebar({ user, lists = [] }: SidebarProps) {
+export default function Sidebar({ user, collections = [] }: SidebarProps) {
 	const [typeGroup, setTypeGroup] = useState(GroupType.MUSIC);
 
 	return (
@@ -103,11 +103,14 @@ export default function Sidebar({ user, lists = [] }: SidebarProps) {
 				</section>
 				<hr className="border-gray-700" />
 				<section className="flex flex-col">
-					<h2 className="mb-2 text-xs text-gray-400">Lists</h2>
+					<h2 className="mb-2 text-xs text-gray-400">Collections</h2>
 					<nav className="flex flex-1 flex-col gap-1">
-						{lists.map((list) => (
-							<SidebarListItem key={list.id} to={`/lists/${list.id}`}>
-								{list.title}
+						{collections.map((collection) => (
+							<SidebarListItem
+								key={collection.id}
+								to={`/resources/${collection.id}`}
+							>
+								{collection.title}
 							</SidebarListItem>
 						))}
 					</nav>

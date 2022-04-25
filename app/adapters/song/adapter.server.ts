@@ -5,6 +5,7 @@ import {
 	composeRefFromValue,
 	composeResourceBase,
 	DataObjectValueMap,
+	getEmptyDetails,
 	valuesToObject,
 } from '~/models/resource/adapters.server';
 import { ResourceType } from '~/models/resource/types';
@@ -31,3 +32,5 @@ export function dataObjectToSong(
 		// artist: values.has('artist') ? values.get('artist') : undefined,
 	};
 }
+
+export const getSongDetails = getEmptyDetails;

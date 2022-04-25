@@ -6,17 +6,25 @@ import {
 	ValueArrayItem,
 } from '@prisma/client';
 
-import { dataObjectToArtist } from '~/adapters/artist/adapter.server';
+import {
+	dataObjectToArtist,
+	getArtistDetails,
+} from '~/adapters/artist/adapter.server';
 import {
 	dataObjectToAlbum,
 	getAlbumDetails,
 } from '~/adapters/album/adapter.server';
-import { dataObjectToSong } from '~/adapters/song/adapter.server';
+import {
+	dataObjectToSong,
+	getSongDetails,
+} from '~/adapters/song/adapter.server';
 
 // export * from '~/models/resource/adapters/types';
 
 import {
 	Album,
+	Collection,
+	Playlist,
 	RawValue,
 	Resource,
 	ResourceDetails,
@@ -28,6 +36,15 @@ import {
 	ValueRef,
 } from '~/models/resource/types';
 import invariant from 'tiny-invariant';
+import {
+	dataObjectToCollection,
+	getCollectionDetails,
+} from '~/adapters/collection/adapter.server';
+import {
+	dataObjectToPlaylist,
+	getPlaylistDetails,
+} from '~/adapters/playlist/adapter.server';
+import { Artist } from '~/adapters/artist/type';
 
 export type CompleteDataObjectValue = DataObjectValue & {
 	items: ValueArrayItem[];
@@ -56,6 +73,10 @@ export function dataObjectToResource(dataObject: CompleteDataObject): Resource {
 	const values = valuesToObject(dataObject.values);
 
 	switch (dataObject.type) {
+		case ResourceType.COLLECTION:
+			return dataObjectToCollection(dataObject, values);
+		case ResourceType.PLAYLIST:
+			return dataObjectToPlaylist(dataObject, values);
 		case ResourceType.ALBUM:
 			return dataObjectToAlbum(dataObject, values);
 		case ResourceType.ARTIST:
@@ -63,7 +84,9 @@ export function dataObjectToResource(dataObject: CompleteDataObject): Resource {
 		case ResourceType.SONG:
 			return dataObjectToSong(dataObject, values);
 		default:
-			throw new Error(`Unknown resource type ${dataObject.type}`);
+			throw new Error(
+				`dataObjectToResource: resource type ${dataObject.type} not implemented`
+			);
 	}
 }
 
@@ -78,12 +101,29 @@ export async function getResourceDetails(
 	resource: Resource
 ): Promise<ResourceDetails> {
 	switch (resource.type) {
+		case ResourceType.COLLECTION:
+			return getCollectionDetails(resource as Collection);
+		case ResourceType.PLAYLIST:
+			return getPlaylistDetails(resource as Playlist);
 		case ResourceType.ALBUM:
 			return getAlbumDetails(resource as Album);
+		case ResourceType.ARTIST:
+			return getArtistDetails(resource as Artist);
+		case ResourceType.SONG:
+			return getSongDetails(resource as Song);
 
 		default:
-			return {};
+			throw new Error(
+				`getResourceDetails: resource type ${resource.type} not implemented`
+			);
 	}
+}
+
+/**
+ * Detail function placeholder.
+ */
+export function getEmptyDetails(_resource: Resource): ResourceDetails {
+	return {};
 }
 
 /**

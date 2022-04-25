@@ -16,10 +16,14 @@ import metaStylesheetUrl from '~/styles/meta-styles.css';
 import { getUser } from '~/session.server';
 import MainAppLayout from '~/components/layout/main';
 import type { User } from '~/models/user.server';
-import { getListsForUser, List } from '~/models/list.server';
 import { MantineProvider } from '@mantine/core';
 import { theme } from '~/styles/mantine.theme';
 import ErrorView from './components/views/error-view';
+import {
+	findResourcesByType,
+	findResourcesByTypes,
+} from './models/resource/resource.server';
+import { Collection, ResourceType } from './models/resource/types';
 
 export const meta: MetaFunction = () => ({
 	charset: 'utf-8',
@@ -29,7 +33,7 @@ export const meta: MetaFunction = () => ({
 
 type LoaderData = {
 	user: User | null;
-	lists: List[];
+	collections: Collection[];
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
@@ -37,7 +41,12 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 	return json<LoaderData>({
 		user,
-		lists: user ? await getListsForUser({ id: user.id }) : [],
+		collections: user
+			? ((await findResourcesByTypes([
+					ResourceType.COLLECTION,
+					ResourceType.PLAYLIST,
+			  ])) as Collection[])
+			: [],
 	});
 };
 
@@ -45,10 +54,10 @@ type FrameProps = {
 	children: React.ReactNode;
 	hideSidebar?: boolean;
 	user?: User;
-	lists?: List[];
+	collections?: Collection[];
 };
 
-function Frame({ children, hideSidebar, user, lists }: FrameProps) {
+function Frame({ children, hideSidebar, user, collections }: FrameProps) {
 	return (
 		<html lang="en" className="h-full">
 			{/* 
@@ -71,7 +80,11 @@ function Frame({ children, hideSidebar, user, lists }: FrameProps) {
 				></script>
 
 				<MantineProvider theme={theme}>
-					<MainAppLayout hideSidebar={hideSidebar} user={user} lists={lists}>
+					<MainAppLayout
+						hideSidebar={hideSidebar}
+						user={user}
+						collections={collections}
+					>
 						{children}
 					</MainAppLayout>
 				</MantineProvider>
@@ -85,10 +98,10 @@ function Frame({ children, hideSidebar, user, lists }: FrameProps) {
 }
 
 export default function App() {
-	const { user, lists } = useLoaderData() as LoaderData;
+	const { user, collections } = useLoaderData() as LoaderData;
 
 	return (
-		<Frame user={user || undefined} lists={lists}>
+		<Frame user={user || undefined} collections={collections}>
 			<Outlet />
 		</Frame>
 	);

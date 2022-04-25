@@ -1,10 +1,12 @@
-import { DataObjectRemote } from '@prisma/client';
+import type { Album, Artist, Song, Playlist } from '~/models/resource/types';
+import type { DataObjectRemote } from '@prisma/client';
+import type { User } from '~/models/user.server';
+
 import SpotifyWebApi from 'spotify-web-api-node';
 import invariant from 'tiny-invariant';
+
 import { saveFile } from '~/models/file.server';
-import { addResourceToList } from '~/models/item.server';
-import { upsertList } from '~/models/list.server';
-import { Album, Artist, Playlist, Song } from '~/models/resource/types';
+
 import {
 	createResource,
 	findResourceByRemoteUri,
@@ -22,7 +24,6 @@ import {
 	SourceToken,
 	updateTokenData,
 } from '~/models/source-token.server';
-import { User } from '~/models/user.server';
 import retry from '~/utilities/retry';
 
 function logEvent(type: ResourceType, ...messages: string[]) {
@@ -153,7 +154,7 @@ export async function refreshResourceData({
 				albumId: spotifyUri.replace('spotify:album:', ''),
 			});
 
-		case ResourceType.LIST:
+		case ResourceType.PLAYLIST:
 			return importPlaylist({
 				api,
 				userId,
@@ -360,7 +361,8 @@ export async function importPlaylist({
 				description: playlistData.description
 					? { value: playlistData.description }
 					: null,
-				songs: [],
+				items: [],
+				source: { value: SourceType.SPOTIFY },
 			},
 			remotes: {
 				[SourceType.SPOTIFY]: playlistData.uri,
@@ -369,7 +371,7 @@ export async function importPlaylist({
 	);
 
 	if (!skipSongs) {
-		playlist.values.songs = [];
+		playlist.values.items = [];
 
 		for (const item of playlistData.tracks.items) {
 			// Catch the local track edge case
@@ -378,10 +380,9 @@ export async function importPlaylist({
 					api,
 					userId,
 					songId: item.track.id,
-					skipPushToAlbum: true,
 				});
 
-				playlist.values.songs.push({ value: song.title, ref: song.id });
+				playlist.values.items.push({ value: song.title, ref: song.id });
 			} catch (e) {
 				// TODO: Proper import error handling
 				console.error(e);

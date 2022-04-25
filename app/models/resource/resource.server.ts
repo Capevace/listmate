@@ -128,6 +128,34 @@ export async function findResourcesByType(
 }
 
 /**
+ * Find multiple Resource by their type, with multiple being possible.
+ *
+ * @param types The valid types
+ */
+export async function findResourcesByTypes(
+	types: ResourceType[]
+): Promise<Resource[]> {
+	const dataObjects = await db.dataObject.findMany({
+		where: {
+			type: {
+				in: types,
+			},
+		},
+		include: {
+			remotes: true,
+			values: {
+				include: {
+					items: true,
+				},
+			},
+			thumbnail: true,
+		},
+	});
+
+	return dataObjects.map(dataObjectToResource);
+}
+
+/**
  * Find multiple Resource by their value.
  *
  * @param type The type of the Resource
@@ -714,6 +742,6 @@ export async function deleteResource(resourceId: string): Promise<void> {
 	await db.dataObject.delete({
 		where: {
 			id: resourceId,
-		}
+		},
 	});
 }
