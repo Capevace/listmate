@@ -5,7 +5,7 @@ import ResourceHeader from '~/components/resource/resource-header';
 
 export default function GenericDetails({ resource }: ResourceDetailsProps) {
 	return (
-		<ResourceHeader resource={resource} className="mx-auto max-w-7xl">
+		<ResourceHeader resource={resource} className="mx-auto w-full max-w-7xl">
 			<ValueGrid values={resource.values} />
 		</ResourceHeader>
 	);
