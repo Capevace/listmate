@@ -101,13 +101,13 @@ model DataObject {
     isFavourite Boolean @default(false)
 
     thumbnail       FileReference? @relation(fields: [thumbnailFileId], references: [id])
-    thumbnailFileId String?        @unique
+    thumbnailFileId String?
 
-    values     DataObjectValue[]  @relation("DataObjectValues")
-    remotes    DataObjectRemote[]
-    references DataObjectValue[]  @relation("DataObjectReferences")
-    placements ListItem[]
-    list       List?
+    values          DataObjectValue[]  @relation("DataObjectValues")
+    remotes         DataObjectRemote[]
+    references      DataObjectValue[]  @relation("ValueReferences")
+    arrayReferences ValueArrayItem[]   @relation("ValueArrayReferences")
+    placements      ListItem[]
 
     @@index([type])
     @@index([isFavourite])
@@ -129,18 +129,33 @@ model DataObjectRemote {
 }
 
 model DataObjectValue {
-    // api       String // youtube, spotify, local
-    // uri String
     dataObject   DataObject @relation("DataObjectValues", fields: [dataObjectId], references: [id], onDelete: Cascade)
     dataObjectId String
     key          String
 
     value             String
-    valueDataObject   DataObject? @relation("DataObjectReferences", fields: [valueDataObjectId], references: [id], onDelete: Cascade)
+    valueDataObject   DataObject? @relation("ValueReferences", fields: [valueDataObjectId], references: [id], onDelete: Cascade)
     valueDataObjectId String?
+
+    isArray Boolean          @default(false)
+    items   ValueArrayItem[]
 
     @@id([dataObjectId, key])
     @@index([key])
+}
+
+model ValueArrayItem {
+    parentValue        DataObjectValue @relation(fields: [parentDataObjectId, parentKey], references: [dataObjectId, key], onDelete: Cascade)
+    parentDataObjectId String
+    parentKey          String
+    position           Int
+
+    value             String
+    valueDataObject   DataObject? @relation("ValueArrayReferences", fields: [valueDataObjectId], references: [id], onDelete: Cascade)
+    valueDataObjectId String?
+
+    @@id([parentDataObjectId, parentKey, position])
+    @@index([parentDataObjectId, parentKey])
 }
 
 model FileReference {
@@ -150,16 +165,13 @@ model FileReference {
 
     coverReferences List[] @relation("FileCoverReferences")
 
-    thumbnailReference DataObject?
+    thumbnailReferences DataObject[]
 }
 
 model List {
     id        String   @id @default(uuid())
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
-
-    dataObject   DataObject @relation(fields: [dataObjectId], references: [id], onDelete: Cascade)
-    dataObjectId String     @unique
 
     user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId String?

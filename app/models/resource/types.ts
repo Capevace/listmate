@@ -27,10 +27,8 @@ export type Resource = {
  * This type of Resource makes certain properties optional.
  * Functions can use this to provide default values for some properties.
  */
-export type ResourceWithoutDefaults = SetOptional<
-	Except<Resource, 'id'>,
-	'isFavourite' | 'thumbnail'
->;
+export type ResourceWithoutDefaults<TResource extends Resource = Resource> =
+	SetOptional<Except<TResource, 'id'>, 'isFavourite' | 'thumbnail'>;
 
 /**
  * ResourceType expresses what kind of resource it is.
@@ -38,22 +36,22 @@ export type ResourceWithoutDefaults = SetOptional<
  * This is important to include the correct values in a performant manner.
  */
 export enum ResourceType {
+	LIST = 'list',
 	BOOKMARK = 'bookmark',
 	SONG = 'song',
 	ARTIST = 'artist',
 	ALBUM = 'album',
-	PLAYLIST = 'playlist',
 }
 
 /**
  * A list of all resource types.
  */
-export const ALL_RESOURCE_TYPES = [
-	'bookmark',
-	'song',
-	'artist',
-	'album',
-	'playlist',
+export const ALL_RESOURCE_TYPES: ResourceType[] = [
+	ResourceType.LIST,
+	ResourceType.BOOKMARK,
+	ResourceType.SONG,
+	ResourceType.ARTIST,
+	ResourceType.ALBUM,
 ];
 
 /**
@@ -63,6 +61,8 @@ export const ALL_RESOURCE_TYPES = [
  */
 export function stringToResourceType(type: string): ResourceType {
 	switch (type) {
+		case 'list':
+			return ResourceType.LIST;
 		case 'bookmark':
 			return ResourceType.BOOKMARK;
 		case 'song':
@@ -71,8 +71,6 @@ export function stringToResourceType(type: string): ResourceType {
 			return ResourceType.ALBUM;
 		case 'artist':
 			return ResourceType.ARTIST;
-		case 'playlist':
-			return ResourceType.PLAYLIST;
 		default:
 			throw new Error(`Unknown resource type: ${type}`);
 	}
@@ -142,7 +140,9 @@ export function stringToSourceType(type: string): SourceType {
  *
  * It is a map of key to corresponding ValueRef.
  */
-export type ResourceValues = { [key: string]: ValueRef<any> | null };
+export type ResourceValues = {
+	[key: string]: ValueRef<any>[] | ValueRef<any> | null;
+};
 
 export type ResourceRemotes = { [key in SourceType]?: string };
 

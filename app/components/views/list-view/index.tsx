@@ -10,7 +10,10 @@ export type PositionedItem = {
 export type ListViewProps = {
 	items: Resource[];
 	page?: number;
+	headerHeight?: number;
 	header?: React.ReactNode;
+	footerHeight?: number;
+	footer?: React.ReactNode;
 };
 
 // TODO: ListView definitely needs some refactoring
@@ -33,6 +36,9 @@ export default function ListView(props: ListViewProps) {
 				items={props.items}
 				page={props.page}
 				header={props.header}
+				headerHeight={props.headerHeight}
+				footer={props.footer}
+				footerHeight={props.footerHeight}
 			/>
 		</>
 	);

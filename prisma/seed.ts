@@ -128,34 +128,34 @@ const seed = async () => {
 		},
 	});
 
-	const albumCover = await saveFile(
-		'album.webp',
-		await fs.readFile('/Users/mat/Downloads/album.webp')
-	);
+	// const albumCover = await saveFile(
+	// 	'album.webp',
+	// 	await fs.readFile('/Users/mat/Downloads/album.webp')
+	// );
 
-	const library = await generateLibrary(user.id, 3);
+	// const library = await generateLibrary(user.id, 3);
 
-	await upsertResources(library.artists);
-	await upsertResources(library.albums);
-	await upsertResources(library.songs);
+	// await upsertResources(library.artists);
+	// await upsertResources(library.albums);
+	// await upsertResources(library.songs);
 
-	for (const playlist of library.lists) {
-		const list = await upsertList({
-			...playlist.list,
-			coverFileReferenceId: albumCover.id,
-		});
+	// for (const playlist of library.lists) {
+	// 	const list = await upsertList({
+	// 		...playlist.list,
+	// 		coverFileReferenceId: albumCover.id,
+	// 	});
 
-		for (const resource of playlist.songs) {
-			await addResourceToList(list.id, resource.id);
-		}
-	}
+	// 	for (const resource of playlist.songs) {
+	// 		await addResourceToList(list.id, resource.id);
+	// 	}
+	// }
 
-	console.log('Library generated', {
-		artists: library.artists.length,
-		albums: library.albums.length,
-		songs: library.songs.length,
-		lists: library.lists.length,
-	});
+	// console.log('Library generated', {
+	// 	artists: library.artists.length,
+	// 	albums: library.albums.length,
+	// 	songs: library.songs.length,
+	// 	lists: library.lists.length,
+	// });
 
 	/*
 

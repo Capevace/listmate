@@ -5,13 +5,17 @@ import invariant from 'tiny-invariant';
 
 import {
 	CompleteDataObject,
+	composeRefArrayFromValue,
 	composeRefFromValue,
 	composeResourceBase,
 	DataObjectValueMap,
 	valuesToObject,
 } from '~/models/resource/adapters.server';
 import { ResourceDetails, ResourceType } from '~/models/resource/types';
-import { findResources } from '~/models/resource/resource.server';
+import {
+	findResources,
+	resolveValueRefArray,
+} from '~/models/resource/resource.server';
 
 export function dataObjectToAlbum(
 	dataObject: CompleteDataObject,
@@ -29,6 +33,7 @@ export function dataObjectToAlbum(
 		values: {
 			name,
 			artist: composeRefFromValue<string>(values.artist),
+			songs: composeRefArrayFromValue<string>(values.songs),
 		},
 	};
 }
@@ -38,10 +43,7 @@ export type AlbumDetails = ResourceDetails & {
 };
 
 export async function getAlbumDetails(album: Album): Promise<AlbumDetails> {
-	const songs = await findResources({
-		type: ResourceType.SONG,
-		valueRef: { key: 'album', ref: album.id },
-	});
+	const songs = await resolveValueRefArray(album.id, 'songs');
 
 	return { songs: songs as Song[] };
 }

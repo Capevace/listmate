@@ -34,7 +34,11 @@ export async function searchResources(text: string): Promise<Resource[]> {
 		},
 		include: {
 			remotes: true,
-			values: true,
+			values: {
+				include: {
+					items: true,
+				},
+			},
 			thumbnail: true,
 		},
 	});
@@ -57,7 +61,11 @@ export async function findResourceById(
 		},
 		include: {
 			remotes: true,
-			values: true,
+			values: {
+				include: {
+					items: true,
+				},
+			},
 			thumbnail: true,
 		},
 	});
@@ -107,7 +115,11 @@ export async function findResourcesByType(
 		},
 		include: {
 			remotes: true,
-			values: true,
+			values: {
+				include: {
+					items: true,
+				},
+			},
 			thumbnail: true,
 		},
 	});
@@ -137,7 +149,11 @@ export async function findResourcesByValue(
 		},
 		include: {
 			remotes: true,
-			values: true,
+			values: {
+				include: {
+					items: true,
+				},
+			},
 			thumbnail: true,
 		},
 	});
@@ -167,12 +183,63 @@ export async function findResourcesByValueRef(
 		},
 		include: {
 			remotes: true,
-			values: true,
+			values: {
+				include: {
+					items: true,
+				},
+			},
 			thumbnail: true,
 		},
 	});
 
 	return dataObjects.map(dataObjectToResource);
+}
+
+/**
+ * Find multiple Resource by their value reference.
+ *
+ * For example, you can find all songs that have a reference to a specific artist or album.
+ *
+ * @param type The type of the Resource
+ */
+export async function resolveValueRefArray(
+	resourceId: Resource['id'],
+	key: string
+): Promise<Resource[]> {
+	const arrayItems = await db.valueArrayItem.findMany({
+		where: {
+			parentDataObjectId: resourceId,
+			parentKey: key,
+			valueDataObjectId: {
+				not: null,
+			},
+		},
+		include: {
+			valueDataObject: {
+				include: {
+					remotes: true,
+					values: {
+						include: {
+							items: true,
+						},
+					},
+					thumbnail: true,
+				},
+			},
+		},
+	});
+
+	return arrayItems
+		.filter((item) => item.valueDataObject !== null)
+		.sort((a, b) => a.position - b.position)
+		.map((arrayItem) => {
+			invariant(
+				arrayItem.valueDataObject !== null,
+				'valueDataObject should not be null, as per query'
+			);
+
+			return dataObjectToResource(arrayItem.valueDataObject);
+		});
 }
 
 type ResourceQuery = {
@@ -183,6 +250,10 @@ type ResourceQuery = {
 		value: string;
 	};
 	valueRef: {
+		key: string;
+		ref: string;
+	};
+	valueArrayRef: {
 		key: string;
 		ref: string;
 	};
@@ -246,7 +317,11 @@ export async function findResources(
 		},
 		include: {
 			remotes: true,
-			values: true,
+			values: {
+				include: {
+					items: true,
+				},
+			},
 			thumbnail: true,
 		},
 	});
@@ -307,7 +382,11 @@ export async function createResource(
 		},
 		include: {
 			remotes: true,
-			values: true,
+			values: {
+				include: {
+					items: true,
+				},
+			},
 			thumbnail: true,
 		},
 	});
@@ -396,7 +475,11 @@ export async function upsertResource(resource: Resource): Promise<Resource> {
 		},
 		include: {
 			remotes: true,
-			values: true,
+			values: {
+				include: {
+					items: true,
+				},
+			},
 			thumbnail: true,
 		},
 	});
@@ -413,28 +496,106 @@ export async function upsertResource(resource: Resource): Promise<Resource> {
  *
  * @param resource
  */
-async function upsertValues(resource: Resource) {
-	for (const [key, valueRef] of Object.entries(resource.values)) {
-		if (!valueRef) continue;
+export async function upsertValues(resource: Resource) {
+	for (const [key, valueRefOrArray] of Object.entries(resource.values)) {
+		if (!valueRefOrArray) continue;
 
-		await db.dataObjectValue.upsert({
-			where: {
-				dataObjectId_key: {
+		if (Array.isArray(valueRefOrArray)) {
+			valueRefOrArray.map((valueRef, index) => {
+				console.log('ref', valueRef, {
+					parentDataObjectId: resource.id,
+					parentKey: key,
+					position: index,
+
+					value: valueRef.value,
+					valueDataObject: {
+						connect: {
+							id: valueRef.ref,
+						},
+					},
+					// valueDataObjectId: valueRef.ref,
+				});
+				return {};
+			});
+
+			await db.dataObjectValue.upsert({
+				where: {
+					dataObjectId_key: {
+						dataObjectId: resource.id,
+						key,
+					},
+				},
+				update: {
+					isArray: true,
+					valueDataObjectId: null,
+					value: valueRefOrArray.map((valueRef) => valueRef.value).join(', '),
+					items: {
+						deleteMany: {},
+					},
+				},
+				create: {
 					dataObjectId: resource.id,
 					key,
+					value: valueRefOrArray.map((valueRef) => valueRef.value).join(', '),
+					isArray: true,
 				},
-			},
-			update: {
-				value: valueRef.value,
-				valueDataObjectId: valueRef.ref,
-			},
-			create: {
-				dataObjectId: resource.id,
-				key,
-				value: valueRef.value,
-				valueDataObjectId: valueRef.ref,
-			},
-		});
+			});
+
+			await db.$transaction(
+				valueRefOrArray.map((valueRef, index) =>
+					db.valueArrayItem.upsert({
+						where: {
+							parentDataObjectId_parentKey_position: {
+								parentDataObjectId: resource.id,
+								parentKey: key,
+								position: index,
+							},
+						},
+						update: {
+							position: index,
+
+							value: valueRef.value,
+							valueDataObjectId: valueRef.ref,
+						},
+						create: {
+							parentDataObjectId: resource.id,
+							parentKey: key,
+							position: index,
+
+							value: valueRef.value,
+							valueDataObjectId: valueRef.ref,
+						},
+					})
+				)
+			);
+		} else {
+			await db.dataObjectValue.upsert({
+				where: {
+					dataObjectId_key: {
+						dataObjectId: resource.id,
+						key,
+					},
+				},
+				update: {
+					value: valueRefOrArray.value,
+					valueDataObjectId: valueRefOrArray.ref,
+					isArray: false,
+					items: {
+						deleteMany: {
+							parentDataObjectId: resource.id,
+							parentKey: key,
+						},
+					},
+				},
+				create: {
+					dataObjectId: resource.id,
+					key,
+					isArray: false,
+					value: valueRefOrArray.value,
+					valueDataObjectId: valueRefOrArray.ref,
+				},
+			});
+		}
 	}
 }
 
@@ -529,7 +690,11 @@ export async function setFavouriteStatus(
 			},
 			include: {
 				remotes: true,
-				values: true,
+				values: {
+					include: {
+						items: true,
+					},
+				},
 				thumbnail: true,
 			},
 		})

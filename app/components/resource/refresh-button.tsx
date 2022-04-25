@@ -12,16 +12,15 @@ export default function RefreshButton({
 	children,
 }: RefreshButtonProps) {
 	const transition = useTransition();
+	const action = resource ? `/resources/${resource.id}/refresh` : 'refresh';
+	const isLoading = transition.submission?.action === action;
+
 	return (
-		<Form
-			replace
-			method="post"
-			action={resource ? `/resources/${resource.id}/refresh` : 'refresh'}
-		>
+		<Form replace method="post" action={action}>
 			{children ? (
-				children({ loading: !!transition.submission })
+				children({ loading: isLoading })
 			) : (
-				<Button loading={!!transition.submission} type="submit">
+				<Button loading={isLoading} type="submit">
 					Refetch Data
 				</Button>
 			)}

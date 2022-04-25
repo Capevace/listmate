@@ -44,9 +44,5 @@ export const action: ActionFunction = async ({ request, params }) => {
 export default function ResourceDetailsPage() {
 	const data = useLoaderData() as LoaderData;
 
-	return (
-		<MainView>
-			<ResourceView resource={data.resource} details={data.details} />
-		</MainView>
-	);
+	return <ResourceView resource={data.resource} details={data.details} />;
 }

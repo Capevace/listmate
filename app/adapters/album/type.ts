@@ -9,6 +9,8 @@ import type {
 export type AlbumData = {
 	name: RawValue<string>;
 	artist: ValueRef<string> | null;
+	songs: (RawValue<string> | ValueRef<string>)[];
+
 	// release_date: '1976-10-14';
 	// release_date_precision: 'day';
 	// total_tracks: 13;

@@ -3,6 +3,7 @@ import {
 	DataObjectRemote,
 	DataObjectValue,
 	FileReference,
+	ValueArrayItem,
 } from '@prisma/client';
 
 import { dataObjectToArtist } from '~/adapters/artist/adapter.server';
@@ -25,20 +26,25 @@ import {
 	stringToSourceType,
 	ValueRef,
 } from '~/models/resource/types';
+import invariant from 'tiny-invariant';
+
+export type CompleteDataObjectValue = DataObjectValue & {
+	items: ValueArrayItem[];
+};
 
 /**
  * A DataObject will all required properties to be a valid Resource.
  */
 export type CompleteDataObject = DataObject & {
 	remotes: DataObjectRemote[];
-	values: DataObjectValue[];
+	values: CompleteDataObjectValue[];
 	thumbnail: FileReference | null;
 };
 
 /**
  * Map of DataObjectValue.
  */
-export type DataObjectValueMap = { [key: string]: DataObjectValue };
+export type DataObjectValueMap = { [key: string]: CompleteDataObjectValue };
 
 /**
  * Convert a DataObject to a resource.
@@ -83,7 +89,9 @@ export async function getResourceDetails(
  * Convert a DataObjectValue array to a map.
  * @param values The value array
  */
-export function valuesToObject(values: DataObjectValue[]): DataObjectValueMap {
+export function valuesToObject(
+	values: CompleteDataObjectValue[]
+): DataObjectValueMap {
 	let object: DataObjectValueMap = {};
 
 	for (const value of values) {
@@ -141,6 +149,26 @@ export function composeRefFromValue<ValueType extends any = string>(
 				value: value.value,
 		  } as ValueRef<ValueType>)
 		: null;
+}
+
+/**
+ * Compose a RawValue or ValueRef array from a DataObjectValue.
+ *
+ * @param value The DataObjectValue to convert from
+ */
+export function composeRefArrayFromValue<ValueType extends any = string>(
+	value?: CompleteDataObjectValue
+): RawValue<ValueType>[] | ValueRef<ValueType>[] {
+	if (!value) return [];
+
+	invariant(value.isArray, 'value is not an array');
+
+	return value.items.map((item) => {
+		return {
+			ref: item.valueDataObjectId,
+			value: item.value,
+		} as ValueRef<ValueType>;
+	});
 }
 
 /**

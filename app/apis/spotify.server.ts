@@ -6,10 +6,10 @@ import { addResourceToList } from '~/models/item.server';
 import { upsertList } from '~/models/list.server';
 import { Album, Artist, Song } from '~/models/resource/types';
 import {
-	attachRemoteUri,
 	createResource,
 	findResourceByRemoteUri,
 	upsertResource,
+	upsertValues,
 } from '~/models/resource/resource.server';
 import {
 	Resource,
@@ -56,6 +56,10 @@ export async function authorizeClient(
 	api.setAccessToken(data.accessToken);
 	api.setRefreshToken(data.refreshToken);
 
+	const res = await retry(() => api.refreshAccessToken(), 5);
+
+	api.setAccessToken(res.body.access_token);
+
 	return api;
 }
 
@@ -73,7 +77,7 @@ export function updateAPITokens(
 export async function importResource<RType extends Resource = Resource>(
 	api: SourceType,
 	uri: DataObjectRemote['uri'],
-	data: ResourceWithoutDefaults
+	data: ResourceWithoutDefaults<RType>
 ): Promise<RType> {
 	logEvent(data.type, `Importing ${uri}`);
 
@@ -149,7 +153,7 @@ export async function refreshResourceData({
 				albumId: spotifyUri.replace('spotify:album:', ''),
 			});
 
-		case ResourceType.PLAYLIST:
+		case ResourceType.LIST:
 			return importPlaylist({
 				api,
 				userId,
@@ -196,15 +200,16 @@ export async function importArtist({
 
 type AlbumImportParameters = ImportParameters & {
 	albumId: string;
+	skipSongs?: boolean;
 };
 export async function importAlbum(
-	{ api, userId, albumId }: AlbumImportParameters,
+	{ api, userId, albumId, skipSongs }: AlbumImportParameters,
 	{ artistResource }: { artistResource?: Artist } = {}
 ) {
 	const { body: albumData } = await retryImport(() => api.getAlbum(albumId));
 
 	const artist =
-		artistResource || albumData.artists.length > 0
+		artistResource ?? albumData.artists.length > 0
 			? await importArtist({ api, userId, artistId: albumData.artists[0].id })
 			: null;
 
@@ -216,34 +221,46 @@ export async function importAlbum(
 			  )
 			: null;
 
-	const album = await importResource<Album>(SourceType.SPOTIFY, albumData.uri, {
+	let album = await importResource<Album>(SourceType.SPOTIFY, albumData.uri, {
 		title: albumData.name,
 		type: ResourceType.ALBUM,
 		thumbnail: thumbnail,
 		values: {
 			name: { value: albumData.name },
 			artist: artist ? { value: artist.title, ref: artist.id } : null,
+			songs: [],
 		},
 		remotes: {
 			[SourceType.SPOTIFY]: albumData.uri,
 		},
 	});
 
-	for (const track of albumData.tracks.items) {
-		// Catch the local track edge case
-		try {
-			await importSong(
-				{
-					api,
-					userId,
-					songId: track.id,
-				},
-				{ albumResource: album, artistResource: artist || undefined }
-			);
-		} catch (e) {
-			// TODO: Proper import error handling
-			console.error(e);
+	if (!skipSongs) {
+		album.values.songs = [];
+
+		for (const track of albumData.tracks.items.sort(
+			(a, b) => a.track_number - b.track_number
+		)) {
+			// Catch the local track edge case
+			try {
+				const song = await importSong(
+					{
+						api,
+						userId,
+						songId: track.id,
+						skipPushToAlbum: true,
+					},
+					{ albumResource: album, artistResource: artist || undefined }
+				);
+
+				album.values.songs.push({ value: song.title, ref: song.id });
+			} catch (e) {
+				// TODO: Proper import error handling
+				console.error(e);
+			}
 		}
+
+		await upsertValues(album);
 	}
 
 	return album;
@@ -251,9 +268,10 @@ export async function importAlbum(
 
 type SongImportParameters = ImportParameters & {
 	songId: string;
+	skipPushToAlbum?: boolean;
 };
 export async function importSong(
-	{ api, userId, songId }: SongImportParameters,
+	{ api, userId, songId, skipPushToAlbum }: SongImportParameters,
 	{
 		artistResource,
 		albumResource,
@@ -269,18 +287,18 @@ export async function importSong(
 		);
 
 	const artist =
-		artistResource || songData.artists.length > 0
+		artistResource ?? songData.artists.length > 0
 			? await importArtist({ api, userId, artistId: songData.artists[0].id })
 			: null;
 
 	const album =
-		albumResource ||
+		albumResource ??
 		(await importAlbum(
-			{ api, userId, albumId: songData.album.id },
+			{ api, userId, albumId: songData.album.id, skipSongs: true },
 			{ artistResource: artist || undefined }
 		));
 
-	return importResource<Song>(SourceType.SPOTIFY, songData.uri, {
+	const song = await importResource<Song>(SourceType.SPOTIFY, songData.uri, {
 		title: songData.name,
 		type: ResourceType.SONG,
 		thumbnail: album.thumbnail,
@@ -293,6 +311,13 @@ export async function importSong(
 			[SourceType.SPOTIFY]: songData.uri,
 		},
 	});
+
+	if (!skipPushToAlbum) {
+		album.values.songs.push({ value: song.title, ref: song.id });
+		await upsertValues(album);
+	}
+
+	return song;
 }
 
 type PlaylistImportParameters = ImportParameters & {

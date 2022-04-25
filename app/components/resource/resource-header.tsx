@@ -11,11 +11,13 @@ import RefreshButton from './refresh-button';
 export type ResourceHeaderProps = {
 	resource: Resource;
 	actions?: React.ReactNode;
+	className?: string;
 	children: React.ReactNode;
 };
 
 export default function ResourceHeader({
 	resource,
+	className,
 	actions,
 	children,
 }: ResourceHeaderProps) {
@@ -31,6 +33,7 @@ export default function ResourceHeader({
 			subtitle={capitalize(resource.type)}
 			coverUrl={composeCoverUrl(resource)}
 			actions={combinedActions}
+			className={className}
 		>
 			{children}
 		</Header>

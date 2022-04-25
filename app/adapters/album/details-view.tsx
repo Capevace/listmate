@@ -4,6 +4,7 @@ import type { AlbumDetails } from './adapter.server';
 import ResourceHeader from '~/components/resource/resource-header';
 import ValueGrid from '~/components/resource/value-grid';
 import ListView from '~/components/views/list-view';
+import ResourceDebugger from '~/components/resource/resource-debugger';
 
 type AlbumDetailsProps = ResourceDetailsProps<Album, AlbumDetails>;
 
@@ -19,6 +20,15 @@ export default function AlbumDetailsView({
 					<ValueGrid values={resource.values} />
 				</ResourceHeader>
 			}
+			headerHeight={365}
+			footer={
+				<ResourceDebugger
+					resource={resource}
+					details={details}
+					className="mt-5"
+				/>
+			}
+			footerHeight={100}
 		/>
 	);
 }

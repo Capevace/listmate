@@ -29,23 +29,27 @@ export function HeaderContent(props: HeaderContentProps) {
 }
 
 type HeaderBackgroundProps = {
+	className?: string;
 	children: React.ReactNode;
 };
 export function HeaderBackground(props: HeaderBackgroundProps) {
 	return (
-		<header className="relative my-5 border border-gray-700 bg-gray-800 px-10 py-8 shadow-xl sm:overflow-hidden sm:rounded-2xl">
+		<header
+			className={`relative my-5 border border-gray-700 bg-gray-800 px-10 py-8 shadow-xl sm:overflow-hidden sm:rounded-2xl ${props.className}`}
+		>
 			{props.children}
 		</header>
 	);
 }
 
 type HeaderProps = HeaderContentProps & {
+	className?: string;
 	children: React.ReactNode;
 };
 
 export default function Header(props: HeaderProps) {
 	return (
-		<HeaderBackground>
+		<HeaderBackground className={props.className}>
 			<HeaderContent
 				title={props.title}
 				subtitle={props.subtitle}
