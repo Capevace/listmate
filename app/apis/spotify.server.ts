@@ -4,7 +4,7 @@ import invariant from 'tiny-invariant';
 import { saveFile } from '~/models/file.server';
 import { addResourceToList } from '~/models/item.server';
 import { upsertList } from '~/models/list.server';
-import { Album, Artist, Song } from '~/models/resource/types';
+import { Album, Artist, Playlist, Song } from '~/models/resource/types';
 import {
 	createResource,
 	findResourceByRemoteUri,
@@ -322,55 +322,101 @@ export async function importSong(
 
 type PlaylistImportParameters = ImportParameters & {
 	playlistId: string;
+	skipSongs?: boolean;
 };
 export async function importPlaylist({
 	api,
 	userId,
 	playlistId,
+	skipSongs,
 }: PlaylistImportParameters) {
-	try {
-		const { body: playlist } = await retry(
-			() => api.getPlaylist(playlistId),
-			5
-		);
-		let fileRef = null;
+	const { body: playlistData } = await retry(
+		() => api.getPlaylist(playlistId),
+		5
+	);
+	let fileRef = null;
 
-		if (playlist.images.length > 0) {
-			try {
-				const cover = playlist.images[0];
-				fileRef = await importImage(
-					cover.url,
-					`playlist-cover-${playlistId}.jpg`
-				);
-			} catch (e) {
-				console.warn('Could not fetch playlist cover', e);
-			}
+	if (playlistData.images.length > 0) {
+		try {
+			const cover = playlistData.images[0];
+			fileRef = await importImage(
+				cover.url,
+				`playlist-cover-${playlistId}.jpg`
+			);
+		} catch (e) {
+			console.warn('Could not fetch playlist cover', e);
 		}
-
-		const list = await upsertList({
-			userId,
-			title: playlist.name,
-			description: playlist.description,
-			coverFileReferenceId: fileRef?.id,
-		});
-
-		for (const { track } of playlist.tracks?.items.filter(
-			(item) => !item.track.is_local
-		)) {
-			try {
-				if (await findResourceByRemoteUri(SourceType.SPOTIFY, track.uri))
-					continue;
-
-				const song = await importSong({ api, userId, songId: track.id });
-				await addResourceToList(list.id, song.id);
-			} catch (e) {
-				console.error('Error fetching track', e);
-			}
-		}
-
-		return list;
-	} catch (e) {
-		console.error('Error fetching playlist', e);
-		return null;
 	}
+
+	let playlist = await importResource<Playlist>(
+		SourceType.SPOTIFY,
+		playlistData.uri,
+		{
+			title: playlistData.name,
+			type: ResourceType.PLAYLIST,
+			thumbnail: fileRef,
+			values: {
+				name: { value: playlistData.name },
+				description: playlistData.description
+					? { value: playlistData.description }
+					: null,
+				songs: [],
+			},
+			remotes: {
+				[SourceType.SPOTIFY]: playlistData.uri,
+			},
+		}
+	);
+
+	if (!skipSongs) {
+		playlist.values.songs = [];
+
+		for (const item of playlistData.tracks.items) {
+			// Catch the local track edge case
+			try {
+				const song = await importSong({
+					api,
+					userId,
+					songId: item.track.id,
+					skipPushToAlbum: true,
+				});
+
+				playlist.values.songs.push({ value: song.title, ref: song.id });
+			} catch (e) {
+				// TODO: Proper import error handling
+				console.error(e);
+			}
+		}
+
+		await upsertValues(playlist);
+	}
+
+	return playlist;
+
+	// 	const list = await upsertList({
+	// 		userId,
+	// 		title: playlist.name,
+	// 		description: playlist.description,
+	// 		coverFileReferenceId: fileRef?.id,
+	// 	});
+
+	// 	for (const { track } of playlist.tracks?.items.filter(
+	// 		(item) => !item.track.is_local
+	// 	)) {
+	// 		try {
+	// 			if (await findResourceByRemoteUri(SourceType.SPOTIFY, track.uri))
+	// 				continue;
+
+	// 			const song = await importSong({ api, userId, songId: track.id });
+	// 			await addResourceToList(list.id, song.id);
+	// 		} catch (e) {
+	// 			console.error('Error fetching track', e);
+	// 		}
+	// 	}
+
+	// 	return list;
+	// } catch (e) {
+	// 	console.error('Error fetching playlist', e);
+	// 	return null;
+	// }
 }

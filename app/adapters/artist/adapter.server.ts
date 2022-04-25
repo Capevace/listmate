@@ -16,7 +16,7 @@ export function dataObjectToArtist(
 ): Artist {
 	values = values ?? valuesToObject(dataObject.values);
 
-	const name = composeRefFromValue<string>(values.name);
+	const name = composeRefFromValue(values.name);
 
 	invariant(name, 'Missing name');
 

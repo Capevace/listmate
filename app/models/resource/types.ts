@@ -3,6 +3,7 @@ import { Except, SetOptional } from 'type-fest';
 export * from './group-type';
 
 // Adapter Types
+export * from '~/adapters/collection/type';
 export * from '~/adapters/album/type';
 export * from '~/adapters/artist/type';
 export * from '~/adapters/song/type';
@@ -36,8 +37,9 @@ export type ResourceWithoutDefaults<TResource extends Resource = Resource> =
  * This is important to include the correct values in a performant manner.
  */
 export enum ResourceType {
-	LIST = 'list',
+	COLLECTION = 'collection',
 	BOOKMARK = 'bookmark',
+	PLAYLIST = 'playlist',
 	SONG = 'song',
 	ARTIST = 'artist',
 	ALBUM = 'album',
@@ -47,8 +49,9 @@ export enum ResourceType {
  * A list of all resource types.
  */
 export const ALL_RESOURCE_TYPES: ResourceType[] = [
-	ResourceType.LIST,
+	ResourceType.COLLECTION,
 	ResourceType.BOOKMARK,
+	ResourceType.PLAYLIST,
 	ResourceType.SONG,
 	ResourceType.ARTIST,
 	ResourceType.ALBUM,
@@ -61,10 +64,12 @@ export const ALL_RESOURCE_TYPES: ResourceType[] = [
  */
 export function stringToResourceType(type: string): ResourceType {
 	switch (type) {
-		case 'list':
-			return ResourceType.LIST;
+		case 'collection':
+			return ResourceType.COLLECTION;
 		case 'bookmark':
 			return ResourceType.BOOKMARK;
+		case 'playlist':
+			return ResourceType.PLAYLIST;
 		case 'song':
 			return ResourceType.SONG;
 		case 'album':
@@ -154,8 +159,11 @@ export type ResourceRemotes = { [key in SourceType]?: string };
  *
  * Used for: A song's artist / an album's artist.
  */
-export type ValueRef<ValueType> = RawValue<ValueType> & {
-	ref?: Resource['id'];
+export type ValueRef<
+	ValueType,
+	TResource extends Resource = Resource
+> = RawValue<ValueType> & {
+	ref?: TResource['id'];
 	value: ValueType;
 };
 

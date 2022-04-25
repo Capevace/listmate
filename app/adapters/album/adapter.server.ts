@@ -11,7 +11,7 @@ import {
 	DataObjectValueMap,
 	valuesToObject,
 } from '~/models/resource/adapters.server';
-import { ResourceDetails, ResourceType } from '~/models/resource/types';
+import { Artist, ResourceDetails, ResourceType } from '~/models/resource/types';
 import {
 	findResources,
 	resolveValueRefArray,
@@ -32,7 +32,7 @@ export function dataObjectToAlbum(
 		// additional spotify-specific fields
 		values: {
 			name,
-			artist: composeRefFromValue<string>(values.artist),
+			artist: composeRefFromValue<string, Artist>(values.artist),
 			songs: composeRefArrayFromValue<string>(values.songs),
 		},
 	};

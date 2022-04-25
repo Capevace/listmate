@@ -16,7 +16,6 @@ model User {
     updatedAt DateTime @updatedAt
 
     password    Password?
-    List        List[]
     SourceToken SourceToken[]
 }
 
@@ -46,51 +45,6 @@ model SourceToken {
     @@unique([api, userId])
 }
 
-// model Source {
-//     id          String         @id @default(uuid())
-//     name        String
-//     type        String // spotify, youtube
-//     description String?
-//     lists       TagsOnLists[]
-//     faucets     SourceFaucet[]
-// }
-
-// model SourceFaucet {
-//     id   String @id @default(uuid())
-//     name String
-//     type String // spotify:playlist, youtube:playlist, youtube:channel
-
-//     Source   Source? @relation(fields: [sourceId], references: [id])
-//     sourceId String?
-// }
-
-// model Tag {
-//     name          String            @id
-//     description   String?
-//     createdByUser Boolean           @default(true)
-//     lists         TagsOnLists[]
-//     items         TagsOnListItems[]
-// }
-
-// model TagsOnLists {
-//     list    List   @relation(fields: [listId], references: [id])
-//     listId  String
-//     tag     Tag    @relation(fields: [tagName], references: [name])
-//     tagName String
-
-//     assignedAt DateTime @default(now())
-
-//     Source   Source? @relation(fields: [sourceId], references: [id])
-//     sourceId String?
-//     @@id([listId, tagName])
-// }
-
-// model Media {
-//     id        String   @id @default(uuid())
-//     createdAt DateTime @default(now())
-//     updatedAt DateTime @updatedAt
-// }
-
 model DataObject {
     id        String   @id @default(uuid())
     createdAt DateTime @default(now())
@@ -100,14 +54,13 @@ model DataObject {
     type        String // song, video, file 
     isFavourite Boolean @default(false)
 
-    thumbnail       FileReference? @relation(fields: [thumbnailFileId], references: [id])
+    thumbnail       FileReference? @relation(fields: [thumbnailFileId], references: [id], onDelete: SetNull)
     thumbnailFileId String?
 
     values          DataObjectValue[]  @relation("DataObjectValues")
     remotes         DataObjectRemote[]
     references      DataObjectValue[]  @relation("ValueReferences")
     arrayReferences ValueArrayItem[]   @relation("ValueArrayReferences")
-    placements      ListItem[]
 
     @@index([type])
     @@index([isFavourite])
@@ -134,7 +87,7 @@ model DataObjectValue {
     key          String
 
     value             String
-    valueDataObject   DataObject? @relation("ValueReferences", fields: [valueDataObjectId], references: [id], onDelete: Cascade)
+    valueDataObject   DataObject? @relation("ValueReferences", fields: [valueDataObjectId], references: [id], onDelete: SetNull)
     valueDataObjectId String?
 
     isArray Boolean          @default(false)
@@ -151,7 +104,7 @@ model ValueArrayItem {
     position           Int
 
     value             String
-    valueDataObject   DataObject? @relation("ValueArrayReferences", fields: [valueDataObjectId], references: [id], onDelete: Cascade)
+    valueDataObject   DataObject? @relation("ValueArrayReferences", fields: [valueDataObjectId], references: [id], onDelete: SetNull)
     valueDataObjectId String?
 
     @@id([parentDataObjectId, parentKey, position])
@@ -163,61 +116,5 @@ model FileReference {
     mimeType  String
     createdAt DateTime @default(now())
 
-    coverReferences List[] @relation("FileCoverReferences")
-
     thumbnailReferences DataObject[]
 }
-
-model List {
-    id        String   @id @default(uuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-    user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
-    userId String?
-
-    title                String
-    description          String?
-    cover                FileReference? @relation("FileCoverReferences", fields: [coverFileReferenceId], references: [id])
-    coverFileReferenceId String?
-
-    items ListItem[]
-}
-
-model ListItem {
-    id        String   @id @default(uuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-    position Int
-
-    list   List   @relation(fields: [listId], references: [id], onDelete: Cascade)
-    listId String
-
-    dataObject   DataObject @relation(fields: [dataObjectId], references: [id], onDelete: Cascade)
-    dataObjectId String
-}
-
-// model TagsOnListItems {
-//     listItem   ListItem @relation(fields: [listItemId], references: [id])
-//     listItemId String
-
-//     tag     Tag    @relation(fields: [tagName], references: [name])
-//     tagName String
-
-//     assignedAt DateTime @default(now())
-
-//     @@id([listItemId, tagName])
-// }
-
-// model ListItemsOnLists {
-//     list   List   @relation(fields: [listId], references: [id])
-//     listId String
-
-//     listItem   ListItem @relation(fields: [listItemId], references: [id])
-//     listItemId String
-
-//     assignedAt DateTime @default(now())
-
-//     @@id([listId, listItemId])
-// }

@@ -22,6 +22,7 @@ import {
 	ResourceDetails,
 	ResourceRemotes,
 	ResourceType,
+	Song,
 	stringToResourceType,
 	stringToSourceType,
 	ValueRef,
@@ -132,22 +133,50 @@ export function composeResourceBase<ForcedType extends ResourceType>(
 	return resource;
 }
 
+type Parser<T> = (v: string) => T;
+type RefReturn<T, R extends Resource> = RawValue<T> | ValueRef<T, R> | null;
+
 /**
  * Compose a RawValue or ValueRef from a DataObjectValue.
  *
  * The function accepts null / undefined as value and will then return null.
  * This is for easier usage when deserializing resources.
  *
+ * The generic types here are a bit special.
+ * Basically, there are 3 possible cases.
+ * 		1. 	No generics are passed
+ * 				We assume that the value is a string and references use the plain Resource type.
+ * 		2.  A raw value type other than string is passed. (e.g. number)
+ * 				Then, a parser function is now required.
+ * 		3.  A raw value type and a Resource type is passed.
+ * 				A parser function is required, and the linked resource is cast as the resource type.
+ *
  * @param value The DataObjectValue to convert from
  */
-export function composeRefFromValue<ValueType extends any = string>(
-	value?: DataObjectValue
-): RawValue<ValueType> | ValueRef<ValueType> | null {
+export function composeRefFromValue(
+	value: CompleteDataObjectValue | undefined,
+	parser?: Parser<string>
+): RefReturn<string, Resource>;
+export function composeRefFromValue<
+	T extends string,
+	R extends Resource = Resource
+>(
+	value: CompleteDataObjectValue | undefined,
+	parser?: Parser<T>
+): RefReturn<T, R>;
+export function composeRefFromValue<T, R extends Resource = Resource>(
+	value: CompleteDataObjectValue | undefined,
+	parser: Parser<T>
+): RefReturn<T, R>;
+export function composeRefFromValue<T, R extends Resource = Resource>(
+	value: CompleteDataObjectValue | undefined,
+	parser?: Parser<T>
+): RefReturn<T, R> {
 	return value
 		? ({
 				ref: value.valueDataObjectId,
-				value: value.value,
-		  } as ValueRef<ValueType>)
+				value: parser ? parser(value.value) : value.value,
+		  } as RefReturn<T, R>)
 		: null;
 }
 
@@ -156,9 +185,12 @@ export function composeRefFromValue<ValueType extends any = string>(
  *
  * @param value The DataObjectValue to convert from
  */
-export function composeRefArrayFromValue<ValueType extends any = string>(
+export function composeRefArrayFromValue<
+	ValueType extends any = string,
+	TResource extends Resource = Resource
+>(
 	value?: CompleteDataObjectValue
-): RawValue<ValueType>[] | ValueRef<ValueType>[] {
+): RawValue<ValueType>[] | ValueRef<ValueType, TResource>[] {
 	if (!value) return [];
 
 	invariant(value.isArray, 'value is not an array');
@@ -167,7 +199,7 @@ export function composeRefArrayFromValue<ValueType extends any = string>(
 		return {
 			ref: item.valueDataObjectId,
 			value: item.value,
-		} as ValueRef<ValueType>;
+		} as ValueRef<ValueType, TResource>;
 	});
 }
 
