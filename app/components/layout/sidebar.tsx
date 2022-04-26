@@ -9,6 +9,7 @@ import {
 	GROUP_TYPES,
 	GROUP_TYPE_ITEMS,
 	ResourceType,
+	SourceType,
 } from '~/models/resource/types';
 import capitalize from '~/utilities/capitalize';
 
@@ -20,24 +21,29 @@ import {
 } from '@heroicons/react/solid';
 import { Select } from '@mantine/core';
 import SearchBox from '~/components/views/search-box';
+import SpotifyIcon from '~/components/icons/spotify-icon';
 
 const listItemBaseClass =
 	'flex items-center justify-start gap-2 rounded py-1 px-2 text-sm border hover:text-gray-200 hover:bg-gray-700 focus:bg-gray-700 focus:border-gray-600 focus:border-gray-600';
 
-const listItemClassName = ({ isActive }: { isActive: boolean }) =>
-	isActive
-		? `${listItemBaseClass} border-gray-600 bg-gray-700 text-gray-200`
-		: `${listItemBaseClass} border-transparent bg-transparent text-gray-400`;
-
 function SidebarListItem({
 	to,
+	className,
 	children,
 }: {
 	to: string;
+	className?: string;
 	children: React.ReactNode;
 }) {
 	return (
-		<NavLink to={to} className={listItemClassName}>
+		<NavLink
+			to={to}
+			className={({ isActive }) =>
+				isActive
+					? `${listItemBaseClass} ${className} border-gray-600 bg-gray-700 text-gray-200`
+					: `${listItemBaseClass} ${className} border-transparent bg-transparent text-gray-400`
+			}
+		>
 			{children}
 		</NavLink>
 	);
@@ -48,6 +54,10 @@ const LIBRARY_ICONS: { [key in ResourceType]?: React.ReactNode } = {
 	[ResourceType.ALBUM]: <CollectionIcon />,
 	[ResourceType.ARTIST]: <UsersIcon />,
 	[ResourceType.BOOKMARK]: <BookmarkIcon />,
+};
+
+const SOURCE_ICONS: { [key in SourceType]?: React.ReactNode } = {
+	[SourceType.SPOTIFY]: <SpotifyIcon />,
 };
 
 type SidebarProps = {
@@ -109,8 +119,13 @@ export default function Sidebar({ user, collections = [] }: SidebarProps) {
 							<SidebarListItem
 								key={collection.id}
 								to={`/resources/${collection.id}`}
+								className="flex justify-between"
 							>
 								{collection.title}
+								<figure className="w-5 text-gray-500">
+									{collection.values.source &&
+										SOURCE_ICONS[collection.values.source.value]}
+								</figure>
 							</SidebarListItem>
 						))}
 					</nav>
