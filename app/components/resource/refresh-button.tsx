@@ -1,6 +1,16 @@
-import type { Resource } from '~/models/resource/types';
+import {
+	ALL_SOURCE_TYPES,
+	Resource,
+	SourceType,
+} from '~/models/resource/types';
+
 import { Form, useTransition } from 'remix';
-import { Button } from '@mantine/core';
+import capitalize from '~/utilities/capitalize';
+
+import { Button, Menu, Select } from '@mantine/core';
+import { ChevronDownIcon } from '@heroicons/react/solid';
+import SelectButton from '~/components/forms/select-button';
+import FauxNoscript from '~/components/common/faux-noscript';
 
 type RefreshButtonProps = {
 	resource?: Resource;
@@ -15,15 +25,47 @@ export default function RefreshButton({
 	const action = resource ? `/resources/${resource.id}/refresh` : 'refresh';
 	const isLoading = transition.submission?.action === action;
 
-	return (
-		<Form replace method="post" action={action}>
-			{children ? (
-				children({ loading: isLoading })
-			) : (
-				<Button loading={isLoading} type="submit">
-					Refetch Data
-				</Button>
-			)}
-		</Form>
+	const data = ALL_SOURCE_TYPES.map((sourceType) => ({
+		value: sourceType,
+		label: capitalize(sourceType),
+		disabled: resource && !(sourceType in resource.remotes),
+	}));
+
+	return children ? (
+		children({ loading: isLoading })
+	) : (
+		<div className="flex items-center gap-2">
+			<FauxNoscript>
+				<Form replace method="post" action={action}>
+					<SelectButton data={data} name="source">
+						Refetch Data
+					</SelectButton>
+				</Form>
+			</FauxNoscript>
+			<Menu
+				className="require-js"
+				control={
+					<Button
+						loading={isLoading}
+						rightIcon={<ChevronDownIcon className="w-5" />}
+					>
+						Refetch Data
+					</Button>
+				}
+			>
+				{data.map((source) => (
+					<Form key={source.value} replace method="post" action={action}>
+						<Menu.Item
+							disabled={source.disabled}
+							type="submit"
+							name="source"
+							value={source.value}
+						>
+							Fetch from {source.label}
+						</Menu.Item>
+					</Form>
+				))}
+			</Menu>
+		</div>
 	);
 }

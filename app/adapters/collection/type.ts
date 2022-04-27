@@ -21,7 +21,4 @@ export type CollectionData<TResource extends Resource> = {
 export type Collection<
 	TResource extends Resource = Resource,
 	TResourceType extends ResourceType = ResourceType.COLLECTION
-> = Resource &
-	ForceResourceType<TResourceType> & {
-		values: CollectionData<TResource>;
-	};
+> = Resource<TResourceType, CollectionData<TResource>>;

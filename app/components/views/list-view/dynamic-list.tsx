@@ -40,7 +40,7 @@ export default function DynamicList({
 					return footerHeight;
 				}
 
-				return 35;
+				return 50;
 			},
 			[headerHeight, footerHeight, total, header, footer]
 		),
@@ -53,7 +53,7 @@ export default function DynamicList({
 	return (
 		<div
 			ref={parentRef}
-			className="h-full max-h-screen w-full px-5"
+			className="require-js h-full max-h-screen w-full px-5"
 			style={{ overflow: 'auto' }}
 		>
 			<div

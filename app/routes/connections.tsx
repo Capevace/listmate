@@ -1,4 +1,4 @@
-import { Link, LoaderFunction, useLoaderData, json, Outlet } from 'remix';
+import { Link, LoaderFunction, useLoaderData, json, Outlet, Form } from 'remix';
 import { Button } from '@mantine/core';
 
 import { requireUserId } from '~/session.server';
@@ -105,19 +105,20 @@ function ConnectRow({
 							</Link>
 						</>
 					) : (
-						<Link
-							to={`/connections/${type}`}
+						<Form
+							method="post"
+							action={`/connections/${type}/connect`}
 							className="col-span-1 col-start-3 block"
 						>
 							<Button
 								type="submit"
 								size="xs"
 								fullWidth={true}
-								disabled={type !== SourceType.SPOTIFY}
+								disabled={isDisabled(type)}
 							>
 								Authorize
 							</Button>
-						</Link>
+						</Form>
 					)}
 				</div>
 			</div>
@@ -147,4 +148,7 @@ export default function ConnectIndexPage() {
 			<Outlet />
 		</MainView>
 	);
+}
+function isDisabled(type: SourceType): boolean {
+	return ![SourceType.SPOTIFY, SourceType.YOUTUBE].includes(type);
 }

@@ -1,6 +1,7 @@
 import type { Resource } from '~/models/resource/types';
 import ResourceValueLabel from '~/components/common/resource-value-label';
 import FavouriteButton from '~/components/resource/favourite-button';
+import composeCoverUrl from '~/utilities/cover-url';
 
 export default function GenericRow({
 	resource,
@@ -15,7 +16,17 @@ export default function GenericRow({
 			style={style}
 		>
 			<FavouriteButton resource={resource} className="col-span-1" />
-			<div className="col-span-11">
+			<figure className="col-span-1">
+				{resource.thumbnail && (
+					<img
+						className="aspect-square w-8 rounded"
+						alt={`${resource.title} thumbnail`}
+						src={composeCoverUrl(resource) || ''}
+						loading="lazy"
+					/>
+				)}
+			</figure>
+			<div className="col-span-10">
 				<ResourceValueLabel
 					valueRef={{ value: resource.title }}
 					forceRef={resource.id}

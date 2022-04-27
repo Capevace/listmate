@@ -12,7 +12,7 @@ import ImportModal from '~/components/views/import-modal';
 import { findToken } from '~/models/source-token.server';
 import { SourceType, stringToSourceType } from '~/models/resource/types';
 import {
-	authorizeClient,
+	authenticateApi,
 	createApi,
 	importPlaylist,
 } from '~/apis/spotify.server';
@@ -34,9 +34,9 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 		return redirect(`/connections/${sourceType}`);
 	}
 
-	const api = await authorizeClient(createApi(), userId, token);
+	const api = await authenticateApi(createApi(), userId, token);
 
-	const response = await api.getUserPlaylists();
+	const response = await api.service.getUserPlaylists();
 	const playlists = response.body.items;
 
 	return json<LoaderData>({
@@ -57,7 +57,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 
 	invariant(token && token.data, 'token should exist and be configured');
 
-	const api = await authorizeClient(createApi(), userId, token);
+	const api = await authenticateApi(createApi(), userId, token);
 
 	const playlistIds = formData.getAll('playlistIds[]');
 

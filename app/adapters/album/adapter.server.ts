@@ -11,7 +11,12 @@ import {
 	DataObjectValueMap,
 	valuesToObject,
 } from '~/models/resource/adapters.server';
-import { Artist, ResourceDetails, ResourceType } from '~/models/resource/types';
+import {
+	Artist,
+	ResourceDetails,
+	ResourceType,
+	SerializedValues,
+} from '~/models/resource/types';
 import {
 	findResources,
 	resolveValueRefArray,

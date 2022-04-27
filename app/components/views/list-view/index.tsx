@@ -26,8 +26,8 @@ export default function ListView(props: ListViewProps) {
 	// };
 
 	return (
-		<>
-			<noscript className={`mx-auto block max-w-7xl`}>
+		<div>
+			<noscript className={`mx-auto block w-full max-w-7xl`}>
 				{props.header}
 				<PaginatedList items={props.items} page={props.page} />
 			</noscript>
@@ -40,6 +40,6 @@ export default function ListView(props: ListViewProps) {
 				footer={props.footer}
 				footerHeight={props.footerHeight}
 			/>
-		</>
+		</div>
 	);
 }

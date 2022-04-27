@@ -18,6 +18,7 @@ import {
 	CollectionIcon,
 	MusicNoteIcon,
 	UsersIcon,
+	VideoCameraIcon,
 } from '@heroicons/react/solid';
 import { Select } from '@mantine/core';
 import SearchBox from '~/components/views/search-box';
@@ -54,6 +55,7 @@ const LIBRARY_ICONS: { [key in ResourceType]?: React.ReactNode } = {
 	[ResourceType.ALBUM]: <CollectionIcon />,
 	[ResourceType.ARTIST]: <UsersIcon />,
 	[ResourceType.BOOKMARK]: <BookmarkIcon />,
+	[ResourceType.VIDEO]: <VideoCameraIcon />,
 };
 
 const SOURCE_ICONS: { [key in SourceType]?: React.ReactNode } = {

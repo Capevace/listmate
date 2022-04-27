@@ -1,4 +1,7 @@
 import { Except, SetOptional } from 'type-fest';
+import { Album } from '~/adapters/album/type';
+import { Song } from '~/adapters/song/type';
+import SpotifyIcon from '~/components/icons/spotify-icon';
 
 export * from './group-type';
 
@@ -15,12 +18,19 @@ export * from '~/adapters/playlist/type';
  * This way, the internal data structure is not directly exposed to the client,
  * and we have some more flexibility without having to change implementations.
  */
-export type Resource = {
+export type Resource<
+	TResourceType extends ResourceType = ResourceType,
+	TValues = {}
+> = {
 	id: string;
 	title: string; // always available string, most basic representation of item
-	type: ResourceType;
+	type: TResourceType;
 	isFavourite: boolean;
-	values: ResourceValues;
+
+	// somehow, I can't seem to figure out how to type values properly, so its just an object for now.
+	// BUT, it can only contain values of the following signature: RawValue<T> | ValueRef<T, R> | ValueRef<T, R>[]
+	values: TValues;
+
 	thumbnail: ResourceFile | null;
 	remotes: ResourceRemotes;
 };
@@ -32,6 +42,32 @@ export type Resource = {
 export type ResourceWithoutDefaults<TResource extends Resource = Resource> =
 	SetOptional<Except<TResource, 'id'>, 'isFavourite' | 'thumbnail'>;
 
+export type ResourceWithSerializedValues<
+	TResource extends Resource = Resource
+> = Except<ResourceWithoutDefaults<TResource>, 'values'> & {
+	values: SerializedValues<TResource['values']>;
+};
+
+/**
+ * Complicated type that casts all ValueRef generics to string for a given resource
+ */
+export type SerializedValues<TResourceValues extends Resource['values']> = {
+	[key in keyof TResourceValues]: IsArray<TResourceValues[key]> extends false
+		? null extends TResourceValues[key]
+			? IsValueRef<TResourceValues, key> | null
+			: IsValueRef<TResourceValues, key>
+		: ValueRef<string>[];
+};
+
+type IsValueRef<
+	TResourceValues extends Resource['values'],
+	key extends keyof TResourceValues
+> = keyof TResourceValues[key] extends 'ref'
+	? ValueRef<string>
+	: RawValue<string>;
+
+type IsArray<A> = A extends Array<infer T> ? T : false;
+
 /**
  * ResourceType expresses what kind of resource it is.
  *
@@ -39,11 +75,18 @@ export type ResourceWithoutDefaults<TResource extends Resource = Resource> =
  */
 export enum ResourceType {
 	COLLECTION = 'collection',
+
 	BOOKMARK = 'bookmark',
+
+	// Music (Spotify etc)
 	PLAYLIST = 'playlist',
 	SONG = 'song',
 	ARTIST = 'artist',
 	ALBUM = 'album',
+
+	// Video (YouTube etc.)
+	VIDEO = 'video',
+	CHANNEL = 'channel',
 }
 
 /**
@@ -51,11 +94,16 @@ export enum ResourceType {
  */
 export const ALL_RESOURCE_TYPES: ResourceType[] = [
 	ResourceType.COLLECTION,
+
 	ResourceType.BOOKMARK,
+
 	ResourceType.PLAYLIST,
 	ResourceType.SONG,
 	ResourceType.ARTIST,
 	ResourceType.ALBUM,
+
+	ResourceType.VIDEO,
+	ResourceType.CHANNEL,
 ];
 
 /**
@@ -67,8 +115,10 @@ export function stringToResourceType(type: string): ResourceType {
 	switch (type) {
 		case 'collection':
 			return ResourceType.COLLECTION;
+
 		case 'bookmark':
 			return ResourceType.BOOKMARK;
+
 		case 'playlist':
 			return ResourceType.PLAYLIST;
 		case 'song':
@@ -77,6 +127,12 @@ export function stringToResourceType(type: string): ResourceType {
 			return ResourceType.ALBUM;
 		case 'artist':
 			return ResourceType.ARTIST;
+
+		case 'video':
+			return ResourceType.VIDEO;
+		case 'channel':
+			return ResourceType.CHANNEL;
+
 		default:
 			throw new Error(`Unknown resource type: ${type}`);
 	}
@@ -141,6 +197,10 @@ export function stringToSourceType(type: string): SourceType {
 	}
 }
 
+export const SOURCE_ICONS: { [key in SourceType]?: React.ReactNode } = {
+	[SourceType.SPOTIFY]: SpotifyIcon,
+};
+
 /**
  * The type of the values property on a Resource.
  *
@@ -160,10 +220,7 @@ export type ResourceRemotes = { [key in SourceType]?: string };
  *
  * Used for: A song's artist / an album's artist.
  */
-export type ValueRef<
-	ValueType,
-	TResource extends Resource = Resource
-> = RawValue<ValueType> & {
+export type ValueRef<ValueType, TResource extends Resource = Resource> = {
 	ref?: TResource['id'];
 	value: ValueType;
 };

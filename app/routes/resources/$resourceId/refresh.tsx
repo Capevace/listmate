@@ -9,10 +9,11 @@ import {
 import { SourceType, stringToSourceType } from '~/models/resource/types';
 import { findToken } from '~/models/source-token.server';
 import {
-	authorizeClient,
+	authenticateApi,
 	createApi,
 	refreshResourceData,
 } from '~/apis/spotify.server';
+import makeProgress from '~/utilities/progress';
 
 export const action: ActionFunction = async ({ request, params }) => {
 	const userId = await requireUserId(request);
@@ -40,9 +41,16 @@ export const action: ActionFunction = async ({ request, params }) => {
 
 	invariant(token && token.data, 'token should exist and be configured');
 
-	const api = await authorizeClient(createApi(), userId, token);
+	const api = await authenticateApi(createApi(), userId, token);
 
-	await refreshResourceData({ api, userId, resource });
+	await refreshResourceData({
+		api,
+		userId,
+		progress: makeProgress((total) =>
+			console.log(`Total: ${(total * 100).toFixed(3)}%`)
+		),
+		resource,
+	});
 
 	return redirect(`/resources/${resource.id}`);
 };

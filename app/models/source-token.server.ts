@@ -15,6 +15,17 @@ export function createToken(userId: User['id'], api: SourceType) {
 	});
 }
 
+export function deleteToken(userId: User['id'], api: SourceType) {
+	return prisma.sourceToken.delete({
+		where: {
+			api_userId: {
+				userId,
+				api,
+			},
+		},
+	});
+}
+
 export function updateTokenData(
 	userId: string,
 	api: SourceType,

@@ -3,13 +3,13 @@ import { ResourceType } from './types';
 export enum GroupType {
 	MUSIC = 'music',
 	BOOKMARKS = 'bookmarks',
-	MOVIES = 'movies',
+	VIDEOS = 'videos',
 }
 
 export const GROUP_TYPES = [
 	GroupType.MUSIC,
 	GroupType.BOOKMARKS,
-	GroupType.MOVIES,
+	GroupType.VIDEOS,
 ];
 
 export type GroupTypeItem = { label: string; type: ResourceType };
@@ -35,10 +35,10 @@ export const GROUP_TYPE_ITEMS: { [key in GroupType]: GroupTypeItem[] } = {
 			type: ResourceType.BOOKMARK,
 		},
 	],
-	[GroupType.MOVIES]: [
+	[GroupType.VIDEOS]: [
 		{
-			label: 'Movies',
-			type: ResourceType.ARTIST,
+			label: 'Videos',
+			type: ResourceType.VIDEO,
 		},
 	],
 };
@@ -49,8 +49,8 @@ export function stringToGroupType(type: string): GroupType {
 			return GroupType.MUSIC;
 		case 'bookmarks':
 			return GroupType.BOOKMARKS;
-		case 'movies':
-			return GroupType.MOVIES;
+		case 'videos':
+			return GroupType.VIDEOS;
 		default:
 			throw new Error(`Unknown group type: ${type}`);
 	}

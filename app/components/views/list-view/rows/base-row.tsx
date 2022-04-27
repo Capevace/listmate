@@ -3,7 +3,7 @@ import type { Resource, Song } from '~/models/resource/types';
 import { ResourceType } from '~/models/resource/types';
 
 import GenericRow from './generic-row';
-import SongRow from './song-row';
+import SongRow from '~/adapters/song/row';
 
 export type BaseRowProps = {
 	resource: Resource;

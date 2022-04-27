@@ -30,6 +30,7 @@ import {
 	ResourceDetails,
 	ResourceRemotes,
 	ResourceType,
+	SerializedValues,
 	Song,
 	stringToResourceType,
 	stringToSourceType,
@@ -45,6 +46,18 @@ import {
 	getPlaylistDetails,
 } from '~/adapters/playlist/adapter.server';
 import { Artist } from '~/adapters/artist/type';
+import {
+	dataObjectToVideo,
+	getVideoDetails,
+	serializeVideoValues,
+} from '~/adapters/video/adapter.server';
+import { Video } from '~/adapters/video/type';
+import {
+	dataObjectToChannel,
+	getChannelDetails,
+	serializeChannelValues,
+} from '~/adapters/channel/adapter.server';
+import { Channel } from '~/adapters/channel/type';
 
 export type CompleteDataObjectValue = DataObjectValue & {
 	items: ValueArrayItem[];
@@ -77,12 +90,18 @@ export function dataObjectToResource(dataObject: CompleteDataObject): Resource {
 			return dataObjectToCollection(dataObject, values);
 		case ResourceType.PLAYLIST:
 			return dataObjectToPlaylist(dataObject, values);
+
 		case ResourceType.ALBUM:
 			return dataObjectToAlbum(dataObject, values);
 		case ResourceType.ARTIST:
 			return dataObjectToArtist(dataObject, values);
 		case ResourceType.SONG:
 			return dataObjectToSong(dataObject, values);
+
+		case ResourceType.VIDEO:
+			return dataObjectToVideo(dataObject, values);
+		case ResourceType.CHANNEL:
+			return dataObjectToChannel(dataObject, values);
 		default:
 			throw new Error(
 				`dataObjectToResource: resource type ${dataObject.type} not implemented`
@@ -112,10 +131,33 @@ export async function getResourceDetails(
 		case ResourceType.SONG:
 			return getSongDetails(resource as Song);
 
+		case ResourceType.VIDEO:
+			return getVideoDetails(resource as Video);
+		case ResourceType.CHANNEL:
+			return getChannelDetails(resource as Channel);
+
 		default:
 			throw new Error(
 				`getResourceDetails: resource type ${resource.type} not implemented`
 			);
+	}
+}
+
+/**
+ * Serialize resource values to string for the DB.
+ *
+ * @param resource The resource to find additional details for
+ */
+export function serializeValues(
+	resource: Resource
+): SerializedValues<Resource['values']> {
+	switch (resource.type) {
+		case ResourceType.VIDEO:
+			return serializeVideoValues(resource.values as Video['values']);
+		case ResourceType.CHANNEL:
+			return serializeChannelValues(resource.values as Channel['values']);
+		default:
+			return resource.values;
 	}
 }
 

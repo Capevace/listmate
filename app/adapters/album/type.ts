@@ -18,5 +18,4 @@ export type AlbumData = {
 	// total_tracks: 13;
 };
 
-export type Album = Resource &
-	ForceResourceType<ResourceType.ALBUM> & { values: AlbumData };
+export type Album = Resource<ResourceType.ALBUM, AlbumData>;

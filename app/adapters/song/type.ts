@@ -2,7 +2,6 @@ import type {
 	Resource,
 	RawValue,
 	ValueRef,
-	ForceResourceType,
 	ResourceType,
 	Artist,
 	Album,
@@ -14,5 +13,4 @@ export type SongData = {
 	album: ValueRef<string, Album> | null;
 };
 
-export type Song = Resource &
-	ForceResourceType<ResourceType.SONG> & { values: SongData };
+export type Song = Resource<ResourceType.SONG, SongData>;

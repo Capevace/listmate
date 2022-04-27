@@ -8,12 +8,14 @@ import type {
 	Resource,
 	ResourceType,
 	ResourceWithoutDefaults,
+	SerializedValues,
 	SourceType,
+	ValueRef,
 } from '~/models/resource/types';
 
 import invariant from 'tiny-invariant';
 import { prisma as db } from '~/db.server';
-import { dataObjectToResource } from './adapters.server';
+import { dataObjectToResource, serializeValues } from './adapters.server';
 
 //
 // READ
@@ -525,27 +527,17 @@ export async function upsertResource(resource: Resource): Promise<Resource> {
  * @param resource
  */
 export async function upsertValues(resource: Resource) {
-	for (const [key, valueRefOrArray] of Object.entries(resource.values)) {
+	const serializedValues = serializeValues(resource);
+
+	for (const key of Object.keys(serializedValues)) {
+		const valueRefOrArray = resource.values[
+			key as keyof typeof serializedValues
+		] as ValueRef<string> | ValueRef<string>[] | null;
+
+		// TODO: If valueRefOrArray is null, we want to delete the value if it exists
 		if (!valueRefOrArray) continue;
 
 		if (Array.isArray(valueRefOrArray)) {
-			valueRefOrArray.map((valueRef, index) => {
-				console.log('ref', valueRef, {
-					parentDataObjectId: resource.id,
-					parentKey: key,
-					position: index,
-
-					value: valueRef.value,
-					valueDataObject: {
-						connect: {
-							id: valueRef.ref,
-						},
-					},
-					// valueDataObjectId: valueRef.ref,
-				});
-				return {};
-			});
-
 			await db.dataObjectValue.upsert({
 				where: {
 					dataObjectId_key: {

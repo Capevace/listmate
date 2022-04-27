@@ -4,6 +4,7 @@ import { PlayIcon } from '@heroicons/react/solid';
 import ResourceValueLabel from '~/components/common/resource-value-label';
 import ResourceContextMenu from '~/components/common/resource-context-menu';
 import FavouriteButton from '~/components/resource/favourite-button';
+import composeCoverUrl from '~/utilities/cover-url';
 
 export default function SongRow({
 	resource,
@@ -23,14 +24,22 @@ export default function SongRow({
 					<PlayIcon className="w-6 " />
 				</button>
 			</div>
-			<div className="col-span-5 truncate">
-				<ResourceValueLabel
-					valueRef={resource.values.name}
-					forceRef={resource.id}
+			<div className="col-span-7 flex items-center gap-3">
+				<img
+					className="aspect-square w-8 rounded"
+					alt={`${resource.title} thumbnail`}
+					src={resource.thumbnail ? composeCoverUrl(resource) ?? '' : ''}
+					loading="lazy"
 				/>
-			</div>
-			<div className="col-span-3 truncate">
-				<ResourceValueLabel valueRef={resource.values.artist} />
+				<div className="flex flex-col truncate">
+					<ResourceValueLabel
+						valueRef={resource.values.name}
+						forceRef={resource.id}
+					/>
+					<div className="truncate text-xs">
+						<ResourceValueLabel valueRef={resource.values.artist} />
+					</div>
+				</div>
 			</div>
 			<div className="col-span-2 truncate">
 				<ResourceValueLabel valueRef={resource.values.album} />
@@ -41,3 +50,5 @@ export default function SongRow({
 		</li>
 	);
 }
+
+SongRow.height = 35;

@@ -1,7 +1,7 @@
 import { ActionFunction } from 'remix';
 import invariant from 'tiny-invariant';
 import {
-	authorizeClient,
+	authenticateApi,
 	createApi,
 	importPlaylist,
 } from '~/apis/spotify.server';
@@ -26,7 +26,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 
 	invariant(token && token.data, 'token should exist and be configured');
 
-	const api = await authorizeClient(createApi(), userId, token);
+	const api = await authenticateApi(createApi(), userId, token);
 
 	// await importPlaylist({
 	// 	api,

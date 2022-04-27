@@ -1,13 +1,7 @@
-import type {
-	Resource,
-	RawValue,
-	ForceResourceType,
-	ResourceType,
-} from '~/models/resource/types';
+import type { Resource, RawValue, ResourceType } from '~/models/resource/types';
 
 export type ArtistData = {
 	name: RawValue<string>;
 };
 
-export type Artist = Resource &
-	ForceResourceType<ResourceType.ARTIST> & { values: ArtistData };
+export type Artist = Resource<ResourceType.ARTIST, ArtistData>;
