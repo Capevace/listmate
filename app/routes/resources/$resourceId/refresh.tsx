@@ -1,19 +1,16 @@
-import { redirect, ActionFunction, json } from 'remix';
+import { redirect, ActionFunction } from 'remix';
 import invariant from 'tiny-invariant';
 
 import { requireUserId } from '~/session.server';
+import { findResourceById } from '~/models/resource/resource.server';
 import {
-	findResourceById,
-	setFavouriteStatus,
-} from '~/models/resource/resource.server';
-import { SourceType, stringToSourceType } from '~/models/resource/types';
-import { findToken } from '~/models/source-token.server';
+	sourceTypeToName,
+	stringToSourceTypeOptional,
+} from '~/models/resource/types';
 import {
-	authenticateApi,
-	createApi,
-	refreshResourceData,
-} from '~/apis/spotify.server';
-import makeProgress from '~/utilities/progress';
+	composeAuthenticatedApi,
+	importResourceWithType,
+} from '~/apis/apis.server';
 
 export const action: ActionFunction = async ({ request, params }) => {
 	const userId = await requireUserId(request);
@@ -21,35 +18,48 @@ export const action: ActionFunction = async ({ request, params }) => {
 	invariant(params.resourceId, 'resourceId not found');
 
 	const url = new URL(request.url);
-	const sourceTypeString = url.searchParams.get('source');
+	const form = await request.formData();
 
-	// if (!sourceTypeString) {
-	// 	throw new Response('A source type needs to be passed', { status: 400 });
-	// }
+	const sourceType = stringToSourceTypeOptional(
+		url.searchParams.get('source') ?? form.get('source')?.toString()
+	);
 
-	const sourceType = sourceTypeString
-		? stringToSourceType(sourceTypeString)
-		: SourceType.SPOTIFY; // TODO: choose default from resource itself
+	if (!sourceType) {
+		throw new Response('API not found', { status: 404 });
+	}
 
 	let resource = await findResourceById(params.resourceId);
 
 	if (!resource) {
-		return new Response('Not Found', { status: 404 });
+		throw new Response('Resource not found', { status: 404 });
 	}
 
-	const token = await findToken(userId, sourceType);
+	const api = await composeAuthenticatedApi(userId, sourceType);
 
-	invariant(token && token.data, 'token should exist and be configured');
+	if (!api) {
+		throw new Response(
+			`User is not logged in to ${sourceTypeToName(sourceType)} API`,
+			{ status: 401 }
+		);
+		// return redirect(`/connections/${sourceType}`);
+	}
 
-	const api = await authenticateApi(createApi(), userId, token);
+	const uri = resource.remotes[sourceType];
 
-	await refreshResourceData({
+	if (!uri) {
+		throw new Response(
+			`Resource is not connected to ${sourceTypeToName(sourceType)} API`,
+			{ status: 400 }
+		);
+		// return redirect(`/connections/${sourceType}`);
+	}
+
+	resource = await importResourceWithType({
 		api,
 		userId,
-		progress: makeProgress((total) =>
-			console.log(`Total: ${(total * 100).toFixed(3)}%`)
-		),
-		resource,
+		sourceType,
+		resourceType: resource.type,
+		uri,
 	});
 
 	return redirect(`/resources/${resource.id}`);

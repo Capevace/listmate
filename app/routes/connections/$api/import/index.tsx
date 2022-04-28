@@ -10,12 +10,13 @@ import invariant from 'tiny-invariant';
 import { requireUserId } from '~/session.server';
 import ImportModal from '~/components/views/import-modal';
 import { findToken } from '~/models/source-token.server';
-import { SourceType, stringToSourceType } from '~/models/resource/types';
 import {
-	authenticateApi,
-	createApi,
-	importPlaylist,
-} from '~/apis/spotify.server';
+	ResourceType,
+	SourceType,
+	stringToSourceType,
+} from '~/models/resource/types';
+import { authenticateApi, createApi } from '~/apis/spotify.server';
+import { importResourceWithType } from '~/apis/apis.server';
 
 type LoaderData = {
 	type: SourceType;
@@ -34,7 +35,11 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 		return redirect(`/connections/${sourceType}`);
 	}
 
-	const api = await authenticateApi(createApi(), userId, token);
+	const api = await authenticateApi(createApi(), {
+		userId,
+		tokenData: JSON.parse(token.data),
+		tokenExpiresAt: token.expiresAt,
+	});
 
 	const response = await api.service.getUserPlaylists();
 	const playlists = response.body.items;
@@ -57,16 +62,22 @@ export const action: ActionFunction = async ({ request, params }) => {
 
 	invariant(token && token.data, 'token should exist and be configured');
 
-	const api = await authenticateApi(createApi(), userId, token);
+	const api = await authenticateApi(createApi(), {
+		userId,
+		tokenData: JSON.parse(token.data),
+		tokenExpiresAt: token.expiresAt,
+	});
 
 	const playlistIds = formData.getAll('playlistIds[]');
 
 	let lastPlaylist = null;
 	for (const id of playlistIds) {
-		lastPlaylist = await importPlaylist({
+		lastPlaylist = await importResourceWithType({
 			api,
 			userId,
-			playlistId: String(id),
+			sourceType,
+			resourceType: ResourceType.PLAYLIST,
+			uri: String(id),
 		});
 		console.log('Imported playlist', lastPlaylist, id);
 	}

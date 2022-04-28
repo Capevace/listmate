@@ -142,10 +142,10 @@ export function stringToResourceType(type: string): ResourceType {
  * Convert a string to a ResourceType, returning null if the string is invalid instead of throwing an error.
  */
 export function stringToResourceTypeOptional(
-	type: string
+	type?: string
 ): ResourceType | null {
 	try {
-		return stringToResourceType(type);
+		return type ? stringToResourceType(type) : null;
 	} catch {
 		return null;
 	}
@@ -168,11 +168,11 @@ export enum SourceType {
  * A list of all source types.
  */
 export const ALL_SOURCE_TYPES = [
-	'local',
-	'spotify',
-	'youtube',
-	'soundcloud',
-	'pocket',
+	SourceType.LOCAL,
+	SourceType.SPOTIFY,
+	SourceType.YOUTUBE,
+	SourceType.SOUNDCLOUD,
+	SourceType.POCKET,
 ];
 
 /**
@@ -197,9 +197,32 @@ export function stringToSourceType(type: string): SourceType {
 	}
 }
 
+/**
+ * Convert a string to a SourceType, returning null if the string is invalid instead of throwing an error.
+ */
+export function stringToSourceTypeOptional(type?: string): SourceType | null {
+	try {
+		return type ? stringToSourceType(type) : null;
+	} catch {
+		return null;
+	}
+}
+
 export const SOURCE_ICONS: { [key in SourceType]?: React.ReactNode } = {
 	[SourceType.SPOTIFY]: SpotifyIcon,
 };
+
+export const SOURCE_NAMES: { [key in SourceType]: string } = {
+	[SourceType.LOCAL]: 'Local',
+	[SourceType.SPOTIFY]: 'Spotify',
+	[SourceType.YOUTUBE]: 'YouTube',
+	[SourceType.SOUNDCLOUD]: 'Soundcloud',
+	[SourceType.POCKET]: 'Pocket',
+};
+
+export function sourceTypeToName(type: SourceType): string {
+	return SOURCE_NAMES[type] || type;
+}
 
 /**
  * The type of the values property on a Resource.

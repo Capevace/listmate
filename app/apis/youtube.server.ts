@@ -3,35 +3,44 @@
 
 import type { Video } from '~/adapters/video/type';
 import {
+	ApiAuthenticationParameters,
 	ImportAPI,
 	importImage,
 	ImportParameters,
-	importResource,
+	importResourceData,
+	ResourceImportParameters,
 	retryImport,
 } from './apis.server';
 import makeProgress from '~/utilities/progress';
 import { ResourceType, SourceType } from '~/models/resource/types';
 
 import { youtube_v3, google, Auth } from 'googleapis';
-import {
-	findToken,
-	SourceToken,
-	updateTokenData,
-} from '~/models/source-token.server';
+import { updateTokenData } from '~/models/source-token.server';
 import { User } from '~/models/user.server';
 import invariant from 'tiny-invariant';
 import { Channel } from '~/adapters/channel/type';
 import { addSeconds } from '~/utilities/date';
 
-type YouTubeAPIType = {
+export type API = ImportAPI<SourceType.YOUTUBE, YouTubeAPIType>;
+
+export type YouTubeTokenData = {
+	accessToken: string;
+	refreshToken: string;
+};
+
+export type YouTubeAPIType = {
 	auth: Auth.OAuth2Client;
 	youtube: youtube_v3.Youtube;
 };
 
-export function createApi(): ImportAPI<YouTubeAPIType> {
+/*
+ * API & OAuth
+ */
+export function createApi(): API {
 	const YouTubeAPI = google.youtube('v3');
 
 	return {
+		type: SourceType.YOUTUBE,
 		authenticated: false,
 		service: {
 			auth: new google.auth.OAuth2(
@@ -44,18 +53,20 @@ export function createApi(): ImportAPI<YouTubeAPIType> {
 	};
 }
 
-type YouTubeTokenData = {
-	accessToken: string;
-	refreshToken: string;
-};
+export async function authenticateApi(
+	api: API,
+	{ tokenData }: ApiAuthenticationParameters<YouTubeTokenData>
+) {
+	api.service.auth.setCredentials({
+		access_token: tokenData.accessToken,
+		refresh_token: tokenData.refreshToken,
+	});
+	api.authenticated = true;
 
-export function composeOauthUrl({
-	userId,
-	state,
-}: {
-	userId: User['id'];
-	state: string;
-}) {
+	return api;
+}
+
+export function composeOauthUrl(_userId: User['id'], state: string) {
 	const api = createApi();
 
 	const scopes = ['https://www.googleapis.com/auth/youtube.readonly'];
@@ -67,13 +78,7 @@ export function composeOauthUrl({
 	});
 }
 
-export async function handleOauthCallback({
-	userId,
-	code,
-}: {
-	userId: User['id'];
-	code: string;
-}) {
+export async function handleOauthCallback(userId: User['id'], code: string) {
 	const api = createApi();
 	const data = await api.service.auth.getToken(code);
 	console.log('youtube oauth data', data);
@@ -86,52 +91,63 @@ export async function handleOauthCallback({
 
 	invariant(accessToken && refreshToken, 'Missing access token');
 
-	await updateAPITokens(userId, accessToken, refreshToken, expiresAt);
+	const tokenData: YouTubeTokenData = {
+		accessToken,
+		refreshToken,
+	};
+
+	return updateTokenData(userId, SourceType.SPOTIFY, tokenData, expiresAt);
 }
 
-export function updateAPITokens(
-	userId: User['id'],
-	accessToken: string,
-	refreshToken: string,
-	expiresAt: Date
-) {
-	const data: YouTubeTokenData = { accessToken, refreshToken };
+/*
+ * Import Resources
+ */
+export async function importResourceWithType({
+	api,
+	userId,
+	uri,
+	resourceType,
+	progress = makeProgress(),
+}: ResourceImportParameters<API>) {
+	switch (resourceType) {
+		case ResourceType.VIDEO:
+			return importVideo(
+				{ videoId: uri },
+				{
+					api,
+					userId,
+					progress,
+				}
+			);
 
-	return updateTokenData(userId, SourceType.YOUTUBE, data, expiresAt);
+		case ResourceType.CHANNEL:
+			return importChannel(
+				{ channelId: uri },
+				{
+					api,
+					userId,
+					progress,
+				}
+			);
+
+		default:
+			throw new Error(
+				`Resource type ${resourceType} not supported by YouTube API`
+			);
+	}
 }
 
-export async function authenticateApi(
-	api: ImportAPI<YouTubeAPIType>,
-	userId: User['id'],
-	_token?: SourceToken
-) {
-	const token = _token ?? (await findToken(userId, SourceType.SPOTIFY));
+/*
+ * Import implementations
+ */
 
-	invariant(token && token.data, 'User is not connected to Spotify');
-
-	const data: YouTubeTokenData = JSON.parse(token.data);
-
-	api.service.auth.setCredentials({
-		access_token: data.accessToken,
-		refresh_token: data.refreshToken,
-	});
-	api.authenticated = true;
-
-	return api;
-}
-
-type VideoImportParameters = ImportParameters<YouTubeAPIType> & {
+type VideoImportParameters = {
 	videoId: string;
+	channelData?: Channel;
 };
 export async function importVideo(
-	{
-		api,
-		userId,
-		progress = makeProgress(),
-
-		videoId,
-	}: VideoImportParameters,
-	{ channelData }: { channelData?: Channel } = {}
+	{ videoId, channelData }: VideoImportParameters,
+	{ api, userId, progress = makeProgress() }: ImportParameters<API>
 ) {
 	const res = await retryImport(() =>
 		api.service.youtube.videos.list({
@@ -163,12 +179,14 @@ export async function importVideo(
 
 	const channel =
 		channelData ??
-		(await importChannel({
-			api,
-			userId,
-			progress: progress.sub(0.2),
-			channelId: data.channelId,
-		}));
+		(await importChannel(
+			{ channelId: data.channelId },
+			{
+				api,
+				userId,
+				progress: progress.sub(0.2),
+			}
+		));
 
 	progress(0.6);
 
@@ -187,7 +205,7 @@ export async function importVideo(
 
 	console.log('video', videoData, data, channel);
 
-	const video = importResource<Video>(SourceType.YOUTUBE, videoId, {
+	const video = importResourceData<Video>(SourceType.YOUTUBE, videoId, {
 		title: data.title,
 		type: ResourceType.VIDEO,
 		thumbnail: thumbnail,
@@ -207,16 +225,13 @@ export async function importVideo(
 	return video;
 }
 
-type ChannelImportParameters = ImportParameters<YouTubeAPIType> & {
+type ChannelImportParameters = {
 	channelId: string;
 };
-export async function importChannel({
-	api,
-	userId,
-	progress = makeProgress(),
-
-	channelId,
-}: ChannelImportParameters) {
+export async function importChannel(
+	{ channelId }: ChannelImportParameters,
+	{ api, userId, progress = makeProgress() }: ImportParameters<API>
+) {
 	const res = await retryImport(() =>
 		api.service.youtube.channels.list({
 			id: [channelId],
@@ -257,7 +272,7 @@ export async function importChannel({
 
 	console.log('channel', channelData, data);
 
-	const channel = importResource<Channel>(SourceType.YOUTUBE, channelId, {
+	const channel = importResourceData<Channel>(SourceType.YOUTUBE, channelId, {
 		title: data.title,
 		type: ResourceType.CHANNEL,
 		thumbnail: thumbnail,
