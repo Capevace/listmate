@@ -35,10 +35,10 @@ export const action: ActionFunction = async ({ request, params }) => {
 
 		switch (sourceType) {
 			case SourceType.SPOTIFY:
-				url = composeSpotifyOauthUrl({ userId, state: newToken.id });
+				url = composeSpotifyOauthUrl(userId, newToken.id);
 				break;
 			case SourceType.YOUTUBE:
-				url = composeYouTubeOauthUrl({ userId, state: newToken.id });
+				url = composeYouTubeOauthUrl(userId, newToken.id);
 				break;
 
 			default:

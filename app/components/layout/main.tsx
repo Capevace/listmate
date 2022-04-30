@@ -1,5 +1,6 @@
 import type { Collection } from '~/adapters/collection/type';
 import type { User } from '~/models/user.server';
+import Player from './player';
 import Sidebar from './sidebar';
 
 type MainAppLayoutProps = {

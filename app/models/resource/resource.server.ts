@@ -38,6 +38,7 @@ export async function searchResources(text: string): Promise<Resource[]> {
 			remotes: true,
 			values: {
 				include: {
+					valueDataObject: true,
 					items: true,
 				},
 			},
@@ -65,6 +66,7 @@ export async function findResourceById(
 			remotes: true,
 			values: {
 				include: {
+					valueDataObject: true,
 					items: true,
 				},
 			},
@@ -119,6 +121,7 @@ export async function findResourcesByType(
 			remotes: true,
 			values: {
 				include: {
+					valueDataObject: true,
 					items: true,
 				},
 			},
@@ -147,6 +150,7 @@ export async function findResourcesByTypes(
 			remotes: true,
 			values: {
 				include: {
+					valueDataObject: true,
 					items: true,
 				},
 			},
@@ -181,6 +185,7 @@ export async function findResourcesByValue(
 			remotes: true,
 			values: {
 				include: {
+					valueDataObject: true,
 					items: true,
 				},
 			},
@@ -215,6 +220,7 @@ export async function findResourcesByValueRef(
 			remotes: true,
 			values: {
 				include: {
+					valueDataObject: true,
 					items: true,
 				},
 			},
@@ -250,6 +256,7 @@ export async function resolveValueRefArray(
 					remotes: true,
 					values: {
 						include: {
+							valueDataObject: true,
 							items: true,
 						},
 					},
@@ -349,6 +356,7 @@ export async function findResources(
 			remotes: true,
 			values: {
 				include: {
+					valueDataObject: true,
 					items: true,
 				},
 			},
@@ -414,6 +422,7 @@ export async function createResource(
 			remotes: true,
 			values: {
 				include: {
+					valueDataObject: true,
 					items: true,
 				},
 			},
@@ -470,6 +479,28 @@ export async function upsertResource(resource: Resource): Promise<Resource> {
 				// 	},
 				// })),
 			},
+
+			// When updating a DataObject, we also need to update the values where they're referenced
+			references: {
+				updateMany: {
+					where: {
+						valueDataObjectId: resource.id,
+					},
+					data: {
+						value: resource.title,
+					},
+				},
+			},
+			arrayReferences: {
+				updateMany: {
+					where: {
+						valueDataObjectId: resource.id,
+					},
+					data: {
+						value: resource.title,
+					},
+				},
+			},
 		},
 		create: {
 			id: resource.id,
@@ -507,6 +538,7 @@ export async function upsertResource(resource: Resource): Promise<Resource> {
 			remotes: true,
 			values: {
 				include: {
+					valueDataObject: true,
 					items: true,
 				},
 			},
@@ -659,11 +691,42 @@ export async function attachRemoteUri(
 	api: SourceType,
 	uri: DataObjectRemote['uri']
 ): Promise<DataObjectRemote> {
-	return db.dataObjectRemote.create({
-		data: {
+	return db.dataObjectRemote.upsert({
+		where: {
+			dataObjectId_api: {
+				dataObjectId: resourceId,
+				api,
+			},
+		},
+		update: {
+			uri,
+		},
+		create: {
 			dataObjectId: resourceId,
 			api,
 			uri,
+		},
+	});
+}
+
+/**
+ * Detach a remote URI from a resource.
+ *
+ * See attachRemoteUri for more information.
+ *
+ * @param resourceId The Resource ID to attach the remote URI to
+ * @param api The type of the remote URI
+ */
+export async function detachRemoteUri(
+	resourceId: Resource['id'],
+	api: SourceType
+): Promise<void> {
+	await db.dataObjectRemote.delete({
+		where: {
+			dataObjectId_api: {
+				dataObjectId: resourceId,
+				api,
+			},
 		},
 	});
 }
@@ -712,6 +775,7 @@ export async function setFavouriteStatus(
 				remotes: true,
 				values: {
 					include: {
+						valueDataObject: true,
 						items: true,
 					},
 				},

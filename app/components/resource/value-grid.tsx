@@ -3,7 +3,9 @@ import capitalize from '~/utilities/capitalize';
 import ResourceValueLabel from '~/components/common/resource-value-label';
 
 export default function ValueGrid({ values }: { values: Resource['values'] }) {
-	const valueList = Object.entries(values);
+	const valueList = Object.entries(values) as [
+		[string, ValueRef<string> | null]
+	];
 
 	return (
 		<dl className="grid grid-cols-6">

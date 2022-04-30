@@ -60,6 +60,7 @@ import {
 import { Channel } from '~/adapters/channel/type';
 
 export type CompleteDataObjectValue = DataObjectValue & {
+	valueDataObject: DataObject | null;
 	items: ValueArrayItem[];
 };
 
@@ -254,12 +255,20 @@ export function composeRefFromValue<T, R extends Resource = Resource>(
 	value: CompleteDataObjectValue | undefined,
 	parser?: Parser<T>
 ): RefReturn<T, R> {
-	return value
-		? ({
-				ref: value.valueDataObjectId,
-				value: parser ? parser(value.value) : value.value,
-		  } as RefReturn<T, R>)
-		: null;
+	if (!value) {
+		return null;
+	}
+
+	const ref = value.valueDataObjectId;
+
+	const parsedValue = parser
+		? parser(value.value)
+		: /*value.valueDataObject?.title ?? */ value.value;
+
+	return {
+		ref,
+		value: parsedValue,
+	} as RefReturn<T, R>;
 }
 
 /**

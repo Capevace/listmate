@@ -13,6 +13,9 @@ import {
 	ImportParameters,
 	importResourceData,
 	ResourceImportParameters,
+	ResourcePlayParameters,
+	ResourceSearchParameters,
+	ResourceSearchResult,
 	retryImport,
 } from './apis.server';
 import retry from '~/utilities/retry';
@@ -63,6 +66,9 @@ export function composeOauthUrl(userId: User['id'], state: string) {
 		'playlist-read-private',
 		'playlist-read-collaborative',
 		'user-library-read',
+		'streaming',
+		'user-read-email',
+		'user-read-private',
 	];
 
 	return api.service.createAuthorizeURL(scopes, state);
@@ -82,6 +88,10 @@ export async function handleOauthCallback(userId: User['id'], code: string) {
 	};
 
 	return updateTokenData(userId, SourceType.SPOTIFY, tokenData, expiresAt);
+}
+
+export function getPlayerToken(api: API) {
+	return { accessToken: api.service.getAccessToken() };
 }
 
 /*
@@ -138,6 +148,101 @@ export async function importResourceWithType({
 		default:
 			throw new Error(
 				`Resource type ${resourceType} not supported by Spotify API`
+			);
+	}
+}
+
+export async function searchForResourceWithType({
+	api,
+	resourceType,
+	search,
+}: ResourceSearchParameters<API>): Promise<ResourceSearchResult[]> {
+	switch (resourceType) {
+		case ResourceType.SONG:
+			return retryImport(() =>
+				api.service
+					.searchTracks(search)
+					.then((res) => res.body.tracks?.items ?? [])
+					.then(
+						(items) =>
+							items.map((item) => ({
+								uri: item.uri,
+								title: item.name,
+								subtitle: item.artists.map((artist) => artist.name).join(', '),
+								thumbnailUrl: item.album.images[0]?.url ?? null,
+							})) ?? []
+					)
+			);
+
+		case ResourceType.ARTIST:
+			return retryImport(() =>
+				api.service
+					.searchArtists(search)
+					.then((res) => res.body.artists?.items ?? [])
+					.then(
+						(items) =>
+							items.map((item) => ({
+								uri: item.uri,
+								title: item.name,
+								subtitle: item.genres.join(', '),
+								thumbnailUrl: item.images[0]?.url ?? null,
+							})) ?? []
+					)
+			);
+
+		case ResourceType.ALBUM:
+			return retryImport(() =>
+				api.service
+					.searchAlbums(search)
+					.then((res) => res.body.albums?.items ?? [])
+					.then(
+						(items) =>
+							items.map((item) => ({
+								uri: item.uri,
+								title: item.name,
+								subtitle: item.artists.map((album) => album.name).join(', '),
+								thumbnailUrl: item.images[0]?.url ?? null,
+							})) ?? []
+					)
+			);
+
+		case ResourceType.PLAYLIST:
+			return retryImport(() =>
+				api.service
+					.searchPlaylists(search)
+					.then((res) => res.body.playlists?.items ?? [])
+					.then(
+						(items) =>
+							items.map((item) => ({
+								uri: item.uri,
+								title: item.name,
+								subtitle: item.owner.display_name ?? null,
+								thumbnailUrl: item.images[0]?.url ?? null,
+							})) ?? []
+					)
+			);
+
+		default:
+			throw new Error(
+				`Resource type ${resourceType} not supported by Spotify API`
+			);
+	}
+}
+
+export async function playResource(
+	parameters: ResourcePlayParameters<API>
+): Promise<void> {
+	switch (parameters.resourceType) {
+		case ResourceType.SONG:
+			await parameters.api.service.play({
+				uris: [parameters.uri],
+				device_id: parameters.deviceId,
+			});
+			return;
+
+		default:
+			throw new Error(
+				`Resource type ${parameters.resourceType} not supported by Spotify API`
 			);
 	}
 }

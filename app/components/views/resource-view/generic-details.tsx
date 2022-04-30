@@ -3,6 +3,7 @@ import type { ResourceDetailsProps } from '~/models/resource/types';
 import ValueGrid from '~/components/resource/value-grid';
 import ResourceHeader from '~/components/resource/resource-header';
 import ResourceDebugger from '~/components/resource/resource-debugger';
+import { Outlet } from 'remix';
 
 export default function GenericDetails({
 	resource,
@@ -16,6 +17,7 @@ export default function GenericDetails({
 				details={details}
 				className="mt-5"
 			/>
+			<Outlet />
 		</ResourceHeader>
 	);
 }

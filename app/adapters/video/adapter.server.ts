@@ -48,4 +48,6 @@ export function serializeVideoValues(
 	};
 }
 
-export const getVideoDetails = getEmptyDetails;
+export async function getVideoDetails(video: Video): Promise<{}> {
+	return {};
+}

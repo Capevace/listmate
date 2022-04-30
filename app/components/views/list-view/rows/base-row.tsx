@@ -6,11 +6,19 @@ import GenericRow from './generic-row';
 import SongRow from '~/adapters/song/row';
 
 export type BaseRowProps = {
+	isSeparator?: boolean;
 	resource: Resource;
 	style: React.CSSProperties;
 };
 
-export default function BaseRow({ resource, style }: BaseRowProps) {
+export default function BaseRow({
+	isSeparator,
+	resource,
+	style,
+}: BaseRowProps) {
+	if (isSeparator) {
+		return <hr className="border-2 border-gray-700" />;
+	}
 	switch (resource.type) {
 		case ResourceType.SONG:
 			return (

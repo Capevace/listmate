@@ -8,6 +8,8 @@ import composeCoverUrl from '~/utilities/cover-url';
 import Header from '~/components/views/header';
 import RefreshButton from './refresh-button';
 import { TrashIcon } from '@heroicons/react/solid';
+import FavouriteButton from './favourite-button';
+import RemoteTags from './remote-tags';
 
 export type ResourceHeaderProps = {
 	resource: Resource;
@@ -27,7 +29,8 @@ export default function ResourceHeader({
 
 	const combinedActions = (
 		<>
-			{actions} <RefreshButton resource={resource} />{' '}
+			{actions}
+			<RefreshButton resource={resource} />
 			<Menu>
 				<Form action="delete" method="post">
 					{/* <Divider /> */}
@@ -47,8 +50,16 @@ export default function ResourceHeader({
 
 	return (
 		<Header
-			title={resource.title}
-			subtitle={capitalize(resource.type)}
+			title={
+				<span className="flex items-center gap-4">
+					{resource.title} <FavouriteButton resource={resource} />
+				</span>
+			}
+			subtitle={
+				<span className="flex items-center gap-4">
+					{capitalize(resource.type)} <RemoteTags resource={resource} />
+				</span>
+			}
 			coverUrl={composeCoverUrl(resource)}
 			actions={combinedActions}
 			className={className}

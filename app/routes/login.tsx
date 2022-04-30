@@ -12,6 +12,7 @@ import {
 import { createUserSession, getUserId } from '~/session.server';
 import { verifyLogin } from '~/models/user.server';
 import { validateEmail } from '~/utils';
+import composePageTitle from '~/utilities/page-title';
 
 export const loader: LoaderFunction = async ({ request }) => {
 	const userId = await getUserId(request);
@@ -73,7 +74,7 @@ export const action: ActionFunction = async ({ request }) => {
 
 export const meta: MetaFunction = () => {
 	return {
-		title: 'Login – Listmate',
+		title: composePageTitle('Login'),
 	};
 };
 

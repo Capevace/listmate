@@ -1,26 +1,22 @@
-import {
-	ALL_SOURCE_TYPES,
-	Resource,
-	SourceType,
-} from '~/models/resource/types';
+import { ALL_SOURCE_TYPES, Resource } from '~/models/resource/types';
 
 import { Form, useTransition } from 'remix';
 import capitalize from '~/utilities/capitalize';
 
-import { Button, Menu, Select } from '@mantine/core';
+import { Button, Menu } from '@mantine/core';
 import { ChevronDownIcon } from '@heroicons/react/solid';
 import SelectButton from '~/components/forms/select-button';
 import FauxNoscript from '~/components/common/faux-noscript';
 
 type RefreshButtonProps = {
 	resource?: Resource;
-	children?: ({ loading }: { loading: boolean }) => React.ReactNode;
+	children?: ({ loading }: { loading: boolean }) => JSX.Element;
 };
 
 export default function RefreshButton({
 	resource,
 	children,
-}: RefreshButtonProps) {
+}: RefreshButtonProps): JSX.Element {
 	const transition = useTransition();
 	const action = resource ? `/resources/${resource.id}/refresh` : 'refresh';
 	const isLoading = transition.submission?.action === action;
@@ -47,6 +43,7 @@ export default function RefreshButton({
 				control={
 					<Button
 						loading={isLoading}
+						color="gray"
 						rightIcon={<ChevronDownIcon className="w-5" />}
 					>
 						Refetch Data

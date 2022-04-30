@@ -9,6 +9,8 @@ import {
 	ImportParameters,
 	importResourceData,
 	ResourceImportParameters,
+	ResourceSearchParameters,
+	ResourceSearchResult,
 	retryImport,
 } from './apis.server';
 import makeProgress from '~/utilities/progress';
@@ -96,7 +98,7 @@ export async function handleOauthCallback(userId: User['id'], code: string) {
 		refreshToken,
 	};
 
-	return updateTokenData(userId, SourceType.SPOTIFY, tokenData, expiresAt);
+	return updateTokenData(userId, SourceType.YOUTUBE, tokenData, expiresAt);
 }
 
 /*
@@ -128,6 +130,67 @@ export async function importResourceWithType({
 					userId,
 					progress,
 				}
+			);
+
+		default:
+			throw new Error(
+				`Resource type ${resourceType} not supported by YouTube API`
+			);
+	}
+}
+
+export async function searchForResourceWithType({
+	api,
+	resourceType,
+	search,
+}: ResourceSearchParameters<API>): Promise<ResourceSearchResult[]> {
+	switch (resourceType) {
+		case ResourceType.VIDEO:
+			return retryImport(() =>
+				api.service.youtube.search
+					.list({
+						q: search,
+						part: ['snippet'],
+						auth: api.service.auth,
+					})
+					.then((res) => res.data.items ?? [])
+					.then((items) =>
+						items.filter(
+							(item) => item.id?.kind === 'youtube#video' && item.id.videoId
+						)
+					)
+					.then((items) =>
+						items.map((item) => ({
+							uri: item.id?.videoId ?? '',
+							title: item.snippet?.title ?? 'No title returned',
+							subtitle: item.snippet?.channelTitle ?? null,
+							thumbnailUrl: item.snippet?.thumbnails?.default?.url ?? null,
+						}))
+					)
+			);
+
+		case ResourceType.CHANNEL:
+			return retryImport(() =>
+				api.service.youtube.search
+					.list({
+						q: search,
+						part: ['snippet'],
+						auth: api.service.auth,
+					})
+					.then((res) => res.data.items ?? [])
+					.then((items) =>
+						items.filter(
+							(item) => item.id?.kind === 'youtube#channel' && item.id.channelId
+						)
+					)
+					.then((items) =>
+						items.map((item) => ({
+							uri: item.id?.channelId ?? '',
+							title: item.snippet?.title ?? 'No title returned',
+							subtitle: null,
+							thumbnailUrl: item.snippet?.thumbnails?.default?.url ?? null,
+						}))
+					)
 			);
 
 		default:
@@ -269,8 +332,6 @@ export async function importChannel(
 			: null;
 
 	progress(0.7);
-
-	console.log('channel', channelData, data);
 
 	const channel = importResourceData<Channel>(SourceType.YOUTUBE, channelId, {
 		title: data.title,

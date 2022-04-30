@@ -27,10 +27,10 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
 	switch (sourceType) {
 		case SourceType.SPOTIFY:
-			await handleSpotifyOauthCallback({ userId, code });
+			await handleSpotifyOauthCallback(userId, code);
 			break;
 		case SourceType.YOUTUBE:
-			await handleYouTubeOauthCallback({ userId, code });
+			await handleYouTubeOauthCallback(userId, code);
 			break;
 
 		default:

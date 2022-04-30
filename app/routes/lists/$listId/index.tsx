@@ -12,7 +12,6 @@ import { findOptionalPageQuery } from '~/utilities/paginate';
 
 import ListView from '~/components/views/list-view';
 import ListHeader from '~/components/views/list-view/list-header';
-import RefreshButton from '~/components/resource/refresh-button';
 
 type LoaderData = {
 	list: List;

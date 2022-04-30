@@ -12,6 +12,7 @@ export type DynamicListProps = {
 	footer: React.ReactNode;
 	footerHeight?: number;
 	page?: number;
+	render: (item: any, index: number) => JSX.Element;
 };
 
 // TODO: Bundle optimization – Here we could bundle split the different type of lists
@@ -22,6 +23,7 @@ export default function DynamicList({
 	headerHeight = 300,
 	footer,
 	footerHeight = 100,
+	render,
 }: DynamicListProps) {
 	const parentRef = useRef<HTMLDivElement>(null);
 

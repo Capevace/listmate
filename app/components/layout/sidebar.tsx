@@ -23,6 +23,7 @@ import {
 import { Select } from '@mantine/core';
 import SearchBox from '~/components/views/search-box';
 import SpotifyIcon from '~/components/icons/spotify-icon';
+import Player from './player';
 
 const listItemBaseClass =
 	'flex items-center justify-start gap-2 rounded py-1 px-2 text-sm border hover:text-gray-200 hover:bg-gray-700 focus:bg-gray-700 focus:border-gray-600 focus:border-gray-600';
@@ -133,7 +134,7 @@ export default function Sidebar({ user, collections = [] }: SidebarProps) {
 					</nav>
 				</section>
 			</div>
-			{user && (
+			{/* {user && (
 				<footer className="flex w-full items-center justify-start gap-5 bg-gray-800 px-5 py-3">
 					<div className="flex items-center">
 						<img
@@ -156,7 +157,8 @@ export default function Sidebar({ user, collections = [] }: SidebarProps) {
 						</Form>
 					</div>
 				</footer>
-			)}
+			)} */}
+			{typeof document !== 'undefined' && <Player />}
 		</aside>
 	);
 }

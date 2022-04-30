@@ -21,8 +21,8 @@ export default function FavouriteButton({
 	const [isFavouriteState, setIsFavouriteState] = useState(isFavourite);
 
 	const heartClass = isFavouriteState
-		? 'text-red-500   stroke-2 hover:stroke-red-500 active:stroke-0 opacity-30'
-		: 'text-gray-600  stroke-2 hover:stroke-gray-600  active:stroke-0 opacity-30 ';
+		? 'text-red-500   stroke-2 hover:stroke-red-500 active:stroke-0'
+		: 'text-gray-600  stroke-2 hover:stroke-gray-600  active:stroke-0 ';
 
 	return (
 		<Form

@@ -17,17 +17,23 @@ export type CollectionDetailsProps<
 > = ResourceDetailsProps<
 	Collection<TResource, TResourceType>,
 	CollectionDetails<TResource>
->;
+> & {
+	actions?: React.ReactNode;
+};
 
 export default function CollectionDetailsView<
 	TResource extends Resource = Resource,
 	TResourceType extends ResourceType = ResourceType.COLLECTION
->({ resource, details }: CollectionDetailsProps<TResource, TResourceType>) {
+>({
+	resource,
+	details,
+	actions,
+}: CollectionDetailsProps<TResource, TResourceType>) {
 	return (
 		<ListView
 			items={details.items}
 			header={
-				<ResourceHeader resource={resource}>
+				<ResourceHeader resource={resource} actions={actions}>
 					<ValueGrid values={resource.values} />
 				</ResourceHeader>
 			}

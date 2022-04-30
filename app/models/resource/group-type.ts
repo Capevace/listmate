@@ -1,4 +1,4 @@
-import { ResourceType } from './types';
+import { ResourceType, SourceType } from './types';
 
 export enum GroupType {
 	MUSIC = 'music',
@@ -13,6 +13,16 @@ export const GROUP_TYPES = [
 ];
 
 export type GroupTypeItem = { label: string; type: ResourceType };
+
+export const GROUP_SOURCE_MAP: { [key in GroupType]: SourceType[] } = {
+	[GroupType.MUSIC]: [
+		SourceType.SPOTIFY,
+		SourceType.YOUTUBE,
+		SourceType.SOUNDCLOUD,
+	],
+	[GroupType.BOOKMARKS]: [SourceType.POCKET],
+	[GroupType.VIDEOS]: [SourceType.YOUTUBE],
+};
 
 export const GROUP_TYPE_ITEMS: { [key in GroupType]: GroupTypeItem[] } = {
 	[GroupType.MUSIC]: [

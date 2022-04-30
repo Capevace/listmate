@@ -1,15 +1,15 @@
 import type { Resource, ResourceDetails } from '~/models/resource/types';
-import type { LoaderFunction, ActionFunction } from 'remix';
+import { LoaderFunction, ActionFunction, Outlet, useOutlet } from 'remix';
 
-import { json, useLoaderData, useCatch, redirect } from 'remix';
+import { json, useLoaderData, redirect } from 'remix';
 import invariant from 'tiny-invariant';
 
 import { requireUserId } from '~/session.server';
 import { findResourceById } from '~/models/resource/resource.server';
 
-import MainView from '~/components/views/main-view';
 import ResourceView from '~/components/views/resource-view';
 import { getResourceDetails } from '~/models/resource/adapters.server';
+import { Button } from '@mantine/core';
 
 type LoaderData = {
 	resource: Resource;
@@ -41,8 +41,20 @@ export const action: ActionFunction = async ({ request, params }) => {
 	return redirect('/lists');
 };
 
+export type ResourceViewContext = {
+	resource: Resource;
+};
+
 export default function ResourceDetailsPage() {
 	const data = useLoaderData() as LoaderData;
 
-	return <ResourceView resource={data.resource} details={data.details} />;
+	return (
+		<>
+			<Button variant="subtle" size="sm" compact>
+				Disconnect
+			</Button>
+			<ResourceView resource={data.resource} details={data.details} />
+			<Outlet />
+		</>
+	);
 }

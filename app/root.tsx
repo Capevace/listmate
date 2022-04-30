@@ -24,6 +24,7 @@ import {
 	findResourcesByTypes,
 } from './models/resource/resource.server';
 import { Collection, ResourceType } from './models/resource/types';
+import { PlayerProvider } from './components/player/provider';
 
 export const meta: MetaFunction = () => ({
 	charset: 'utf-8',
@@ -71,7 +72,7 @@ function Frame({ children, hideSidebar, user, collections }: FrameProps) {
 				<Links />
 				<link rel="stylesheet" href={metaStylesheetUrl} />
 			</head>
-			<body className="no-js h-screen bg-gray-900 text-gray-100">
+			<body className="no-js h-screen bg-gray-900 text-gray-100 antialiased">
 				<script
 					type="text/javascript"
 					dangerouslySetInnerHTML={{
@@ -80,13 +81,15 @@ function Frame({ children, hideSidebar, user, collections }: FrameProps) {
 				></script>
 
 				<MantineProvider theme={theme}>
-					<MainAppLayout
-						hideSidebar={hideSidebar}
-						user={user}
-						collections={collections}
-					>
-						{children}
-					</MainAppLayout>
+					<PlayerProvider>
+						<MainAppLayout
+							hideSidebar={hideSidebar}
+							user={user}
+							collections={collections}
+						>
+							{children}
+						</MainAppLayout>
+					</PlayerProvider>
 				</MantineProvider>
 
 				<ScrollRestoration />

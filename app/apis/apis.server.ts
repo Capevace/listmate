@@ -162,6 +162,83 @@ export async function importResourceWithType(
 	}
 }
 
+export type ResourceSearchResult = {
+	uri: string;
+	title: string;
+	subtitle: string | null;
+	thumbnailUrl: string | null;
+};
+
+export type ResourceSearchParameters<TImportAPI extends ImportAPI = ImportAPI> =
+	{
+		api: TImportAPI;
+		userId: User['id'];
+		progress?: ProgressFunction;
+		sourceType: SourceType;
+		resourceType: ResourceType;
+		search: string;
+	};
+
+export async function searchForResourceWithType(
+	parameters: ResourceSearchParameters
+): Promise<ResourceSearchResult[]> {
+	switch (parameters.sourceType) {
+		case SourceType.SPOTIFY:
+			return spotifyApi.searchForResourceWithType(
+				parameters as ResourceSearchParameters<spotifyApi.API>
+			);
+
+		case SourceType.YOUTUBE:
+			return youtubeApi.searchForResourceWithType(
+				parameters as ResourceSearchParameters<youtubeApi.API>
+			);
+
+		default:
+			throw new Error(`Unsupported API type ${parameters.sourceType}`);
+	}
+}
+
+export type ResourcePlayParameters<TImportAPI extends ImportAPI = ImportAPI> = {
+	api: TImportAPI;
+	userId: User['id'];
+	progress?: ProgressFunction;
+	sourceType: SourceType;
+	resourceType: ResourceType;
+	uri: string;
+	deviceId?: string;
+};
+
+export async function playResource(
+	parameters: ResourcePlayParameters
+): Promise<void> {
+	switch (parameters.sourceType) {
+		case SourceType.SPOTIFY:
+			return spotifyApi.playResource(
+				parameters as ResourcePlayParameters<spotifyApi.API>
+			);
+
+		default:
+			throw new Error(
+				`Play not supported by API type ${parameters.sourceType}`
+			);
+	}
+}
+
+export function getPlayerToken<TImportAPI extends ImportAPI = ImportAPI>(
+	api: TImportAPI,
+	sourceType: SourceType
+) {
+	switch (sourceType) {
+		case SourceType.SPOTIFY:
+			return spotifyApi.getPlayerToken(api as spotifyApi.API);
+
+		default:
+			throw new Error(
+				`${capitalize(sourceType)} does not support player tokens`
+			);
+	}
+}
+
 export function composeOauthUrl(
 	sourceType: SourceType,
 	userId: User['id'],

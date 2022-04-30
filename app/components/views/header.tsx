@@ -1,6 +1,6 @@
 type HeaderContentProps = {
-	title: string;
-	subtitle?: string | null;
+	title: string | React.ReactNode;
+	subtitle?: string | React.ReactNode | null;
 	coverUrl?: string | null;
 	actions?: React.ReactNode;
 };

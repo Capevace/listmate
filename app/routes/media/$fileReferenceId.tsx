@@ -23,6 +23,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 	return new Response(contents, {
 		headers: {
 			'Content-Type': contentType || 'application/octet-stream, charset=utf-8',
+			'Cache-Control': 'public,max-age=31536000,immutable',
 		},
 	});
 };
