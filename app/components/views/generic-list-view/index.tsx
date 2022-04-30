@@ -14,15 +14,7 @@ export type GenericListViewProps = {
 	children: (index: number, item?: VirtualItem) => JSX.Element;
 };
 
-// TODO: ListView definitely needs some refactoring
 export default function GenericListView(props: GenericListViewProps) {
-	// const actions: ListActions = {
-	// 	canPlay: true,
-	// 	canEdit: true,
-	// 	canAddItems: true,
-	// 	canDelete: true,
-	// };
-
 	return (
 		<div>
 			<noscript className={`mx-auto block w-full max-w-7xl`}>
