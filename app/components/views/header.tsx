@@ -6,15 +6,17 @@ type HeaderContentProps = {
 };
 export function HeaderContent(props: HeaderContentProps) {
 	return (
-		<div className="mb-5 flex items-start">
-			<div className="flex-1 items-stretch">
-				<div className="relative mb-5 flex flex-col">
-					<h1 className="mb-2 text-4xl font-bold text-gray-100">
-						{props.title}
-					</h1>
-					<p className="text-xl text-gray-300">{props.subtitle}</p>
+		<div className="flex items-start ">
+			<div className="flex flex-1 flex-col items-stretch gap-5">
+				<div className="relative">
+					<h1 className="mb-2 text-4xl font-bold">{props.title}</h1>
+					<p className="text-xl text-gray-500 dark:text-gray-300">
+						{props.subtitle}
+					</p>
 				</div>
-				<nav className="flex items-center gap-3">{props.actions}</nav>
+				{props.actions && (
+					<nav className="flex items-center gap-3">{props.actions}</nav>
+				)}
 			</div>
 			{props.coverUrl && (
 				<aside
@@ -35,7 +37,7 @@ type HeaderBackgroundProps = {
 export function HeaderBackground(props: HeaderBackgroundProps) {
 	return (
 		<header
-			className={`relative my-5 border border-gray-700 bg-gray-800 px-10 py-8 shadow-xl sm:overflow-hidden sm:rounded-2xl ${props.className}`}
+			className={`00 relative my-5 border border-gray-100 bg-gray-200 px-10 py-8 text-gray-700 text-gray-700 shadow-xl dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 sm:overflow-hidden sm:rounded-2xl ${props.className}`}
 		>
 			{props.children}
 		</header>
@@ -44,7 +46,7 @@ export function HeaderBackground(props: HeaderBackgroundProps) {
 
 type HeaderProps = HeaderContentProps & {
 	className?: string;
-	children: React.ReactNode;
+	children?: React.ReactNode;
 };
 
 export default function Header(props: HeaderProps) {

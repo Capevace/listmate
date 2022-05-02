@@ -31,7 +31,6 @@ export const sessionStorage = createSessionStorage({
 		return session.id;
 	},
 	async readData(id) {
-		console.log(id);
 		const session = await prisma.session.findUnique({
 			where: { id },
 		});

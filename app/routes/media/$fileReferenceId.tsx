@@ -27,18 +27,3 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 		},
 	});
 };
-
-// export default function ListIndexPage() {
-// 	const { lists } = useLoaderData() as LoaderData;
-
-// 	return (
-// 		<div>
-// 			<h1>Lists</h1>
-// 			<div className="flex flex-col">
-// 				{lists.map((list) => (
-// 					<ListRow key={list.id} list={list} />
-// 				))}
-// 			</div>
-// 		</div>
-// 	);
-// }

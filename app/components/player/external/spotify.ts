@@ -57,7 +57,7 @@ export default function createSpotifyPlayer(
 			player.addListener('playback_error', onError);
 
 			player.addListener('player_state_changed', (state: any) => {
-				console.log('spot_onplaystatechange', state);
+				console.log('Spotify player state update', state);
 
 				if (state) {
 					onPlayStateChange({

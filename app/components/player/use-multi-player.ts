@@ -245,7 +245,6 @@ export function useMultiPlayer(): [PlayerState, MultiPlayer] {
 				});
 			}
 
-			console.log(nextState);
 			setPlayerState(nextState);
 
 			if (nextState.playing && nextState.currentTrack) {

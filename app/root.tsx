@@ -60,7 +60,7 @@ type FrameProps = {
 
 function Frame({ children, hideSidebar, user, collections }: FrameProps) {
 	return (
-		<html lang="en" className="h-full">
+		<html lang="en" className="dark h-full">
 			{/* 
 				TODO: this is awful but necessary, so that tailwind loads AFTER mantine.
 				Otherwise tailwinds resets override some mantine stuff.
@@ -72,7 +72,7 @@ function Frame({ children, hideSidebar, user, collections }: FrameProps) {
 				<Links />
 				<link rel="stylesheet" href={metaStylesheetUrl} />
 			</head>
-			<body className="no-js h-screen bg-gray-900 text-gray-100 antialiased">
+			<body className="no-js h-screen bg-gray-900 text-gray-900 text-gray-900 antialiased dark:text-gray-100">
 				<script
 					type="text/javascript"
 					dangerouslySetInnerHTML={{

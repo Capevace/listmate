@@ -21,7 +21,7 @@ export default function MainAppLayout({
 		<div className="flex h-full">
 			{!hideSidebar && <Sidebar user={user} collections={collections} />}
 
-			<main className="flex flex-1 flex-col overflow-y-scroll bg-gray-900">
+			<main className="relative flex flex-1 flex-col overflow-y-scroll bg-gray-50 dark:bg-gray-900">
 				{children}
 			</main>
 		</div>

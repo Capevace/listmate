@@ -23,7 +23,7 @@ export function dataObjectToVideo(
 		values.publishedAt,
 		(v) => new Date(v)
 	);
-	console.log('convert', values);
+
 	invariant(title, 'Missing title');
 	invariant(publishedAt, 'Missing publishedAt date');
 

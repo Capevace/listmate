@@ -6,6 +6,7 @@ import {
 	Form,
 	json,
 	LoaderFunction,
+	MetaFunction,
 	useFetcher,
 	useLoaderData,
 	useNavigate,
@@ -22,6 +23,7 @@ import { requireUserId } from '~/session.server';
 import { useDebounce } from '~/utilities/hooks/use-debounce';
 import httpFindResource from '~/utilities/http/find-resource';
 import httpFindSourceType from '~/utilities/http/find-source-type';
+import composePageTitle from '~/utilities/page-title';
 
 export type LoaderData = {
 	resource: Resource;
@@ -53,8 +55,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 		  })
 		: [];
 
-	console.log(searchResults);
-
 	return json<LoaderData>({
 		resource,
 		sourceType,
@@ -63,7 +63,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 };
 
 export const action: ActionFunction = async ({ request, params }) => {
-	const userId = await requireUserId(request);
 	const sourceType = httpFindSourceType(params.sourceType);
 	const resource = await httpFindResource(params.resourceId);
 
@@ -81,11 +80,30 @@ export const action: ActionFunction = async ({ request, params }) => {
 	return null;
 };
 
+export const meta: MetaFunction = ({ data, parentsData }) => {
+	if (!data) {
+		// If routes/resources/$resourceId is not in the parentsData, the resource itself was not found
+		const errorType = parentsData['routes/resources/$resourceId']
+			? 'Source'
+			: 'Resource';
+
+		return { title: composePageTitle(`${errorType} not found`) };
+	}
+
+	const { resource } = data as LoaderData;
+
+	return {
+		title: composePageTitle(resource.title),
+	};
+};
+
 export default function ResourceSourceView() {
 	const transition = useTransition();
 	const fetcher = useFetcher<LoaderData>();
 	const navigate = useNavigate();
-	const { resource, sourceType, searchResults } = useLoaderData<LoaderData>();
+	const data = useLoaderData<LoaderData>();
+	const { resource, sourceType, searchResults } = data;
+	console.log(data);
 	const uri = resource.remotes[sourceType];
 
 	const findResources: ChangeEventHandler<HTMLInputElement> = (e) => {

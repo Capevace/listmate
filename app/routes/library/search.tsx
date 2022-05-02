@@ -2,7 +2,7 @@ import type { Resource } from '~/models/resource/types';
 import type { List } from '~/models/list.server';
 import type { ListItemData } from '~/models/item.server';
 
-import { LoaderFunction, useLoaderData, json } from 'remix';
+import { LoaderFunction, useLoaderData, json, MetaFunction } from 'remix';
 import invariant from 'tiny-invariant';
 
 import { requireUserId } from '~/session.server';
@@ -10,6 +10,9 @@ import { searchResources } from '~/models/resource/resource.server';
 import { findOptionalPageQuery } from '~/utilities/paginate';
 
 import ListView from '~/components/views/list-view';
+import composePageTitle from '~/utilities/page-title';
+import Header from '~/components/views/header';
+import ResourceDebugger from '~/components/resource/resource-debugger';
 
 type LoaderData = {
 	resources: Resource[];
@@ -32,24 +35,28 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 	return json<LoaderData>({ resources, page, searchString });
 };
 
+export const meta: MetaFunction = ({ data }) => {
+	const { searchString } = data as LoaderData;
+	return {
+		title: composePageTitle(`Search for "${searchString}"`),
+	};
+};
+
 export default function SearchPage() {
 	const { resources, page, searchString } = useLoaderData<LoaderData>();
-	const list: List = {
-		id: 'search',
-		title: 'Search results',
-		description: searchString,
-		userId: null,
-		createdAt: new Date(),
-		updatedAt: new Date(),
-		coverFileReferenceId: null,
-	};
 
-	const items: ListItemData[] = resources.map((resource) => ({
-		id: resource.id,
-		listId: list.id,
-		resource,
-		position: -1,
-	}));
-
-	return <ListView list={list} items={items} page={page} />;
+	return (
+		<ListView
+			items={resources}
+			page={page}
+			header={
+				<Header
+					title="Search results"
+					subtitle={searchString}
+					className="mx-auto max-w-7xl"
+				/>
+			}
+			headerHeight={365}
+		/>
+	);
 }

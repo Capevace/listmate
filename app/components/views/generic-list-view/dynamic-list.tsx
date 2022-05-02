@@ -5,7 +5,8 @@ export type GenericDynamicListProps = {
 	size: number;
 	estimateHeight: (index: number) => number;
 	page?: number;
-	render: (index: number, item?: VirtualItem) => JSX.Element;
+	parentRef: React.RefObject<HTMLElement>;
+	children: (index: number, item?: VirtualItem) => JSX.Element;
 };
 
 // TODO: Bundle optimization – Here we could bundle split the different type of lists
@@ -14,10 +15,9 @@ export default function GenericDynamicList({
 	size,
 	estimateHeight,
 	page,
-	render,
+	parentRef,
+	children,
 }: GenericDynamicListProps) {
-	const parentRef = useRef<HTMLDivElement>(null);
-
 	const rowVirtualizer = useVirtual({
 		size,
 		parentRef,
@@ -30,22 +30,16 @@ export default function GenericDynamicList({
 
 	return (
 		<div
-			ref={parentRef}
-			className="require-js h-full max-h-screen w-full px-5"
-			style={{ overflow: 'auto' }}
+			className="mx-auto block max-w-7xl"
+			style={{
+				height: `${rowVirtualizer.totalSize}px`,
+				width: '100%',
+				position: 'relative',
+			}}
 		>
-			<div
-				className="mx-auto block max-w-7xl"
-				style={{
-					height: `${rowVirtualizer.totalSize}px`,
-					width: '100%',
-					position: 'relative',
-				}}
-			>
-				{rowVirtualizer.virtualItems.map((virtualRow) =>
-					render(virtualRow.index, virtualRow)
-				)}
-			</div>
+			{rowVirtualizer.virtualItems.map((virtualRow) =>
+				children(virtualRow.index, virtualRow)
+			)}
 		</div>
 	);
 }

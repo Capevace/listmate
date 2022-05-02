@@ -1,6 +1,6 @@
 import type { Resource } from '~/models/resource/types';
 import ResourceValueLabel from '~/components/common/resource-value-label';
-import FavouriteButton from '~/components/resource/favourite-button';
+import InlineFavouriteButton from '~/components/resource/inline-favourite-button';
 import composeCoverUrl from '~/utilities/cover-url';
 
 export default function GenericRow({
@@ -15,7 +15,7 @@ export default function GenericRow({
 			className="grid w-full grid-cols-12 items-center py-1 text-sm text-gray-200"
 			style={style}
 		>
-			<FavouriteButton resource={resource} className="col-span-1" />
+			<InlineFavouriteButton resource={resource} className="col-span-1" />
 			<figure className="col-span-1">
 				{resource.thumbnail && (
 					<img

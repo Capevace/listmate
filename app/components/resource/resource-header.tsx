@@ -8,7 +8,7 @@ import composeCoverUrl from '~/utilities/cover-url';
 import Header from '~/components/views/header';
 import RefreshButton from './refresh-button';
 import { TrashIcon } from '@heroicons/react/solid';
-import FavouriteButton from './favourite-button';
+import InlineFavouriteButton from './inline-favourite-button';
 import RemoteTags from './remote-tags';
 
 export type ResourceHeaderProps = {
@@ -52,7 +52,7 @@ export default function ResourceHeader({
 		<Header
 			title={
 				<span className="flex items-center gap-4">
-					{resource.title} <FavouriteButton resource={resource} />
+					{resource.title} <InlineFavouriteButton resource={resource} />
 				</span>
 			}
 			subtitle={
@@ -62,7 +62,7 @@ export default function ResourceHeader({
 			}
 			coverUrl={composeCoverUrl(resource)}
 			actions={combinedActions}
-			className={className}
+			className={`mx-auto max-w-7xl ${className}`}
 		>
 			{children}
 		</Header>

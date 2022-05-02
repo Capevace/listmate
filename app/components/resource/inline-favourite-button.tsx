@@ -2,13 +2,18 @@ import type { Resource } from '~/models/resource/types';
 import { useState } from 'react';
 import { Form, useLocation, useTransition } from 'remix';
 
-import { HeartIcon } from '@heroicons/react/solid';
+import {
+	HeartFill as HeartFillIcon,
+	Heart as HeartOutlineIcon,
+} from 'react-bootstrap-icons';
+
+import { InlineButton } from '../forms/inline-button';
 
 type FavouriteButtonProps = {
 	resource: Resource;
 	className?: string;
 };
-export default function FavouriteButton({
+export default function InlineFavouriteButton({
 	resource,
 	className,
 }: FavouriteButtonProps) {
@@ -20,9 +25,7 @@ export default function FavouriteButton({
 
 	const [isFavouriteState, setIsFavouriteState] = useState(isFavourite);
 
-	const heartClass = isFavouriteState
-		? 'text-red-500   stroke-2 hover:stroke-red-500 active:stroke-0'
-		: 'text-gray-600  stroke-2 hover:stroke-gray-600  active:stroke-0 ';
+	const heartClass = isFavouriteState ? 'text-gray-300' : 'text-gray-500';
 
 	return (
 		<Form
@@ -32,7 +35,7 @@ export default function FavouriteButton({
 			onSubmit={(e) => {
 				setIsFavouriteState(!isFavouriteState);
 			}}
-			className={className}
+			className={`${className} flex items-center`}
 		>
 			<input
 				type="hidden"
@@ -40,9 +43,14 @@ export default function FavouriteButton({
 				value={String(!isFavouriteState)}
 			/>
 			<input type="hidden" name="redirectTo" value={location.pathname} />
-			<button className={`${heartClass} group `} type="submit">
-				<HeartIcon className="w-6 " />
-			</button>
+
+			<InlineButton type="submit">
+				{isFavouriteState ? (
+					<HeartFillIcon size={20} />
+				) : (
+					<HeartOutlineIcon size={20} />
+				)}
+			</InlineButton>
 		</Form>
 	);
 }

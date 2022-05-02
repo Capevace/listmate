@@ -1,4 +1,4 @@
-import type { LoaderFunction } from 'remix';
+import type { LoaderFunction, MetaFunction } from 'remix';
 import type { List } from '~/models/list.server';
 import type { ListItemData } from '~/models/item.server';
 import type { Resource } from '~/models/resource/types';
@@ -15,6 +15,7 @@ import capitalize from '~/utilities/capitalize';
 
 import ListView from '~/components/views/list-view';
 import ListHeader from '~/components/views/list-view/list-header';
+import composePageTitle from '~/utilities/page-title';
 
 type LoaderData = {
 	list: List;
@@ -63,10 +64,24 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 	return json<LoaderData>({ list, items, page });
 };
 
+export const meta: MetaFunction = ({ data }) => {
+	if (!data) {
+		return {};
+	}
+
+	const { list } = data as LoaderData;
+
+	return {
+		title: composePageTitle(`All ${list.title}`),
+	};
+};
+
 export default function ListPage() {
 	const data = useLoaderData<LoaderData>();
 
-	const resources = data.items.map((item) => item.resource);
+	const resources = data.items
+		.map((item) => item.resource)
+		.sort((a, b) => (a.title < b.title ? -1 : 1));
 
 	return (
 		<ListView

@@ -79,7 +79,6 @@ export const action: ActionFunction = async ({ request, params }) => {
 			resourceType: ResourceType.PLAYLIST,
 			uri: String(id),
 		});
-		console.log('Imported playlist', lastPlaylist, id);
 	}
 
 	return redirect(

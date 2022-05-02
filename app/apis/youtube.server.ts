@@ -83,7 +83,6 @@ export function composeOauthUrl(_userId: User['id'], state: string) {
 export async function handleOauthCallback(userId: User['id'], code: string) {
 	const api = createApi();
 	const data = await api.service.auth.getToken(code);
-	console.log('youtube oauth data', data);
 
 	const accessToken = data.tokens.access_token;
 	const refreshToken = data.tokens.refresh_token;
@@ -265,8 +264,6 @@ export async function importVideo(
 			: null;
 
 	progress(0.8);
-
-	console.log('video', videoData, data, channel);
 
 	const video = importResourceData<Video>(SourceType.YOUTUBE, videoId, {
 		title: data.title,

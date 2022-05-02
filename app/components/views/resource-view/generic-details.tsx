@@ -1,23 +1,21 @@
 import type { ResourceDetailsProps } from '~/models/resource/types';
 
 import ValueGrid from '~/components/resource/value-grid';
-import ResourceHeader from '~/components/resource/resource-header';
 import ResourceDebugger from '~/components/resource/resource-debugger';
-import { Outlet } from 'remix';
+import CompactResourceView from '~/components/views/compact-view/compact-resource-header';
 
 export default function GenericDetails({
 	resource,
 	details,
 }: ResourceDetailsProps) {
 	return (
-		<ResourceHeader resource={resource} className="mx-auto w-full max-w-7xl">
+		<CompactResourceView resource={resource} showCover>
 			<ValueGrid values={resource.values} />
 			<ResourceDebugger
 				resource={resource}
 				details={details}
 				className="mt-5"
 			/>
-			<Outlet />
-		</ResourceHeader>
+		</CompactResourceView>
 	);
 }

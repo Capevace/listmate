@@ -89,7 +89,7 @@ export type PlayerState = {
 };
 
 export interface MultiPlayer {
-	play(track?: PlayableTrack, context?: PlayerContext): void;
+	play(track?: PlayableTrack, context?: PlayerContext): Promise<void>;
 	togglePlay(): void;
 	resume(type?: SourceType): void;
 	pause(type?: SourceType): void;

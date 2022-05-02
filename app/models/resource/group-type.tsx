@@ -1,3 +1,9 @@
+import {
+	BookmarksFill as BookmarksFillIcon,
+	Film as FilmIcon,
+	MusicNote,
+	MusicNoteList as MusicNoteListIcon,
+} from 'react-bootstrap-icons';
 import { ResourceType, SourceType } from './types';
 
 export enum GroupType {
@@ -51,6 +57,12 @@ export const GROUP_TYPE_ITEMS: { [key in GroupType]: GroupTypeItem[] } = {
 			type: ResourceType.VIDEO,
 		},
 	],
+};
+
+export const GROUP_ICONS: { [key in GroupType]: JSX.Element } = {
+	[GroupType.MUSIC]: <MusicNoteListIcon />,
+	[GroupType.BOOKMARKS]: <BookmarksFillIcon />,
+	[GroupType.VIDEOS]: <FilmIcon />,
 };
 
 export function stringToGroupType(type: string): GroupType {

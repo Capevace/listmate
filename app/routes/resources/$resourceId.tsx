@@ -1,5 +1,11 @@
 import type { Resource, ResourceDetails } from '~/models/resource/types';
-import { LoaderFunction, ActionFunction, Outlet, useOutlet } from 'remix';
+import {
+	LoaderFunction,
+	ActionFunction,
+	Outlet,
+	useOutlet,
+	MetaFunction,
+} from 'remix';
 
 import { json, useLoaderData, redirect } from 'remix';
 import invariant from 'tiny-invariant';
@@ -10,6 +16,9 @@ import { findResourceById } from '~/models/resource/resource.server';
 import ResourceView from '~/components/views/resource-view';
 import { getResourceDetails } from '~/models/resource/adapters.server';
 import { Button } from '@mantine/core';
+import composePageTitle from '~/utilities/page-title';
+import RefreshButton from '~/components/resource/refresh-button';
+import { PlayIcon } from '@heroicons/react/solid';
 
 type LoaderData = {
 	resource: Resource;
@@ -45,14 +54,23 @@ export type ResourceViewContext = {
 	resource: Resource;
 };
 
+export const meta: MetaFunction = ({ data }) => {
+	if (!data) {
+		return { title: composePageTitle('Resource not found') };
+	}
+
+	const { resource } = data as LoaderData;
+
+	return {
+		title: composePageTitle(resource.title),
+	};
+};
+
 export default function ResourceDetailsPage() {
 	const data = useLoaderData() as LoaderData;
 
 	return (
 		<>
-			<Button variant="subtle" size="sm" compact>
-				Disconnect
-			</Button>
 			<ResourceView resource={data.resource} details={data.details} />
 			<Outlet />
 		</>

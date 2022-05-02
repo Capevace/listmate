@@ -1,4 +1,12 @@
-import { Link, LoaderFunction, useLoaderData, json, Outlet, Form } from 'remix';
+import {
+	Link,
+	LoaderFunction,
+	useLoaderData,
+	json,
+	Outlet,
+	Form,
+	MetaFunction,
+} from 'remix';
 import { Button } from '@mantine/core';
 
 import { requireUserId } from '~/session.server';
@@ -11,6 +19,7 @@ import {
 import capitalize from '~/utilities/capitalize';
 
 import MainView from '~/components/views/main-view';
+import composePageTitle from '~/utilities/page-title';
 
 type Token = {
 	id: SourceToken['id'];
@@ -54,6 +63,12 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 	}
 
 	return json<LoaderData>(data);
+};
+
+export const meta: MetaFunction = () => {
+	return {
+		title: composePageTitle('External Connections'),
+	};
 };
 
 function ConnectRow({

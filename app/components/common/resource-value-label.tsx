@@ -16,7 +16,7 @@ export default function ResourceValueLabel({
 		return forceRef || valueRef.ref ? (
 			<Link
 				to={`/resources/${forceRef || valueRef.ref}`}
-				className="text-blue-500 hover:text-blue-700"
+				className="hover:opacity-80"
 			>
 				{valueRef.value}
 			</Link>

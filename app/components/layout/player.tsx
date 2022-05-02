@@ -77,7 +77,6 @@ export default function Player() {
 						<div>{song.values.name.value}</div>
 						<div className="text-gray-400">{song.values.artist?.value}</div>
 					</div>
-					{/* <button onClick={() => console.log(playerState)}>DEBUG</button> */}
 				</section>
 
 				<nav className="relative flex items-center justify-between bg-gray-800 px-3 py-2 pt-4">

@@ -1,5 +1,4 @@
 import { PlayIcon } from '@heroicons/react/solid';
-import { Button } from '@mantine/core';
 import { usePlayer } from '~/components/player/use-player';
 import { PlayableTrack, PlayerContext } from '~/components/player/types';
 
@@ -16,13 +15,8 @@ export default function PlayButton({ track, playContext }: PlayButtonProps) {
 	};
 
 	return (
-		<Button
-			variant="filled"
-			color="gray"
-			rightIcon={<PlayIcon className="w-6" />}
-			onClick={onClick}
-		>
-			Play
-		</Button>
+		<button className="text-gray-400 hover:text-gray-100" onClick={onClick}>
+			<PlayIcon className="w-6" />
+		</button>
 	);
 }
