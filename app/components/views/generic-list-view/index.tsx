@@ -9,6 +9,7 @@ export type PositionedItem = {
 
 export type GenericListViewProps = GenericDynamicListProps & {
 	children: (index: number, item?: VirtualItem) => JSX.Element;
+	className?: string | null;
 };
 
 export default function GenericListView(props: GenericListViewProps) {
