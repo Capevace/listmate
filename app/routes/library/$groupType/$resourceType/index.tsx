@@ -16,10 +16,15 @@ import capitalize from '~/utilities/capitalize';
 import ListView from '~/components/views/list-view';
 import ListHeader from '~/components/views/list-view/list-header';
 import composePageTitle from '~/utilities/page-title';
+import CompactView from '~/components/views/compact-view/compact-view';
+import GenericListView from '~/components/views/generic-list-view';
+import { useRef } from 'react';
+import BaseRow from '~/components/views/list-view/rows/base-row';
 
 type LoaderData = {
-	list: List;
-	items: ListItemData[];
+	title: string;
+	subtitle?: string;
+	resources: Resource[];
 	page?: number;
 };
 
@@ -43,25 +48,14 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
 	const page = findOptionalPageQuery(request.url);
 
-	const list: List = {
-		id: '',
-		title: capitalize(resourceType) + 's', // TODO: proper pluralization
-		description: `All ${resourceType}s in your ${groupType} library.`,
-		createdAt: new Date(),
-		updatedAt: new Date(),
-		userId,
-		coverFileReferenceId: null,
-	};
-
 	const resources: Resource[] = await findResourcesByType(resourceType);
-	const items: ListItemData[] = resources.map((resource) => ({
-		id: resource.id,
-		listId: list.id,
-		resource,
-		position: -1,
-	}));
 
-	return json<LoaderData>({ list, items, page });
+	return json<LoaderData>({
+		title: capitalize(resourceType) + 's',
+		subtitle: `All ${resourceType}s in your ${groupType} library.`,
+		resources,
+		page,
+	});
 };
 
 export const meta: MetaFunction = ({ data }) => {
@@ -69,25 +63,49 @@ export const meta: MetaFunction = ({ data }) => {
 		return {};
 	}
 
-	const { list } = data as LoaderData;
+	const { title } = data as LoaderData;
 
 	return {
-		title: composePageTitle(`All ${list.title}`),
+		title: composePageTitle(`All ${title}`),
 	};
 };
 
 export default function ListPage() {
-	const data = useLoaderData<LoaderData>();
-
-	const resources = data.items
-		.map((item) => item.resource)
-		.sort((a, b) => (a.title < b.title ? -1 : 1));
+	const { resources, title, subtitle } = useLoaderData<LoaderData>();
+	const ref = useRef<HTMLElement>(null);
 
 	return (
-		<ListView
-			items={resources}
-			page={data.page}
-			header={<ListHeader list={data.list} />}
-		/>
+		<CompactView parentRef={ref} title={title} subtitle={subtitle}>
+			<GenericListView
+				size={resources.length}
+				estimateHeight={() => 50}
+				parentRef={ref}
+			>
+				{(index, row) => {
+					invariant(row, 'Only JS-enabled supported for now');
+
+					const resource = resources[index];
+
+					return (
+						<BaseRow
+							key={`${resource.id}-${index}`}
+							resource={resource}
+							style={
+								row
+									? {
+											position: 'absolute',
+											top: 0,
+											left: 0,
+											width: '100%',
+											height: `${row.size}px`,
+											transform: `translateY(${row.start}px)`,
+									  }
+									: { position: 'relative' }
+							}
+						/>
+					);
+				}}
+			</GenericListView>
+		</CompactView>
 	);
 }

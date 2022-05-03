@@ -2,6 +2,7 @@ import { ActionFunction, redirect } from 'remix';
 import { detachRemoteUri } from '~/models/resource/resource.server';
 import httpFindResource from '~/utilities/http/find-resource';
 import httpFindSourceType from '~/utilities/http/find-source-type';
+import { composeResourceUrl } from '~/utilities/resource-url';
 
 export const action: ActionFunction = async ({ request, params }) => {
 	const sourceType = httpFindSourceType(params.sourceType);
@@ -9,5 +10,5 @@ export const action: ActionFunction = async ({ request, params }) => {
 
 	await detachRemoteUri(resource.id, sourceType);
 
-	return redirect(`/resources/${resource.id}/${sourceType}`);
+	return redirect(composeResourceUrl(resource, sourceType));
 };

@@ -17,6 +17,7 @@ import {
 } from '~/models/resource/types';
 import { authenticateApi, createApi } from '~/apis/spotify.server';
 import { importResourceWithType } from '~/apis/apis.server';
+import { composeResourceUrl } from '~/utilities/resource-url';
 
 type LoaderData = {
 	type: SourceType;
@@ -82,7 +83,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 	}
 
 	return redirect(
-		lastPlaylist ? `/resources/${lastPlaylist.id}` : '/connections'
+		lastPlaylist ? composeResourceUrl(lastPlaylist) : '/connections'
 	);
 };
 

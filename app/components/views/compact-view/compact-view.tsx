@@ -7,12 +7,11 @@ export type CompactViewProps = CompactHeaderProps & {
 
 export default function CompactView(props: CompactViewProps) {
 	return (
-		<article
-			className="mx-auto flex w-full max-w-7xl flex-col gap-5"
-			ref={props.parentRef}
-		>
+		<article className="mx-auto flex w-full max-w-7xl flex-col gap-5">
 			<CompactHeader {...props} children={undefined} />
-			<main className="z-10">{props.children}</main>
+			<main className="z-10" ref={props.parentRef}>
+				{props.children}
+			</main>
 		</article>
 	);
 }

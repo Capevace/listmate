@@ -7,6 +7,7 @@ import { Button, Menu } from '@mantine/core';
 import { ChevronDownIcon } from '@heroicons/react/solid';
 import SelectButton from '~/components/forms/select-button';
 import FauxNoscript from '~/components/common/faux-noscript';
+import { composeResourceUrl } from '~/utilities/resource-url';
 
 type RefreshButtonProps = {
 	resource?: Resource;
@@ -18,7 +19,7 @@ export default function RefreshButton({
 	children,
 }: RefreshButtonProps): JSX.Element {
 	const transition = useTransition();
-	const action = resource ? `/resources/${resource.id}/refresh` : 'refresh';
+	const action = resource ? composeResourceUrl(resource, 'refresh') : 'refresh';
 	const isLoading = transition.submission?.action === action;
 
 	const data = ALL_SOURCE_TYPES.map((sourceType) => ({

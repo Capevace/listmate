@@ -10,6 +10,7 @@ import {
 } from '~/models/resource/types';
 import { requireUserId } from '~/session.server';
 import capitalize from '~/utilities/capitalize';
+import { composeResourceUrl } from '~/utilities/resource-url';
 
 export const loader: LoaderFunction = async ({ request, params }) => {
 	const userId = await requireUserId(request);
@@ -47,5 +48,5 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 		uri,
 	});
 
-	return redirect(`/resources/${resource.id}`);
+	return redirect(composeResourceUrl(resource));
 };

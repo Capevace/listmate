@@ -19,6 +19,8 @@ import { Button } from '@mantine/core';
 import composePageTitle from '~/utilities/page-title';
 import RefreshButton from '~/components/resource/refresh-button';
 import { PlayIcon } from '@heroicons/react/solid';
+import httpFindResourceType from '~/utilities/http/find-resource-type';
+import { composeResourceUrl } from '~/utilities/resource-url';
 
 type LoaderData = {
 	resource: Resource;
@@ -35,6 +37,9 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 	if (!resource) {
 		throw new Response('Not Found', { status: 404 });
 	}
+
+	// Validate resource type URL part
+	httpFindResourceType(params.resourceType, resource, new URL(request.url));
 
 	const details = await getResourceDetails(resource);
 

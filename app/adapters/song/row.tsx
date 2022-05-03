@@ -56,16 +56,23 @@ export default function SongRow({
 				/>
 				<div className="flex flex-col truncate font-medium">
 					<ResourceValueLabel
+						resource={resource}
 						valueRef={resource.values.name}
 						forceRef={resource.id}
 					/>
 					<div className="font-regular truncate text-xs">
-						<ResourceValueLabel valueRef={resource.values.artist} />
+						<ResourceValueLabel
+							resource={resource}
+							valueRef={resource.values.artist}
+						/>
 					</div>
 				</div>
 			</div>
 			<div className="col-span-3 truncate">
-				<ResourceValueLabel valueRef={resource.values.album} />
+				<ResourceValueLabel
+					resource={resource}
+					valueRef={resource.values.album}
+				/>
 			</div>
 			<div className="col-span-1 flex justify-end">
 				<ResourceContextMenu />

@@ -25,6 +25,7 @@ import { Select } from '@mantine/core';
 import SearchBox from '~/components/views/search-box';
 import SpotifyIcon from '~/components/icons/spotify-icon';
 import Player from './player';
+import { composeResourceUrl } from '~/utilities/resource-url';
 
 const listItemBaseClass =
 	'flex items-center justify-start gap-2 rounded py-1 px-2 text-sm border hover:text-gray-200 hover:bg-gray-700 focus:bg-gray-700 focus:border-gray-600 focus:border-gray-600';
@@ -40,6 +41,7 @@ function SidebarListItem({
 }) {
 	return (
 		<NavLink
+			end
 			to={to}
 			className={({ isActive }) =>
 				isActive
@@ -69,65 +71,52 @@ type SidebarProps = {
 	collections?: Collection[];
 };
 
+function GroupLink({ group }: { group: GroupType }) {
+	const className = 'flex h-16 items-center justify-center bg-opacity-50 ';
+
+	return (
+		<NavLink
+			key={group}
+			to={`/library/${group}`}
+			className={({ isActive }) =>
+				isActive
+					? `${className} bg-gray-700 text-gray-200`
+					: `${className} bg-transparent text-gray-400`
+			}
+		>
+			<figure className="h-8 w-8">{GROUP_ICONS[group]}</figure>
+		</NavLink>
+	);
+}
+
 export default function Sidebar({ user, collections = [] }: SidebarProps) {
 	const [typeGroup, setTypeGroup] = useState(GroupType.MUSIC);
 	// const groups = Object.entries() as [GroupType, string][];
 
 	return (
-		<aside className="flex h-full max-w-sm border-r-2 border-gray-800 bg-gray-800">
-			<section className="flex  w-16 flex-col gap-5 bg-gray-900">
-				<header className="flex h-16 items-center justify-center bg-gray-900">
+		<aside className="z-10 flex h-full max-w-sm border-r-2 border-gray-800">
+			<section className="flex  w-16 flex-col gap-5 bg-gray-800 bg-opacity-60">
+				<header className="flex h-16 items-center justify-center">
 					<h2 className="text-2xl font-semibold text-gray-200 dark:text-gray-400">
 						L
 					</h2>
 				</header>
-				<nav>
+				<nav className="flex flex-col">
 					{GROUP_TYPES.map((group) => (
-						<NavLink
-							key={group}
-							to={''}
-							className={({ isActive }) =>
-								isActive
-									? `${listItemBaseClass}  border-gray-600 bg-gray-700 text-gray-200`
-									: `${listItemBaseClass}  border-transparent bg-transparent text-gray-400`
-							}
-						>
-							{GROUP_ICONS[group]}
-						</NavLink>
+						<GroupLink key={group} group={group} />
 					))}
 				</nav>
 			</section>
-			<section className="flex flex-1 flex-col justify-between">
+			<section className="flex flex-1 flex-col justify-between bg-gray-900 bg-opacity-60">
 				<SearchBox className="py-2 px-2" />
 				<hr className="border-gray-700" />
 
-				<div className="flex flex-1 flex-col gap-5 overflow-y-scroll px-2 py-2">
+				<div className="flex flex-1 flex-col gap-5 overflow-y-scroll px-3 py-2">
 					<section>
-						<h2 className="mb-2 text-xs text-gray-400">
-							<span className="mb-2 block">Library</span>
-							{/* TODO: replace Mantine component with own one, this is for prototyping */}
-							<Select
-								styles={{
-									input: {
-										fontSize: 'inherit',
-										color: 'inherit',
-										fontWeight: 'inherit',
-									},
-								}}
-								className="w-full text-lg font-bold text-gray-400"
-								color="gray"
-								variant="unstyled"
-								value={typeGroup}
-								onChange={(value) => setTypeGroup(value as GroupType)}
-								data={GROUP_TYPES.map((type) => {
-									return {
-										value: type,
-										label: capitalize(type.toLowerCase()),
-									};
-								})}
-							/>
+						<h2 className="mb-3 text-xs font-semibold text-gray-500">
+							Library
 						</h2>
-						<nav className="flex flex-col gap-1">
+						<nav className="flex flex-col gap-1 font-medium">
 							{GROUP_TYPE_ITEMS[typeGroup].map((item) => (
 								<SidebarListItem
 									key={item.label}
@@ -143,12 +132,14 @@ export default function Sidebar({ user, collections = [] }: SidebarProps) {
 					</section>
 					<hr className="border-gray-700" />
 					<section className="flex flex-col">
-						<h2 className="mb-2 text-xs text-gray-400">Collections</h2>
+						<h2 className="mb-2 text-xs font-semibold text-gray-500">
+							Collections
+						</h2>
 						<nav className="flex flex-1 flex-col gap-1">
 							{collections.map((collection) => (
 								<SidebarListItem
 									key={collection.id}
-									to={`/resources/${collection.id}`}
+									to={composeResourceUrl(collection)}
 									className="flex justify-between"
 								>
 									{collection.title}

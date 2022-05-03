@@ -31,7 +31,7 @@ export default function CompactHeader({
 							backgroundImage: `url(${coverUrl})`,
 						}}
 					></div>
-					<div className="absolute top-0 left-0 right-0 h-72 bg-gray-100 opacity-40"></div>
+					<div className="absolute top-0 left-0 right-0 h-72 bg-gray-100 opacity-40 dark:bg-gray-900"></div>
 
 					<div className="absolute top-0 left-0 right-0 h-72 bg-gradient-to-b from-transparent to-gray-50 dark:to-gray-900"></div>
 				</div>

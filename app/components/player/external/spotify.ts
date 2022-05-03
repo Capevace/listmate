@@ -1,4 +1,5 @@
 import { SourceType } from '~/models/resource/types';
+import { composeResourceUrl } from '~/utilities/resource-url';
 import { ExternalPlayer, ListmateWindow, PlayerState } from '../types';
 
 declare const window: ListmateWindow;
@@ -32,13 +33,18 @@ export default function createSpotifyPlayer(
 			const api: ExternalPlayer<{}> = {
 				ref: player,
 				async play(state, uri) {
-					await fetch(
-						`/resources/${state.multi.currentTrack?.resource.id}/${state.multi.currentTrack?.type}/player/play?device_id=${deviceId}`,
-						{
-							method: 'POST',
-							credentials: 'include',
-						}
+					if (!state.multi.currentTrack?.resource) {
+						throw new Error('no track to play');
+					}
+
+					const url = composeResourceUrl(
+						state.multi.currentTrack.resource,
+						`${state.multi.currentTrack?.type}/player/play?device_id=${deviceId}`
 					);
+					await fetch(url, {
+						method: 'POST',
+						credentials: 'include',
+					});
 				},
 				async resume(state) {
 					return player.resume();

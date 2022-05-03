@@ -30,6 +30,17 @@ export const GROUP_SOURCE_MAP: { [key in GroupType]: SourceType[] } = {
 	[GroupType.VIDEOS]: [SourceType.YOUTUBE],
 };
 
+export const RESOURCE_GROUP_MAP: { [key in ResourceType]: GroupType } = {
+	[ResourceType.COLLECTION]: GroupType.MUSIC,
+	[ResourceType.SONG]: GroupType.MUSIC,
+	[ResourceType.ALBUM]: GroupType.MUSIC,
+	[ResourceType.ARTIST]: GroupType.MUSIC,
+	[ResourceType.PLAYLIST]: GroupType.MUSIC,
+	[ResourceType.BOOKMARK]: GroupType.BOOKMARKS,
+	[ResourceType.VIDEO]: GroupType.VIDEOS,
+	[ResourceType.CHANNEL]: GroupType.VIDEOS,
+};
+
 export const GROUP_TYPE_ITEMS: { [key in GroupType]: GroupTypeItem[] } = {
 	[GroupType.MUSIC]: [
 		{
@@ -60,9 +71,9 @@ export const GROUP_TYPE_ITEMS: { [key in GroupType]: GroupTypeItem[] } = {
 };
 
 export const GROUP_ICONS: { [key in GroupType]: JSX.Element } = {
-	[GroupType.MUSIC]: <MusicNoteListIcon />,
-	[GroupType.BOOKMARKS]: <BookmarksFillIcon />,
-	[GroupType.VIDEOS]: <FilmIcon />,
+	[GroupType.MUSIC]: <MusicNoteListIcon className="h-full w-full" />,
+	[GroupType.BOOKMARKS]: <BookmarksFillIcon className="h-full w-full" />,
+	[GroupType.VIDEOS]: <FilmIcon className="h-full w-full" />,
 };
 
 export function stringToGroupType(type: string): GroupType {
@@ -78,9 +89,9 @@ export function stringToGroupType(type: string): GroupType {
 	}
 }
 
-export function stringToGroupTypeOptional(type: string): GroupType | null {
+export function stringToGroupTypeOptional(type?: string): GroupType | null {
 	try {
-		return stringToGroupType(type);
+		return type ? stringToGroupType(type) : null;
 	} catch (e) {
 		return null;
 	}

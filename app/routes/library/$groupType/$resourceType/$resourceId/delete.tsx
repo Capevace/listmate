@@ -6,6 +6,7 @@ import {
 	deleteResource,
 	findResourceById,
 } from '~/models/resource/resource.server';
+import httpFindResourceType from '~/utilities/http/find-resource-type';
 
 export const action: ActionFunction = async ({ request, params }) => {
 	await requireUserId(request);

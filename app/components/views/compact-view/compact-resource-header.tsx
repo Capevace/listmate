@@ -5,6 +5,7 @@ import InlineFavouriteButton from '~/components/resource/inline-favourite-button
 import { Resource, ValueRef } from '~/models/resource/types';
 import capitalize from '~/utilities/capitalize';
 import composeCoverUrl from '~/utilities/cover-url';
+import { composeResourceUrl } from '~/utilities/resource-url';
 import GenericListView from '../generic-list-view';
 import CompactView from './compact-view';
 
@@ -48,7 +49,7 @@ export default function CompactResourceView({
 						{Object.entries(resource.remotes).map(([sourceType, tags]) => (
 							<Link
 								key={sourceType}
-								to={`/resources/${resource.id}/${sourceType}`}
+								to={composeResourceUrl(resource, sourceType)}
 								className="flex items-center text-xs font-bold uppercase opacity-40 hover:opacity-90"
 							>
 								<Spotify className="" size={15} />

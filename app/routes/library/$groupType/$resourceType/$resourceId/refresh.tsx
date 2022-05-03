@@ -11,6 +11,8 @@ import {
 	composeAuthenticatedApi,
 	importResourceWithType,
 } from '~/apis/apis.server';
+import { composeResourceUrl } from '~/utilities/resource-url';
+import httpFindResourceType from '~/utilities/http/find-resource-type';
 
 export const action: ActionFunction = async ({ request, params }) => {
 	const userId = await requireUserId(request);
@@ -62,5 +64,5 @@ export const action: ActionFunction = async ({ request, params }) => {
 		uri,
 	});
 
-	return redirect(`/resources/${resource.id}`);
+	return redirect(composeResourceUrl(resource));
 };

@@ -28,6 +28,7 @@ export default function GenericRow({
 			</figure>
 			<div className="col-span-10">
 				<ResourceValueLabel
+					resource={resource}
 					valueRef={{ value: resource.title }}
 					forceRef={resource.id}
 				/>

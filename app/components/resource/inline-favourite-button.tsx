@@ -8,6 +8,7 @@ import {
 } from 'react-bootstrap-icons';
 
 import { InlineButton } from '../forms/inline-button';
+import { composeResourceUrl } from '~/utilities/resource-url';
 
 type FavouriteButtonProps = {
 	resource: Resource;
@@ -31,7 +32,7 @@ export default function InlineFavouriteButton({
 		<Form
 			replace
 			method="post"
-			action={`/resources/${resource.id}/favourite`}
+			action={composeResourceUrl(resource, 'favourite')}
 			onSubmit={(e) => {
 				setIsFavouriteState(!isFavouriteState);
 			}}
