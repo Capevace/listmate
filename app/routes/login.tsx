@@ -64,11 +64,13 @@ export const action: ActionFunction = async ({ request }) => {
 		);
 	}
 
+	// return json<ActionData>({ errors: { email: 'aaaa' } }, { status: 200 });
+
 	return createUserSession({
 		request,
 		userId: user.id,
 		remember: remember === 'on' ? true : false,
-		redirectTo: typeof redirectTo === 'string' ? redirectTo : '/notes',
+		redirectTo: '/librar/music/songs', // typeof redirectTo === 'string' ? redirectTo : '/librar/music/songs',
 	});
 };
 

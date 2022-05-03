@@ -30,7 +30,7 @@ export default function GenericDynamicList({
 
 	return (
 		<div
-			className="mx-auto block max-w-7xl"
+			className="mx-auto block flex max-w-7xl flex-wrap"
 			style={{
 				height: `${rowVirtualizer.totalSize}px`,
 				width: '100%',

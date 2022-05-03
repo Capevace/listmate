@@ -8,6 +8,7 @@ import { ChevronDownIcon } from '@heroicons/react/solid';
 import SelectButton from '~/components/forms/select-button';
 import FauxNoscript from '~/components/common/faux-noscript';
 import { composeResourceUrl } from '~/utilities/resource-url';
+import { ArrowRepeat } from 'react-bootstrap-icons';
 
 type RefreshButtonProps = {
 	resource?: Resource;
@@ -42,13 +43,15 @@ export default function RefreshButton({
 			<Menu
 				className="require-js"
 				control={
-					<Button
-						loading={isLoading}
-						color="gray"
-						rightIcon={<ChevronDownIcon className="w-5" />}
+					<button
+						className="flex items-center disabled:opacity-75"
+						disabled={isLoading}
 					>
-						Refetch Data
-					</Button>
+						<ArrowRepeat
+							size="auto"
+							className={`w-6 ${isLoading ? 'animate-spin' : ''}`}
+						/>
+					</button>
 				}
 			>
 				{data.map((source) => (

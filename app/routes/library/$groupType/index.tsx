@@ -1,13 +1,22 @@
 import { LoaderFunction, redirect } from 'remix';
-import { GROUP_SOURCE_MAP } from '~/models/resource/group-type';
+import {
+	GroupType,
+	GROUP_SOURCE_MAP,
+	stringToGroupTypeOptional,
+} from '~/models/resource/group-type';
 import findResource from '~/utilities/http/find-resource';
 import { composeResourceUrl } from '~/utilities/resource-url';
 
 export const loader: LoaderFunction = async ({ request, params }) => {
-	const resource = await findResource(params.resourceId);
+	const groupType = stringToGroupTypeOptional(params.groupType);
 
-	group;
-	GROUP_SOURCE_MAP;
-
-	return redirect(composeResourceUrl(resource, params['*']));
+	switch (groupType) {
+		case GroupType.BOOKMARKS:
+			return redirect(`/library/${groupType}/bookmark`);
+		case GroupType.VIDEOS:
+			return redirect(`/library/${groupType}/video`);
+		case GroupType.MUSIC:
+		default:
+			return redirect(`/library/${GroupType.MUSIC}/song`);
+	}
 };

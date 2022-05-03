@@ -1,4 +1,10 @@
-import type { Album, Artist, Song, Playlist } from '~/models/resource/types';
+import {
+	Album,
+	Artist,
+	Song,
+	Playlist,
+	stringToResourceTypeOptional,
+} from '~/models/resource/types';
 import type { User } from '~/models/user.server';
 
 import SpotifyWebApi from 'spotify-web-api-node';
@@ -17,6 +23,7 @@ import {
 	ResourceSearchParameters,
 	ResourceSearchResult,
 	retryImport,
+	ValidatedSourceURI,
 } from './apis.server';
 import retry from '~/utilities/retry';
 import makeProgress from '~/utilities/progress';
@@ -92,6 +99,36 @@ export async function handleOauthCallback(userId: User['id'], code: string) {
 
 export function getPlayerToken(api: API) {
 	return { accessToken: api.service.getAccessToken() };
+}
+
+export function detectSourceType(uri: string): ValidatedSourceURI | null {
+	if (uri.startsWith('spotify:')) {
+		const uriType = uri.split(':')[1];
+		const resourceType = stringToResourceTypeOptional(uriType);
+
+		if (resourceType) {
+			return { sourceType: SourceType.SPOTIFY, resourceType, uri };
+		}
+	}
+
+	if (uri.startsWith('https://open.spotify.com/')) {
+		const path = uri.replace('https://open.spotify.com/', '');
+		const paths = path.split('/');
+		const type = paths[0];
+		const id = paths[1].split('?')[0];
+
+		const resourceType = stringToResourceTypeOptional(uriType);
+
+		if (resourceType) {
+			return {
+				sourceType: SourceType.SPOTIFY,
+				resourceType,
+				uri: `spotify:${type}:${id}`,
+			};
+		}
+	}
+
+	return null;
 }
 
 /*

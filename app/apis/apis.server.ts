@@ -273,3 +273,15 @@ export function handleOauthCallback(
 			);
 	}
 }
+
+export type ValidatedSourceURI = {
+	sourceType: SourceType;
+	resourceType: ResourceType;
+	uri: string;
+};
+
+export function detectSourceType(uri: string): ValidatedSourceURI[] {
+	return [spotifyApi.detectSourceType, youtubeApi.detectSourceType]
+		.map((fn) => fn(uri))
+		.filter((uri) => !!uri) as ValidatedSourceURI[];
+}

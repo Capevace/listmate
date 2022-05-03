@@ -8,7 +8,7 @@ export default function ValueGrid({ values }: { values: Resource['values'] }) {
 	];
 
 	return (
-		<dl className="grid grid-cols-6">
+		<dl className="grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-6">
 			{valueList.map(([key, value]: [string, ValueRef<string> | null]) => (
 				<div key={key} className="col-span-2">
 					<dt className="text-sm font-medium text-gray-400">

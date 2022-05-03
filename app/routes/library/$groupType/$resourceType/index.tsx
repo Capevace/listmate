@@ -1,7 +1,7 @@
 import type { LoaderFunction, MetaFunction } from 'remix';
 import type { List } from '~/models/list.server';
 import type { ListItemData } from '~/models/item.server';
-import type { Resource } from '~/models/resource/types';
+import { Resource, ResourceType } from '~/models/resource/types';
 
 import { json, useLoaderData } from 'remix';
 import invariant from 'tiny-invariant';
@@ -18,7 +18,7 @@ import ListHeader from '~/components/views/list-view/list-header';
 import composePageTitle from '~/utilities/page-title';
 import CompactView from '~/components/views/compact-view/compact-view';
 import GenericListView from '~/components/views/generic-list-view';
-import { useRef } from 'react';
+import { RefObject, useRef } from 'react';
 import BaseRow from '~/components/views/list-view/rows/base-row';
 
 type LoaderData = {
@@ -78,7 +78,7 @@ export default function ListPage() {
 		<CompactView parentRef={ref} title={title} subtitle={subtitle}>
 			<GenericListView
 				size={resources.length}
-				estimateHeight={() => 50}
+				estimateHeight={(index) => 50}
 				parentRef={ref}
 			>
 				{(index, row) => {
@@ -86,19 +86,31 @@ export default function ListPage() {
 
 					const resource = resources[index];
 
+					const isMasonry = false && resource.type === ResourceType.ALBUM;
+
 					return (
 						<BaseRow
 							key={`${resource.id}-${index}`}
+							measureRef={
+								row.measureRef as unknown as RefObject<HTMLDivElement>
+							}
 							resource={resource}
 							style={
 								row
 									? {
-											position: 'absolute',
-											top: 0,
-											left: 0,
-											width: '100%',
-											height: `${row.size}px`,
-											transform: `translateY(${row.start}px)`,
+											...(isMasonry
+												? {
+														width: '20%',
+														// height: `${row.size}px`,
+														transform: `translateY(${row.start % 5}px)`,
+												  }
+												: {
+														position: 'absolute',
+														top: 0,
+														left: 0,
+														width: '100%',
+														transform: `translateY(${row.start}px)`,
+												  }),
 									  }
 									: { position: 'relative' }
 							}

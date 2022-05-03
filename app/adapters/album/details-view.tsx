@@ -39,10 +39,6 @@ export default function AlbumDetailsView({
 							style={
 								row
 									? {
-											position: 'absolute',
-											top: 0,
-											left: 0,
-											width: '100%',
 											height: `${row.size}px`,
 											transform: `translateY(${row.start}px)`,
 									  }

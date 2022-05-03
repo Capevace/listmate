@@ -12,6 +12,7 @@ import {
 	ResourceSearchParameters,
 	ResourceSearchResult,
 	retryImport,
+	ValidatedSourceURI,
 } from './apis.server';
 import makeProgress from '~/utilities/progress';
 import { ResourceType, SourceType } from '~/models/resource/types';
@@ -98,6 +99,18 @@ export async function handleOauthCallback(userId: User['id'], code: string) {
 	};
 
 	return updateTokenData(userId, SourceType.YOUTUBE, tokenData, expiresAt);
+}
+
+export function detectSourceType(uri: string): ValidatedSourceURI | null {
+	if (uri.startsWith('youtube#video#')) {
+		return {
+			sourceType: SourceType.SPOTIFY,
+			type: ResourceType.VIDEO,
+			uri: uri.replace('youtube#video#', ''),
+		};
+	}
+
+	return null;
 }
 
 /*
