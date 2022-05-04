@@ -28,7 +28,7 @@ Long gone are the days of the personal media library. Streaming services and Saa
 ## Features
 
 - &nbsp;📝 &nbsp; **Organize your [music library, your bookmarks, movies and more](#supported-resource-types)**
-- &nbsp;⚡️&nbsp; Flexible data model – [**everything is a resource**](#everything-is-a-dataobject--resource)
+- &nbsp;⚡️ &nbsp; Flexible data model – [**everything is a resource**](#everything-is-a-dataobject--resource)
 - &nbsp;🎶 &nbsp; **Import playlists** etc. from [Spotify, YouTube, Pocket and more](#supported-apis)
 - &nbsp;🔗 &nbsp; **Link resources** to each other and to external services
 - &nbsp;🔮 &nbsp; **Automatic matching** by finding and identifying resources from different services
