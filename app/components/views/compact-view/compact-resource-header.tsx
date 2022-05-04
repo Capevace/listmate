@@ -3,7 +3,12 @@ import { Download, Spotify } from 'react-bootstrap-icons';
 import { Link } from 'remix';
 import InlineFavouriteButton from '~/components/resource/inline-favourite-button';
 import RefreshButton from '~/components/resource/refresh-button';
-import { Resource, ValueRef } from '~/models/resource/types';
+import {
+	Resource,
+	SourceType,
+	SOURCE_ICONS,
+	ValueRef,
+} from '~/models/resource/types';
 import capitalize from '~/utilities/capitalize';
 import composeCoverUrl from '~/utilities/cover-url';
 import { composeResourceUrl } from '~/utilities/resource-url';
@@ -15,7 +20,7 @@ export type CompactResourceViewProps = {
 	actions?: JSX.Element;
 	showCover?: boolean;
 	parentRef?: React.RefObject<HTMLElement>;
-	children?: JSX.Element | JSX.Element[];
+	children?: JSX.Element;
 };
 
 export default function CompactResourceView({
@@ -41,9 +46,10 @@ export default function CompactResourceView({
 						<Link
 							key={sourceType}
 							to={composeResourceUrl(resource, sourceType)}
-							className="flex items-center text-xs font-bold uppercase opacity-40 hover:opacity-90"
+							className="flex w-4 items-center text-xs font-bold uppercase opacity-40 hover:opacity-90"
 						>
-							<Spotify className="" size={15} />
+							{SOURCE_ICONS[sourceType as SourceType]}
+							{/* <Spotify className="" size={15} /> */}
 						</Link>
 					))}
 				</>

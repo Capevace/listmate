@@ -1,7 +1,8 @@
+import {
+	Spotify as SpotifyIcon,
+	Youtube as YoutubeIcon,
+} from 'react-bootstrap-icons';
 import { Except, SetOptional } from 'type-fest';
-import { Album } from '~/adapters/album/type';
-import { Song } from '~/adapters/song/type';
-import SpotifyIcon from '~/components/icons/spotify-icon';
 
 export * from './group-type';
 
@@ -209,7 +210,8 @@ export function stringToSourceTypeOptional(type?: string): SourceType | null {
 }
 
 export const SOURCE_ICONS: { [key in SourceType]?: React.ReactNode } = {
-	[SourceType.SPOTIFY]: SpotifyIcon,
+	[SourceType.SPOTIFY]: <SpotifyIcon size={'auto'} />,
+	[SourceType.YOUTUBE]: <YoutubeIcon size={'auto'} />,
 };
 
 export const SOURCE_NAMES: { [key in SourceType]: string } = {

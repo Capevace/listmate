@@ -10,12 +10,14 @@ export default function GenericDetails({
 }: ResourceDetailsProps) {
 	return (
 		<CompactResourceView resource={resource} showCover>
-			<ValueGrid values={resource.values} />
-			<ResourceDebugger
-				resource={resource}
-				details={details}
-				className="mt-5"
-			/>
+			<>
+				<ValueGrid values={resource.values} />
+				<ResourceDebugger
+					resource={resource}
+					details={details}
+					className="mt-5"
+				/>
+			</>
 		</CompactResourceView>
 	);
 }

@@ -8,7 +8,11 @@ import {
 	getEmptyDetails,
 	valuesToObject,
 } from '~/models/resource/adapters.server';
-import { ResourceType, SerializedValues } from '~/models/resource/types';
+import {
+	ResourceDetails,
+	ResourceType,
+	SerializedValues,
+} from '~/models/resource/types';
 import { Channel } from '~/adapters/channel/type';
 import type { Video } from './type';
 
@@ -48,6 +52,8 @@ export function serializeVideoValues(
 	};
 }
 
-export async function getVideoDetails(video: Video): Promise<{}> {
+export type VideoDetails = ResourceDetails & {};
+
+export async function getVideoDetails(video: Video): Promise<VideoDetails> {
 	return {};
 }

@@ -47,7 +47,7 @@ export default function SongRow({
 					</>
 				)}
 			</div>
-			<div className="col-span-7 flex items-center gap-4 text-gray-700 dark:text-gray-300">
+			<div className="col-span-10 flex items-center gap-4 truncate text-gray-700 dark:text-gray-300 sm:col-span-7">
 				<img
 					className="ml-2 aspect-square w-8 rounded"
 					alt={`${resource.title} thumbnail`}
@@ -68,7 +68,7 @@ export default function SongRow({
 					</div>
 				</div>
 			</div>
-			<div className="col-span-3 truncate">
+			<div className="col-span-3 hidden truncate sm:block">
 				<ResourceValueLabel
 					resource={resource}
 					valueRef={resource.values.album}
