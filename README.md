@@ -23,6 +23,8 @@ E.g. a `Song` resource has a `resource.values.artist` property, that is a ValueR
 
 Using this system makes it really easy to build resource types, that link to each other with automatic UI support.
 
+<br>
+
 ![Resource explainer image](resources/remote-explainer.png)
 
 <br>
