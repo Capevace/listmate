@@ -1,21 +1,28 @@
-# Listmate (alpha)
+# Listmate (alpha, work in progress)
 
 ![Early listmate build](resources/header.png)
 
-> A web application to manage your **_music, videos, bookmarks and more_** by synchornizing your lists with external services like **_YouTube, Spotify or Pocket_**.
+> **Next generation** knowledge suite for your music library, bookmarks, RSS feeds and [more](#supported-resource-types)
+
+A web application to manage your personal library of different resources by connecting with and download data from external sources like Spotify, YouTube, and co.
 
 <br>
 
 ## Features
 
-- 📝 &nbsp; **Organize your music library, your bookmarks, movies** and [more](#)
-- ⚡️ &nbsp; Flexible data model – **everything is a resource**
-- 🔗 &nbsp; **Link resources to external services** – Spotify, YouTube, Pocket and [more](#)
-- 🔊 &nbsp; **Built-in player** combines playback of **local files, Spotify and YouTube** into single interface
-- 📻 &nbsp; **Unified player queue** – add videos and songs from different sources into a single joint queue
+- 📝 &nbsp; **Organize your [music library, your bookmarks, movies and more](#supported-resource-types)**
+- ⚡️ &nbsp; Flexible data model – [**everything is a resource**](#everything-is-a-dataobject--resource)
+- 🔗 &nbsp; **Link resources** to each other and to external services – [Spotify, YouTube, Pocket and more](#supported-apis)
+- 🔊 &nbsp; **Built-in player** combines the playback of **local, Spotify and YouTube files** into a single interface
+- 📻 &nbsp; **Unified player queue** – add videos and songs from different playback sources into a single joint queue
 - 🤖 &nbsp; (Mostly[^1]) **works without JavaScript** – built with Remix and on top HTTP & HTML
+- 💾 &nbsp; Keep all your data in a [single SQLite database file](https://sqlite.org/appfileformat.html)[^2]
+- 🔌 &nbsp; **Direct integration** with [Spotify Data API and Playback SDK](https://developer.spotify.com/documentation/)
+- 📆 &nbsp; **Scheduled data imports** – daily RSS feeds, weekly playlist updates...
+- 💿 &nbsp; **Easy data exports** – JSON, XML, CSV, RDF exports and symlinked FS "views"
 
 [^1]: Playback requires JS enabled
+[^2]: As of right now, files are still in a seperate folder, but I plan on saving files as BLOB data inside the database as well.
 
 <br>
 
@@ -81,6 +88,30 @@ This starts your app in development mode, rebuilding assets on file changes.
 
 <br><br>
 
-## GitHub Actions
+## Supported resource types
 
-We use GitHub Actions for continuous integration and deployment. Anything that gets into the `main` branch will be deployed to production after running tests/build/etc. Anything in the `dev` branch will be deployed to staging.
+- Collection
+- Song
+- Album
+- Artist
+- Playlist [_Collection_]
+- Bookmark
+- Video
+- Channel
+
+###### Coming up
+
+- Webpage
+- RSS Feed [_Collection_]
+
+## Supported APIs
+
+- Spotify API
+- YouTube API
+
+###### Coming up
+
+- Pocket API
+- youtube-dl API
+- Internet Archive API
+- Archive API
