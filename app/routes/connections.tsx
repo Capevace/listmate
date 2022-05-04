@@ -20,6 +20,7 @@ import capitalize from '~/utilities/capitalize';
 
 import MainView from '~/components/views/main-view';
 import composePageTitle from '~/utilities/page-title';
+import { ContextLoaderFunction } from '~/models/context';
 
 type Token = {
 	id: SourceToken['id'];
@@ -38,8 +39,12 @@ type LoaderData = {
 	activeType?: SourceType;
 };
 
-export const loader: LoaderFunction = async ({ request, params }) => {
-	const userId = await requireUserId(request);
+export const loader: LoaderFunction = async ({
+	request,
+	params,
+	context,
+}: ContextLoaderFunction) => {
+	const userId = await requireUserId(request, context);
 
 	let data: LoaderData = {
 		tokens: ALL_SOURCE_TYPES.reduce((all, type) => {

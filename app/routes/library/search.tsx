@@ -1,8 +1,7 @@
 import type { Resource } from '~/models/resource/types';
-import type { List } from '~/models/list.server';
-import type { ListItemData } from '~/models/item.server';
+import type { ContextLoaderFunction } from '~/models/context';
 
-import { LoaderFunction, useLoaderData, json, MetaFunction } from 'remix';
+import { useLoaderData, json, MetaFunction } from 'remix';
 import invariant from 'tiny-invariant';
 
 import { requireUserId } from '~/session.server';
@@ -12,7 +11,6 @@ import { findOptionalPageQuery } from '~/utilities/paginate';
 import ListView from '~/components/views/list-view';
 import composePageTitle from '~/utilities/page-title';
 import Header from '~/components/views/header';
-import ResourceDebugger from '~/components/resource/resource-debugger';
 
 type LoaderData = {
 	resources: Resource[];
@@ -20,8 +18,12 @@ type LoaderData = {
 	searchString: string;
 };
 
-export const loader: LoaderFunction = async ({ request, params }) => {
-	await requireUserId(request);
+export const loader = async ({
+	request,
+	params,
+	context,
+}: ContextLoaderFunction) => {
+	await requireUserId(request, context);
 
 	const url = new URL(request.url);
 	const searchString = url.searchParams.get('text');

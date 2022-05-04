@@ -1,6 +1,6 @@
 import { LoaderFunction, redirect } from 'remix';
 import invariant from 'tiny-invariant';
-
+import type { ContextLoaderFunction } from '~/models/context';
 import { requireUserId } from '~/session.server';
 import { findToken } from '~/models/source-token.server';
 import { handleOauthCallback as handleSpotifyOauthCallback } from '~/apis/spotify.server';
@@ -8,8 +8,12 @@ import { handleOauthCallback as handleYouTubeOauthCallback } from '~/apis/youtub
 
 import { SourceType, stringToSourceType } from '~/models/resource/types';
 
-export const loader: LoaderFunction = async ({ request, params }) => {
-	const userId = await requireUserId(request);
+export const loader: LoaderFunction = async ({
+	request,
+	params,
+	context,
+}: ContextLoaderFunction) => {
+	const userId = await requireUserId(request, context);
 
 	invariant(params.api, 'No API found');
 

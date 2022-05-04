@@ -25,6 +25,7 @@ import {
 } from './models/resource/resource.server';
 import { Collection, ResourceType } from './models/resource/types';
 import { PlayerProvider } from './components/player/provider';
+import { ContextLoaderFunction } from './models/context';
 
 export const meta: MetaFunction = () => ({
 	charset: 'utf-8',
@@ -37,8 +38,11 @@ type LoaderData = {
 	collections: Collection[];
 };
 
-export const loader: LoaderFunction = async ({ request }) => {
-	const user = await getUser(request);
+export const loader: LoaderFunction = async ({
+	request,
+	context,
+}: ContextLoaderFunction) => {
+	const user = await getUser(request, context);
 
 	return json<LoaderData>({
 		user,

@@ -26,7 +26,7 @@ import SearchBox from '~/components/views/search-box';
 import SpotifyIcon from '~/components/icons/spotify-icon';
 import Player from './player';
 import { composeResourceUrl } from '~/utilities/resource-url';
-import { ArrowBarLeft, List } from 'react-bootstrap-icons';
+import { ArrowBarLeft, Ethernet, List } from 'react-bootstrap-icons';
 
 const listItemBaseClass =
 	'flex items-center justify-start gap-2 rounded py-1 px-2 text-sm border hover:text-gray-200 hover:bg-gray-700 focus:bg-gray-700 focus:border-gray-600 focus:border-gray-600';
@@ -74,61 +74,70 @@ type SidebarProps = {
 
 function GroupLink({
 	active,
-	group,
+	to,
 	onClick,
+	children,
 }: {
-	active: boolean;
-	group: GroupType;
-	onClick: (group: GroupType) => void;
+	active?: boolean;
+	to: string;
+	onClick?: () => void;
+	children: JSX.Element;
 }) {
 	const className =
 		'flex h-16 items-center justify-center bg-opacity-50  hover:bg-gray-700';
 
 	return (
 		<NavLink
-			key={group}
-			to={`/library/${group}`}
+			to={to}
 			className={({ isActive }) =>
-				active // || isActive
+				(active === undefined && isActive) || active
 					? `${className} bg-gray-700 text-gray-200`
 					: `${className} cursor-pointer bg-transparent text-gray-400`
 			}
-			onClick={() => onClick(group)}
+			onClick={onClick}
 		>
-			<figure className="h-8 w-8">{GROUP_ICONS[group]}</figure>
+			<figure className="h-8 w-8">{children}</figure>
 		</NavLink>
 	);
 }
 
 export default function Sidebar({ user, collections = [] }: SidebarProps) {
-	const [typeGroup, setTypeGroup] = useState(GroupType.MUSIC);
+	const [typeGroup, setTypeGroup] = useState<GroupType | null>(GroupType.MUSIC);
 	const [extended, setExtended] = useState(false);
 	// const groups = Object.entries() as [GroupType, string][];
 
 	return (
 		<aside className="z-10 flex h-full max-w-sm border-r-2 border-gray-800">
-			<section className=" z-20 flex  w-16 flex-col gap-5 bg-gray-800 bg-opacity-60">
-				<header className="flex h-16 items-center justify-center">
+			<section className=" z-20 flex h-full  flex-col justify-between gap-5 bg-gray-800 bg-opacity-60">
+				<header className="flex w-full flex-col items-center justify-between">
 					<button
-						className="text-xs font-semibold text-gray-200 dark:text-gray-400"
+						className="flex h-16 w-16 items-center justify-center text-xs font-semibold text-gray-200 dark:text-gray-400"
 						onClick={() => setExtended(!extended)}
 					>
 						{extended ? <ArrowBarLeft size={30} /> : <List size={30} />}
 					</button>
+					<nav className="flex w-full flex-col">
+						{GROUP_TYPES.map((group) => (
+							<GroupLink
+								key={group}
+								to={`/library/${group}`}
+								active={group === typeGroup}
+								onClick={() => {
+									setTypeGroup(group);
+									setExtended(true);
+								}}
+							>
+								{GROUP_ICONS[group]}
+							</GroupLink>
+						))}
+					</nav>
 				</header>
-				<nav className="flex flex-col">
-					{GROUP_TYPES.map((group) => (
-						<GroupLink
-							key={group}
-							group={group}
-							active={group === typeGroup}
-							onClick={(group) => {
-								setTypeGroup(group);
-								setExtended(true);
-							}}
-						/>
-					))}
-				</nav>
+
+				<footer>
+					<GroupLink to={`/connections`}>
+						<Ethernet className="h-full w-full" />
+					</GroupLink>
+				</footer>
 			</section>
 			<section
 				className={`${

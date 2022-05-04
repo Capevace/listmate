@@ -24,6 +24,7 @@ import { useDebounce } from '~/utilities/hooks/use-debounce';
 import httpFindResource from '~/utilities/http/find-resource';
 import httpFindSourceType from '~/utilities/http/find-source-type';
 import composePageTitle from '~/utilities/page-title';
+import type { ContextLoaderFunction } from '~/models/context';
 
 export type LoaderData = {
 	resource: Resource;
@@ -31,8 +32,12 @@ export type LoaderData = {
 	searchResults: ResourceSearchResult[];
 };
 
-export const loader: LoaderFunction = async ({ request, params }) => {
-	const userId = await requireUserId(request);
+export const loader: LoaderFunction = async ({
+	request,
+	params,
+	context,
+}: ContextLoaderFunction) => {
+	const userId = await requireUserId(request, context);
 	const sourceType = httpFindSourceType(params.sourceType);
 	const resource = await httpFindResource(params.resourceId);
 	const api = await composeAuthenticatedApi(userId, sourceType);

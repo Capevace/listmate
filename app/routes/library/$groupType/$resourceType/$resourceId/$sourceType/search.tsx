@@ -10,10 +10,15 @@ import {
 	stringToSourceTypeOptional,
 } from '~/models/resource/types';
 import { requireUserId } from '~/session.server';
+import type { ContextLoaderFunction } from '~/models/context';
 
 // Remix action to search with an authenticated API
-export const action: ActionFunction = async ({ request, params }) => {
-	const userId = await requireUserId(request);
+export const action: ActionFunction = async ({
+	request,
+	params,
+	context,
+}: ContextLoaderFunction) => {
+	const userId = await requireUserId(request, context);
 	const formData = await request.formData();
 	const uri = formData.get('uri');
 	const providedSourcePath = stringToSourceTypeOptional(
@@ -41,7 +46,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 			api,
 			userId,
 			...validatedUri,
-			search:
+			search: '',
 		});
 	});
 

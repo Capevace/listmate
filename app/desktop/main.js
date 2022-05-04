@@ -1,11 +1,12 @@
 const { initRemix } = require('remix-electron');
-const { app, BrowserWindow } = require('electron');
+const { app, components, BrowserWindow } = require('electron');
 const { resolve } = require('node:path');
 
 let win;
 
-app.on('ready', async () => {
+app.whenReady().then(async () => {
 	try {
+		await components.whenReady();
 		const url = await initRemix({
 			serverBuild: resolve(__dirname, '../../build'),
 			publicFolder: resolve(__dirname, '../../public'),
@@ -13,7 +14,7 @@ app.on('ready', async () => {
 			/** @type {import("~/models/context").LoadContext} */
 			getLoadContext() {
 				return {
-					userId: '123',
+					userId: '918db1b0-9382-47aa-bbb8-f842fef2067d',
 				};
 			},
 		});

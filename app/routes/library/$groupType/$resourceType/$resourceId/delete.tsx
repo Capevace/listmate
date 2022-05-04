@@ -1,4 +1,5 @@
-import { redirect, ActionFunction, json } from 'remix';
+import type { ContextLoaderFunction } from '~/models/context';
+import { redirect } from 'remix';
 import invariant from 'tiny-invariant';
 
 import { requireUserId } from '~/session.server';
@@ -6,10 +7,13 @@ import {
 	deleteResource,
 	findResourceById,
 } from '~/models/resource/resource.server';
-import httpFindResourceType from '~/utilities/http/find-resource-type';
 
-export const action: ActionFunction = async ({ request, params }) => {
-	await requireUserId(request);
+export const action = async ({
+	request,
+	params,
+	context,
+}: ContextLoaderFunction) => {
+	await requireUserId(request, context);
 
 	invariant(params.resourceId, 'resourceId not found');
 

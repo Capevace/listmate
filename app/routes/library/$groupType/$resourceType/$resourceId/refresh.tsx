@@ -13,9 +13,14 @@ import {
 } from '~/apis/apis.server';
 import { composeResourceUrl } from '~/utilities/resource-url';
 import httpFindResourceType from '~/utilities/http/find-resource-type';
+import type { ContextLoaderFunction } from '~/models/context';
 
-export const action: ActionFunction = async ({ request, params }) => {
-	const userId = await requireUserId(request);
+export const action: ActionFunction = async ({
+	request,
+	params,
+	context,
+}: ContextLoaderFunction) => {
+	const userId = await requireUserId(request, context);
 
 	invariant(params.resourceId, 'resourceId not found');
 

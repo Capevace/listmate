@@ -20,6 +20,7 @@ import CompactView from '~/components/views/compact-view/compact-view';
 import GenericListView from '~/components/views/generic-list-view';
 import { RefObject, useRef } from 'react';
 import BaseRow from '~/components/views/list-view/rows/base-row';
+import type { ContextLoaderFunction } from '~/models/context';
 
 type LoaderData = {
 	title: string;
@@ -28,8 +29,12 @@ type LoaderData = {
 	page?: number;
 };
 
-export const loader: LoaderFunction = async ({ request, params }) => {
-	const userId = await requireUserId(request);
+export const loader: LoaderFunction = async ({
+	request,
+	params,
+	context,
+}: ContextLoaderFunction) => {
+	const userId = await requireUserId(request, context);
 
 	invariant(params.groupType, 'Library not found');
 	invariant(params.resourceType, 'Resource type not found');

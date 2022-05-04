@@ -9,7 +9,7 @@ import {
 } from 'remix';
 import { Modal, Button, Group } from '@mantine/core';
 import invariant from 'tiny-invariant';
-
+import type { ContextLoaderFunction } from '~/models/context';
 import { requireUserId } from '~/session.server';
 import { findToken, invalidateToken } from '~/models/source-token.server';
 import { SourceType, stringToSourceType } from '~/models/resource/types';
@@ -18,8 +18,12 @@ type LoaderData = {
 	type: SourceType;
 };
 
-export const loader: LoaderFunction = async ({ request, params }) => {
-	await requireUserId(request);
+export const loader = async ({
+	request,
+	params,
+	context,
+}: ContextLoaderFunction) => {
+	await requireUserId(request, context);
 
 	invariant(params.api, 'No API found');
 
@@ -30,8 +34,12 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 	});
 };
 
-export const action: ActionFunction = async ({ request, params }) => {
-	const userId = await requireUserId(request);
+export const action: ActionFunction = async ({
+	request,
+	params,
+	context,
+}: ContextLoaderFunction) => {
+	const userId = await requireUserId(request, context);
 
 	invariant(params.api, 'No API found');
 

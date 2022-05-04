@@ -11,9 +11,14 @@ import {
 import { requireUserId } from '~/session.server';
 import capitalize from '~/utilities/capitalize';
 import { composeResourceUrl } from '~/utilities/resource-url';
+import type { ContextLoaderFunction } from '~/models/context';
 
-export const loader: LoaderFunction = async ({ request, params }) => {
-	const userId = await requireUserId(request);
+export const loader: LoaderFunction = async ({
+	request,
+	params,
+	context,
+}: ContextLoaderFunction) => {
+	const userId = await requireUserId(request, context);
 
 	const sourceType = stringToSourceTypeOptional(params.api);
 

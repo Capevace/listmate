@@ -10,7 +10,7 @@ export default function AlbumRow({
 }: {
 	resource: Album;
 	style: React.CSSProperties;
-	measureRef?: React.RefObject<HTMLDivElement>;
+	measureRef?: (el: HTMLElement | null) => void;
 }) {
 	const remote = findPreferredRemote(resource.remotes, GroupType.MUSIC);
 

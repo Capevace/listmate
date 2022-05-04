@@ -4,9 +4,14 @@ import { SOURCE_NAMES } from '~/models/resource/types';
 import { requireUserId } from '~/session.server';
 import httpFindResource from '~/utilities/http/find-resource';
 import httpFindSourceType from '~/utilities/http/find-source-type';
+import type { ContextLoaderFunction } from '~/models/context';
 
-export const action: ActionFunction = async ({ request, params }) => {
-	const userId = await requireUserId(request);
+export const action: ActionFunction = async ({
+	request,
+	params,
+	context,
+}: ContextLoaderFunction) => {
+	const userId = await requireUserId(request, context);
 
 	const url = new URL(request.url);
 	const deviceId = url.searchParams.get('device_id');

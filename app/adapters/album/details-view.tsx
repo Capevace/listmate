@@ -1,14 +1,9 @@
 import type { Album, ResourceDetailsProps } from '~/models/resource/types';
 import type { AlbumDetails } from './adapter.server';
 
-import ResourceHeader from '~/components/resource/resource-header';
-import ValueGrid from '~/components/resource/value-grid';
-import ListView from '~/components/views/list-view';
-import ResourceDebugger from '~/components/resource/resource-debugger';
 import invariant from 'tiny-invariant';
 import BaseRow from '~/components/views/list-view/rows/base-row';
 import GenericListView from '~/components/views/generic-list-view';
-import capitalize from '~/utilities/capitalize';
 import CompactResourceView from '~/components/views/compact-view/compact-resource-header';
 import { useRef } from 'react';
 
@@ -35,10 +30,15 @@ export default function AlbumDetailsView({
 					return (
 						<BaseRow
 							key={`${item.id}-${index}`}
+							measureRef={row.measureRef}
 							resource={item}
 							style={
 								row
 									? {
+											position: 'absolute',
+											top: 0,
+											left: 0,
+											width: '100%',
 											height: `${row.size}px`,
 											transform: `translateY(${row.start}px)`,
 									  }

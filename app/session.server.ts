@@ -5,6 +5,7 @@ import invariant from 'tiny-invariant';
 
 import type { User } from '~/models/user.server';
 import { getUserById } from '~/models/user.server';
+import { LoadContext } from './models/context';
 
 invariant(process.env.SESSION_SECRET, 'SESSION_SECRET must be set');
 
@@ -65,14 +66,23 @@ export async function getSession(request: Request) {
 	return sessionStorage.getSession(cookie);
 }
 
-export async function getUserId(request: Request): Promise<string | undefined> {
+export async function getUserId(
+	request: Request,
+	context?: LoadContext
+): Promise<string | undefined> {
+	if (context && context.userId) {
+		return context.userId;
+	}
 	const session = await getSession(request);
 	const userId = session.get(USER_SESSION_KEY);
 	return userId;
 }
 
-export async function getUser(request: Request): Promise<null | User> {
-	const userId = await getUserId(request);
+export async function getUser(
+	request: Request,
+	context?: LoadContext
+): Promise<null | User> {
+	const userId = await getUserId(request, context);
 	if (userId === undefined) return null;
 
 	const user = await getUserById(userId);
@@ -83,18 +93,26 @@ export async function getUser(request: Request): Promise<null | User> {
 
 export async function requireUserId(
 	request: Request,
-	redirectTo: string = new URL(request.url).pathname
+	context?: LoadContext
 ): Promise<string> {
-	const userId = await getUserId(request);
+	const userId =
+		context && context.userId ? context.userId : await getUserId(request);
+
 	if (!userId) {
-		const searchParams = new URLSearchParams([['redirectTo', redirectTo]]);
+		const searchParams = new URLSearchParams([
+			['redirectTo', new URL(request.url).pathname],
+		]);
 		throw redirect(`/login?${searchParams}`);
 	}
+
 	return userId;
 }
 
-export async function requireUser(request: Request) {
-	const userId = await requireUserId(request);
+export async function requireUser(
+	request: Request,
+	context?: LoadContext
+): Promise<User> {
+	const userId = await requireUserId(request, context);
 
 	const user = await getUserById(userId);
 	if (user) return user;

@@ -6,7 +6,7 @@ import {
 	useLoaderData,
 } from 'remix';
 import invariant from 'tiny-invariant';
-
+import type { ContextLoaderFunction } from '~/models/context';
 import { requireUserId } from '~/session.server';
 import ImportModal from '~/components/views/import-modal';
 import { findToken } from '~/models/source-token.server';
@@ -24,8 +24,12 @@ type LoaderData = {
 	playlists: SpotifyApi.PlaylistObjectSimplified[];
 };
 
-export const loader: LoaderFunction = async ({ request, params }) => {
-	const userId = await requireUserId(request);
+export const loader: LoaderFunction = async ({
+	request,
+	params,
+	context,
+}: ContextLoaderFunction) => {
+	const userId = await requireUserId(request, context);
 
 	invariant(params.api, 'No API found');
 	const sourceType = stringToSourceType(params.api);
@@ -51,8 +55,12 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 	});
 };
 
-export const action: ActionFunction = async ({ request, params }) => {
-	const userId = await requireUserId(request);
+export const action: ActionFunction = async ({
+	request,
+	params,
+	context,
+}: ContextLoaderFunction) => {
+	const userId = await requireUserId(request, context);
 
 	invariant(params.api, 'No API found');
 

@@ -2,13 +2,18 @@ import { json, LoaderFunction } from 'remix';
 import { composeAuthenticatedApi, getPlayerToken } from '~/apis/apis.server';
 import { requireUserId } from '~/session.server';
 import httpFindSourceType from '~/utilities/http/find-source-type';
+import type { ContextLoaderFunction } from '~/models/context';
 
 type LoaderData = {
 	token: { accessToken?: string };
 };
 
-export const loader: LoaderFunction = async ({ request, params }) => {
-	const userId = await requireUserId(request);
+export const loader: LoaderFunction = async ({
+	request,
+	params,
+	context,
+}: ContextLoaderFunction) => {
+	const userId = await requireUserId(request, context);
 	const sourceType = httpFindSourceType(params.sourceType);
 
 	if (!sourceType) {

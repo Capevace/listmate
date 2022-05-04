@@ -1,11 +1,5 @@
 import type { Resource, ResourceDetails } from '~/models/resource/types';
-import {
-	LoaderFunction,
-	ActionFunction,
-	Outlet,
-	useOutlet,
-	MetaFunction,
-} from 'remix';
+import { ActionFunction, Outlet, MetaFunction } from 'remix';
 
 import { json, useLoaderData, redirect } from 'remix';
 import invariant from 'tiny-invariant';
@@ -15,20 +9,21 @@ import { findResourceById } from '~/models/resource/resource.server';
 
 import ResourceView from '~/components/views/resource-view';
 import { getResourceDetails } from '~/models/resource/adapters.server';
-import { Button } from '@mantine/core';
 import composePageTitle from '~/utilities/page-title';
-import RefreshButton from '~/components/resource/refresh-button';
-import { PlayIcon } from '@heroicons/react/solid';
 import httpFindResourceType from '~/utilities/http/find-resource-type';
-import { composeResourceUrl } from '~/utilities/resource-url';
+import type { ContextLoaderFunction } from '~/models/context';
 
 type LoaderData = {
 	resource: Resource;
 	details: ResourceDetails;
 };
 
-export const loader: LoaderFunction = async ({ request, params }) => {
-	await requireUserId(request);
+export const loader = async ({
+	request,
+	params,
+	context,
+}: ContextLoaderFunction) => {
+	await requireUserId(request, context);
 
 	invariant(params.resourceId, 'resourceId not found');
 
@@ -46,8 +41,12 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 	return json<LoaderData>({ resource, details });
 };
 
-export const action: ActionFunction = async ({ request, params }) => {
-	await requireUserId(request);
+export const action: ActionFunction = async ({
+	request,
+	params,
+	context,
+}: ContextLoaderFunction) => {
+	await requireUserId(request, context);
 	invariant(params.listId, 'listId not found');
 
 	// await c({ userId, id: params.listId });

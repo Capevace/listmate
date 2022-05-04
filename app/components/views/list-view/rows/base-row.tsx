@@ -10,7 +10,7 @@ export type BaseRowProps = {
 	isSeparator?: boolean;
 	resource: Resource;
 	style: React.CSSProperties;
-	measureRef?: React.RefObject<HTMLDivElement>;
+	measureRef?: (el: HTMLElement | null) => void; //React.RefObject<HTMLDivElement>;
 };
 
 export default function BaseRow({

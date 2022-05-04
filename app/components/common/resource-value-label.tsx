@@ -22,12 +22,7 @@ export default function ResourceValueLabel({
 		return <>-</>;
 	} else {
 		return ref ? (
-			<Link
-				to={
-					resource ? composeResourceUrl(resource) : composeShortResourceUrl(ref)
-				}
-				className="hover:opacity-80"
-			>
+			<Link to={composeShortResourceUrl(ref)} className="hover:opacity-80">
 				{valueRef.value}
 			</Link>
 		) : (

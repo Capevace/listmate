@@ -10,13 +10,18 @@ import {
 } from '~/models/source-token.server';
 import { composeOauthUrl as composeSpotifyOauthUrl } from '~/apis/spotify.server';
 import { composeOauthUrl as composeYouTubeOauthUrl } from '~/apis/youtube.server';
+import type { ContextLoaderFunction } from '~/models/context';
 
 type LoaderData = {
 	isConnected: boolean;
 };
 
-export const action: ActionFunction = async ({ request, params }) => {
-	const userId = await requireUserId(request);
+export const action: ActionFunction = async ({
+	request,
+	params,
+	context,
+}: ContextLoaderFunction) => {
+	const userId = await requireUserId(request, context);
 
 	invariant(params.api, 'No API found');
 
