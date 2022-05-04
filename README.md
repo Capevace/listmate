@@ -12,7 +12,9 @@ A web application to manage your personal library of different resources by conn
 
 - 📝 &nbsp; **Organize your [music library, your bookmarks, movies and more](#supported-resource-types)**
 - ⚡️ &nbsp; Flexible data model – [**everything is a resource**](#everything-is-a-dataobject--resource)
-- 🔗 &nbsp; **Link resources** to each other and to external services – [Spotify, YouTube, Pocket and more](#supported-apis)
+- 🎶 &nbsp; **Import playlists** etc. from [Spotify, YouTube, Pocket and more](#supported-apis)
+- 🔗 &nbsp; **Link resources** to each other and to external services
+- 🔮 &nbsp; **Automatic matching** by finding and identifying resources from different services
 - 🔊 &nbsp; **Built-in player** combines the playback of **local, Spotify and YouTube files** into a single interface
 - 📻 &nbsp; **Unified player queue** – add videos and songs from different playback sources into a single joint queue
 - 🤖 &nbsp; (Mostly[^1]) **works without JavaScript** – built with Remix and on top HTTP & HTML
