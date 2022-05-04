@@ -1,10 +1,27 @@
-# Listmate (alpha, work in progress)
+<div align="center">
+	<br />
+	<h1>Listmate</h1>
+	<p>
+		<strong>Next generation</strong> knowledge suite for your music library, bookmarks, RSS feeds and <a href="#supported-resource-types">more</a>.
+	</p>
+	<br />
+	<a href="resources/header.png">
+		<img src="resources/header.png">
+	</a>
+	<br /><br />
+	<p>
+		<a href="#">Project Homepage</a>
+		<span>&nbsp;|&nbsp;</span>
+		<a href="#">Docs</a>
+	</p>
+	<br />
+</div>
 
-![Early listmate build](resources/header.png)
+>
 
-> **Next generation** knowledge suite for your music library, bookmarks, RSS feeds and [more](#supported-resource-types)
+Long gone are the days of the personal media library. Streaming services and SaaS dominate the market. Once subscriptions end, access to your data is lost until more payments have been made. Your playlists, bookmarks, and movies are trapped in silos that are hard to move away from.
 
-A web application to manage your personal library of different resources by connecting with and download data from external sources like Spotify, YouTube, and co.
+**Listmate was created to take back control of your personal knowledge by integrating external data APIs directly into the local media library.**
 
 <br>
 
