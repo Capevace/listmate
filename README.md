@@ -27,18 +27,18 @@ Long gone are the days of the personal media library. Streaming services and Saa
 
 ## Features
 
-- 📝 &nbsp; **Organize your [music library, your bookmarks, movies and more](#supported-resource-types)**
-- ⚡️ &nbsp; Flexible data model – [**everything is a resource**](#everything-is-a-dataobject--resource)
-- 🎶 &nbsp; **Import playlists** etc. from [Spotify, YouTube, Pocket and more](#supported-apis)
-- 🔗 &nbsp; **Link resources** to each other and to external services
-- 🔮 &nbsp; **Automatic matching** by finding and identifying resources from different services
-- 🔊 &nbsp; **Built-in player** combines the playback of **local, Spotify and YouTube files** into a single interface
-- 📻 &nbsp; **Unified player queue** – add videos and songs from different playback sources into a single joint queue
-- 🤖 &nbsp; (Mostly[^1]) **works without JavaScript** – built with Remix and on top HTTP & HTML
-- 💾 &nbsp; Keep all your data in a [single SQLite database file](https://sqlite.org/appfileformat.html)[^2]
-- 🔌 &nbsp; **Direct integration** with [Spotify Data API and Playback SDK](https://developer.spotify.com/documentation/)
-- 📆 &nbsp; **Scheduled data imports** – daily RSS feeds, weekly playlist updates...
-- 💿 &nbsp; **Easy data exports** – JSON, XML, CSV, RDF exports and symlinked FS "views"
+- &nbsp;📝 &nbsp; **Organize your [music library, your bookmarks, movies and more](#supported-resource-types)**
+- &nbsp;⚡️&nbsp; Flexible data model – [**everything is a resource**](#everything-is-a-dataobject--resource)
+- &nbsp;🎶 &nbsp; **Import playlists** etc. from [Spotify, YouTube, Pocket and more](#supported-apis)
+- &nbsp;🔗 &nbsp; **Link resources** to each other and to external services
+- &nbsp;🔮 &nbsp; **Automatic matching** by finding and identifying resources from different services
+- &nbsp;🔊 &nbsp; **Built-in player** combines the playback of **local, Spotify and YouTube files** into a single interface
+- &nbsp;📻 &nbsp; **Unified player queue** – add videos and songs from different playback sources into a single joint queue
+- &nbsp;🤖 &nbsp; (Mostly[^1]) **works without JavaScript** – built with Remix and on top HTTP & HTML
+- &nbsp;💾 &nbsp; Keep all your data in a [single SQLite database file](https://sqlite.org/appfileformat.html)[^2]
+- &nbsp;🔌 &nbsp; **Direct integration** with [Spotify Data API and Playback SDK](https://developer.spotify.com/documentation/)
+- &nbsp;📆 &nbsp; **Scheduled data imports** – daily RSS feeds, weekly playlist updates...
+- &nbsp;💿 &nbsp; **Easy data exports** – JSON, XML, CSV, RDF exports and symlinked FS "views"
 
 [^1]: Playback requires JS enabled
 [^2]: As of right now, files are still in a seperate folder, but I plan on saving files as BLOB data inside the database as well.
