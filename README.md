@@ -1,8 +1,21 @@
-# Listmate (alpha pre-release)
+# Listmate (alpha)
 
 ![Early listmate build](resources/header.png)
 
 > A web application to manage your **_music, videos, bookmarks and more_** by synchornizing your lists with external services like **_YouTube, Spotify or Pocket_**.
+
+<br>
+
+## Features
+
+- 📝 &nbsp; **Organize your music library, your bookmarks, movies** and [more](#)
+- ⚡️ &nbsp; Flexible data model – **everything is a resource**
+- 🔗 &nbsp; **Link resources to external services** – Spotify, YouTube, Pocket and [more](#)
+- 🔊 &nbsp; **Built-in player** combines playback of **local files, Spotify and YouTube** into single interface
+- 📻 &nbsp; **Unified player queue** – add videos and songs from different sources into a single joint queue
+- 🤖 &nbsp; (Mostly $^1$) **works without JavaScript** – built with Remix and on top HTTP & HTML
+
+###### $^1$ Playback requires JS enabled
 
 <br>
 
