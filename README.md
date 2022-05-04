@@ -44,9 +44,7 @@ Long gone are the days of the personal media library. Streaming services and Saa
 [^2]: As of right now, files are still in a seperate folder, but I plan on saving files as BLOB data inside the database as well.
 
 <br>
-
----
-
+<br>
 <br>
 
 ## Concepts
