@@ -70,7 +70,7 @@ export const action: ActionFunction = async ({ request }) => {
 		request,
 		userId: user.id,
 		remember: remember === 'on' ? true : false,
-		redirectTo: '/library/music/songs', // typeof redirectTo === 'string' ? redirectTo : '/librar/music/songs',
+		redirectTo: '/library/music/song', // typeof redirectTo === 'string' ? redirectTo : '/librar/music/songs',
 	});
 };
 

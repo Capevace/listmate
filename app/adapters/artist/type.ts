@@ -1,7 +1,12 @@
-import type { Resource, RawValue, ResourceType } from '~/models/resource/types';
+import type {
+	Resource,
+	ResourceType,
+	ValueType,
+	ValueRef,
+} from '~/models/resource/types';
 
 export type ArtistData = {
-	name: RawValue<string>;
+	name: ValueRef<ValueType.TEXT>;
 };
 
 export type Artist = Resource<ResourceType.ARTIST, ArtistData>;

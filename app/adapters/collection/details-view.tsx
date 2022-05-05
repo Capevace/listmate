@@ -3,26 +3,14 @@ import {
 	Resource,
 	ResourceDetailsProps,
 	ResourceType,
-	SourceType,
-	SOURCE_ICONS,
 } from '~/models/resource/types';
 import type { CollectionDetails } from './adapter.server';
 
-import ResourceHeader from '~/components/resource/resource-header';
-import ValueGrid from '~/components/resource/value-grid';
 import GenericListView from '~/components/views/generic-list-view';
-import ResourceDebugger from '~/components/resource/resource-debugger';
 import { useRef } from 'react';
-import CompactView from '~/components/views/compact-view/compact-view';
 import invariant from 'tiny-invariant';
-import BaseRow from '~/components/views/list-view/rows/base-row';
-import composeCoverUrl from '~/utilities/cover-url';
-import capitalize from '~/utilities/capitalize';
-import { Link } from 'remix';
-import SpotifyIcon from '~/components/icons/spotify-icon';
-import { Download, Spotify } from 'react-bootstrap-icons';
-import InlineFavouriteButton from '~/components/resource/inline-favourite-button';
 import CompactResourceView from '~/components/views/compact-view/compact-resource-header';
+import BaseRow from '~/components/views/rows/base-row';
 
 export type CollectionDetailsProps<
 	TResource extends Resource,

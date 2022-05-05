@@ -35,6 +35,12 @@ export const action: ActionFunction = async ({
 		);
 	}
 
+	if (!deviceId) {
+		throw new Response('No device ID provided', {
+			status: 400,
+		});
+	}
+
 	await playResource({
 		api,
 		userId,

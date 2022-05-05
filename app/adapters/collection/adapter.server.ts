@@ -1,51 +1,36 @@
 import type { Collection } from './type';
 
-import invariant from 'tiny-invariant';
-
-import {
-	CompleteDataObject,
-	composeRefArrayFromValue,
-	composeRefFromValue,
-	composeResourceBase,
-	DataObjectValueMap,
-	valuesToObject,
-} from '~/models/resource/adapters.server';
 import {
 	Resource,
 	ResourceDetails,
 	ResourceType,
-	SourceType,
-	stringToSourceType,
 } from '~/models/resource/types';
 import { resolveValueRefArray } from '~/models/resource/resource.server';
 
-export function dataObjectToCollection<
-	TResource extends Resource = Resource,
-	TResourceType extends ResourceType = ResourceType.COLLECTION
->(
-	dataObject: CompleteDataObject,
-	values?: DataObjectValueMap
-): Collection<TResource, TResourceType> {
-	values = values ?? valuesToObject(dataObject.values);
+// export function dataObjectToCollection<
+// 	TResource extends Resource = Resource,
+// 	TResourceType extends ResourceType = ResourceType.COLLECTION
+// >(
+// 	dataObject: CompleteDataObject,
+// 	values?: DataObjectValueMap
+// ): Collection<TResource, TResourceType> {
+// 	values = values ?? valuesToObject(dataObject.values);
 
-	const name = composeRefFromValue(values.name);
+// 	const name = composeRefFromValue(values.name, ValueType.TEXT);
 
-	invariant(name, 'Missing name');
+// 	invariant(name, 'Missing name');
 
-	return {
-		...composeResourceBase<TResourceType>(dataObject),
-		// additional spotify-specific fields
-		values: {
-			name,
-			source: composeRefFromValue<SourceType>(
-				values.source,
-				stringToSourceType
-			),
-			description: composeRefFromValue(values.description),
-			items: composeRefArrayFromValue<string>(values.items),
-		},
-	};
-}
+// 	return {
+// 		...composeResourceBase<TResourceType>(dataObject),
+// 		// additional spotify-specific fields
+// 		values: {
+// 			name,
+// 			source: composeRefFromValue(values.source, ValueType.SOURCE_TYPE),
+// 			description: composeRefFromValue(values.description, ValueType.TEXT),
+// 			items: composeRefArrayFromValue(values.items),
+// 		},
+// 	};
+// }
 
 export type CollectionDetails<TResource extends Resource = Resource> =
 	ResourceDetails & {

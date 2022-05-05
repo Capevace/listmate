@@ -15,7 +15,7 @@ import {
 	ValidatedSourceURI,
 } from './apis.server';
 import makeProgress from '~/utilities/progress';
-import { ResourceType, SourceType } from '~/models/resource/types';
+import { ResourceType, SourceType, ValueType } from '~/models/resource/types';
 
 import { youtube_v3, google, Auth } from 'googleapis';
 import { updateTokenData } from '~/models/source-token.server';
@@ -105,7 +105,7 @@ export function detectSourceType(uri: string): ValidatedSourceURI | null {
 	if (uri.startsWith('youtube#video#')) {
 		return {
 			sourceType: SourceType.SPOTIFY,
-			type: ResourceType.VIDEO,
+			resourceType: ResourceType.VIDEO,
 			uri: uri.replace('youtube#video#', ''),
 		};
 	}
@@ -283,10 +283,20 @@ export async function importVideo(
 		type: ResourceType.VIDEO,
 		thumbnail: thumbnail,
 		values: {
-			title: { value: data.title },
-			description: data.description ? { value: data.description } : null,
-			publishedAt: { value: new Date(data.publishedAt) },
-			channel: { value: channel.title, ref: channel.id },
+			title: { value: data.title, type: ValueType.TEXT, ref: null },
+			description: data.description
+				? { value: data.description, type: ValueType.TEXT, ref: null }
+				: null,
+			publishedAt: {
+				value: new Date(data.publishedAt),
+				type: ValueType.DATE,
+				ref: null,
+			},
+			channel: {
+				value: channel.title,
+				ref: channel.id,
+				type: ValueType.RESOURCE,
+			},
 		},
 		remotes: {
 			[SourceType.YOUTUBE]: videoId,
@@ -348,10 +358,22 @@ export async function importChannel(
 		type: ResourceType.CHANNEL,
 		thumbnail: thumbnail,
 		values: {
-			name: { value: data.title },
-			createdAt: { value: new Date(data.publishedAt) },
-			description: data.description ? { value: data.description } : null,
-			url: data.url ? { value: data.url } : null,
+			name: { value: data.title, type: ValueType.TEXT, ref: null },
+			createdAt: {
+				value: new Date(data.publishedAt),
+				type: ValueType.DATE,
+				ref: null,
+			},
+			description: data.description
+				? { value: data.description, type: ValueType.TEXT, ref: null }
+				: null,
+			url: data.url
+				? {
+						value: new URL(`https://youtube.com/watch?v=${data.url}`),
+						type: ValueType.URL,
+						ref: null,
+				  }
+				: null,
 		},
 		remotes: {
 			[SourceType.YOUTUBE]: channelId,

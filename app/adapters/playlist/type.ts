@@ -1,6 +1,4 @@
 import type {
-	Resource,
-	ForceResourceType,
 	ResourceType,
 	CollectionData,
 	Song,

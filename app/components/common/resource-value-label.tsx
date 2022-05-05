@@ -7,7 +7,7 @@ import {
 
 export type ResourceValueLabelProps = {
 	resource?: Resource | null;
-	valueRef: ValueRef<string> | null;
+	valueRef: ValueRef | null;
 	forceRef?: string;
 };
 

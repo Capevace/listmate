@@ -85,6 +85,7 @@ model DataObjectValue {
     dataObject   DataObject @relation("DataObjectValues", fields: [dataObjectId], references: [id], onDelete: Cascade)
     dataObjectId String
     key          String
+    type         String     @default("text") // TEXT, NUMBER, RESOURCE
 
     value             String
     valueDataObject   DataObject? @relation("ValueReferences", fields: [valueDataObjectId], references: [id], onDelete: SetNull)

@@ -1,5 +1,4 @@
-import { useRef } from 'react';
-import { Download, Spotify } from 'react-bootstrap-icons';
+import { Download } from 'react-bootstrap-icons';
 import { Link } from 'remix';
 import InlineFavouriteButton from '~/components/resource/inline-favourite-button';
 import RefreshButton from '~/components/resource/refresh-button';
@@ -8,11 +7,11 @@ import {
 	SourceType,
 	SOURCE_ICONS,
 	ValueRef,
+	ValueType,
 } from '~/models/resource/types';
 import capitalize from '~/utilities/capitalize';
 import composeCoverUrl from '~/utilities/cover-url';
 import { composeResourceUrl } from '~/utilities/resource-url';
-import GenericListView from '../generic-list-view';
 import CompactView from './compact-view';
 
 export type CompactResourceViewProps = {
@@ -30,13 +29,16 @@ export default function CompactResourceView({
 	showCover,
 	children,
 }: CompactResourceViewProps) {
-	const values = resource.values as Record<string, ValueRef<any>>;
+	const values = resource.values;
+	const description = values.description
+		? (values.description as ValueRef<ValueType.TEXT>).value
+		: null;
 
 	return (
 		<CompactView
 			parentRef={parentRef}
 			title={resource.title}
-			subtitle={values.description?.value}
+			subtitle={description}
 			headerDetails={
 				<>
 					<span className="text-xs font-bold uppercase opacity-60">

@@ -1,7 +1,16 @@
 import { faker } from '@faker-js/faker';
-import type { List } from '~/models/list.server';
-import { composeRefFromResource } from '~/models/resource/adapters.server';
-import type { Album, Artist, Song } from '~/models/resource/types';
+import {
+	composeRefFromResource,
+	composeRefFromResourceArray,
+} from '~/models/resource/adapters.server';
+import {
+	Album,
+	Artist,
+	Playlist,
+	Song,
+	SourceType,
+	ValueType,
+} from '~/models/resource/types';
 import { ResourceType } from '~/models/resource/types';
 
 export function generateArtist(): Artist {
@@ -13,8 +22,11 @@ export function generateArtist(): Artist {
 		title: name,
 		isFavourite: false,
 		thumbnail: null,
+		remotes: {
+			local: `fake:${faker.datatype.uuid()}`,
+		},
 		values: {
-			name: { value: name },
+			name: { value: name, type: ValueType.TEXT, ref: null },
 		},
 	};
 }
@@ -28,10 +40,13 @@ export function generateSong(artist: Artist, album: Album): Song {
 		title: name,
 		thumbnail: null,
 		isFavourite: false,
+		remotes: {
+			local: `fake:${faker.datatype.uuid()}`,
+		},
 		values: {
-			name: { value: name },
-			artist: composeRefFromResource<string>(artist),
-			album: composeRefFromResource<string>(album),
+			name: { value: name, type: ValueType.TEXT, ref: null },
+			artist: composeRefFromResource(artist),
+			album: composeRefFromResource(album),
 		},
 	};
 }
@@ -42,41 +57,61 @@ export function generateAlbum(artist: Artist): {
 } {
 	const name = faker.company.catchPhrase();
 
+	const songs = new Array(faker.datatype.number({ min: 1, max: 10 }))
+		.fill(0)
+		.map(() => generateSong(artist, album));
+
 	const album: Album = {
 		id: faker.datatype.uuid(),
 		type: ResourceType.ALBUM,
 		title: name,
 		thumbnail: null,
 		isFavourite: false,
+		remotes: {
+			local: `fake:${faker.datatype.uuid()}`,
+		},
 		values: {
-			name: { value: name },
-			artist: composeRefFromResource<string>(artist),
+			name: { value: name, type: ValueType.TEXT, ref: null },
+			artist: composeRefFromResource(artist),
+			songs: composeRefFromResourceArray(songs),
 		},
 	};
 
 	return {
 		album,
-		songs: new Array(faker.datatype.number({ min: 1, max: 10 }))
-			.fill(0)
-			.map(() => generateSong(artist, album)),
+		songs,
 	};
 }
 
 export function generatePlaylist(userId: string, availableSongs: Song[]) {
 	const name = faker.company.catchPhrase();
-	const createdAt = faker.date.past();
 
-	const list: List = {
+	const album: Playlist = {
 		id: faker.datatype.uuid(),
+		type: ResourceType.PLAYLIST,
 		title: name,
-		description: faker.lorem.sentence(),
-		createdAt,
-		updatedAt: faker.date.between(createdAt, new Date()),
-		userId,
-		coverFileReferenceId: null,
+		thumbnail: null,
+		isFavourite: false,
+		remotes: {
+			local: `fake:${faker.datatype.uuid()}`,
+		},
+		values: {
+			name: { value: name, type: ValueType.TEXT, ref: null },
+			description: {
+				value: faker.lorem.sentence(),
+				type: ValueType.TEXT,
+				ref: null,
+			},
+			source: {
+				value: SourceType.LOCAL,
+				type: ValueType.SOURCE_TYPE,
+				ref: null,
+			},
+			items: composeRefFromResourceArray(availableSongs),
+		},
 	};
 
-	return { list, songs: availableSongs };
+	return { album, songs: availableSongs };
 }
 
 export function generateLibrary(userId: string, playlistCount: number) {

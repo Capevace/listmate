@@ -10,6 +10,7 @@ import { useMemo } from 'react';
 import InlinePlayButton from '~/components/resource/inline-play-button';
 import findPreferredRemote from '~/utilities/preferred-remote';
 import InlineQueueButton from '~/components/resource/inline-queue-button';
+import { Soundwave } from 'react-bootstrap-icons';
 
 export default function SongRow({
 	resource,
@@ -18,6 +19,7 @@ export default function SongRow({
 	resource: Song;
 	style: React.CSSProperties;
 }) {
+	const [playerState] = usePlayer();
 	const remote = findPreferredRemote(resource.remotes, GroupType.MUSIC);
 
 	return (
@@ -32,12 +34,21 @@ export default function SongRow({
 				/>
 				{remote && (
 					<>
-						<InlinePlayButton
-							className="col-span-1 opacity-30"
-							resource={resource}
-							sourceType={remote.type}
-							uri={remote.uri}
-						/>
+						{playerState &&
+						playerState.playing &&
+						playerState.currentTrack?.resource.id === resource.id ? (
+							<figure className="flex items-center justify-center">
+								<Soundwave size={'auto'} className="w-6" />
+							</figure>
+						) : (
+							<InlinePlayButton
+								className="col-span-1 opacity-30"
+								resource={resource}
+								sourceType={remote.type}
+								uri={remote.uri}
+							/>
+						)}
+
 						<InlineQueueButton
 							className="col-span-1 opacity-30"
 							resource={resource}

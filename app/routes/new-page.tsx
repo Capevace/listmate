@@ -25,7 +25,7 @@ export default function NewPage() {
 						<button>
 							<PlayIcon className="w-6" />
 						</button>
-						<RefreshButton resource={resource} />
+						{/* <RefreshButton resource={resource} /> */}
 					</nav>
 				</div>
 				<hr className="z-10 border-gray-400" />

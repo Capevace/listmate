@@ -1,7 +1,7 @@
 import type { User } from '~/models/user.server';
 
 import React, { useState } from 'react';
-import { Form, NavLink } from 'remix';
+import { NavLink } from 'remix';
 
 import {
 	Collection,
@@ -12,8 +12,6 @@ import {
 	ResourceType,
 	SourceType,
 } from '~/models/resource/types';
-import capitalize from '~/utilities/capitalize';
-
 import {
 	BookmarkIcon,
 	CollectionIcon,
@@ -21,7 +19,6 @@ import {
 	UsersIcon,
 	VideoCameraIcon,
 } from '@heroicons/react/solid';
-import { Select } from '@mantine/core';
 import SearchBox from '~/components/views/search-box';
 import SpotifyIcon from '~/components/icons/spotify-icon';
 import Player from './player';
@@ -102,7 +99,7 @@ function GroupLink({
 }
 
 export default function Sidebar({ user, collections = [] }: SidebarProps) {
-	const [typeGroup, setTypeGroup] = useState<GroupType | null>(GroupType.MUSIC);
+	const [typeGroup, setTypeGroup] = useState<GroupType>(GroupType.MUSIC);
 	const [extended, setExtended] = useState(false);
 	// const groups = Object.entries() as [GroupType, string][];
 

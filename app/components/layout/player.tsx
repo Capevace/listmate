@@ -84,9 +84,11 @@ export default function Player() {
 						className="absolute top-0 left-0 right-0 block h-1.5 cursor-pointer bg-green-900"
 						onClick={(e) => {
 							e.stopPropagation();
+							const x = (e.nativeEvent as any).layerX ?? 0;
+
 							const target = e.target as HTMLDivElement;
 							multiPlayer.seek(
-								(e.clientX / target.offsetWidth) * playerState.position.total
+								(x / target.offsetWidth) * playerState.position.total
 							);
 						}}
 					></div>

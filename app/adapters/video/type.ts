@@ -1,17 +1,15 @@
 import type {
 	Resource,
-	RawValue,
-	ForceResourceType,
 	ResourceType,
 	ValueRef,
+	ValueType,
 } from '~/models/resource/types';
-import { Channel } from '~/adapters/channel/type';
 
 export type VideoData = {
-	title: RawValue<string>;
-	description: RawValue<string> | null;
-	publishedAt: RawValue<Date>;
-	channel: ValueRef<string, Channel> | null;
+	title: ValueRef<ValueType.TEXT>;
+	description: ValueRef<ValueType.TEXT> | null;
+	publishedAt: ValueRef<ValueType.DATE>;
+	channel: ValueRef<ValueType.RESOURCE> | null;
 };
 
 export type Video = Resource<ResourceType.VIDEO, VideoData>;

@@ -1,17 +1,14 @@
 import type {
 	Resource,
-	RawValue,
-	ForceResourceType,
 	ResourceType,
 	ValueRef,
-	Song,
-	Artist,
+	ValueType,
 } from '~/models/resource/types';
 
 export type AlbumData = {
-	name: RawValue<string>;
-	artist: ValueRef<string, Artist> | null;
-	songs: (RawValue<string> | ValueRef<string, Song>)[];
+	name: ValueRef<ValueType.TEXT>;
+	artist: ValueRef<ValueType.RESOURCE> | null;
+	songs: ValueRef<ValueType.RESOURCE>[];
 
 	// release_date: '1976-10-14';
 	// release_date_precision: 'day';

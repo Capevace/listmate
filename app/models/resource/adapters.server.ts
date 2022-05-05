@@ -6,18 +6,9 @@ import {
 	ValueArrayItem,
 } from '@prisma/client';
 
-import {
-	dataObjectToArtist,
-	getArtistDetails,
-} from '~/adapters/artist/adapter.server';
-import {
-	dataObjectToAlbum,
-	getAlbumDetails,
-} from '~/adapters/album/adapter.server';
-import {
-	dataObjectToSong,
-	getSongDetails,
-} from '~/adapters/song/adapter.server';
+import { getArtistDetails } from '~/adapters/artist/adapter.server';
+import { getAlbumDetails } from '~/adapters/album/adapter.server';
+import { getSongDetails } from '~/adapters/song/adapter.server';
 
 // export * from '~/models/resource/adapters/types';
 
@@ -25,39 +16,27 @@ import {
 	Album,
 	Collection,
 	Playlist,
-	RawValue,
 	Resource,
 	ResourceDetails,
 	ResourceRemotes,
 	ResourceType,
-	SerializedValues,
 	Song,
 	stringToResourceType,
 	stringToSourceType,
+	stringToValueType,
 	ValueRef,
+	ValueType,
+	ValueTypeRawValue,
 } from '~/models/resource/types';
 import invariant from 'tiny-invariant';
-import {
-	dataObjectToCollection,
-	getCollectionDetails,
-} from '~/adapters/collection/adapter.server';
-import {
-	dataObjectToPlaylist,
-	getPlaylistDetails,
-} from '~/adapters/playlist/adapter.server';
+import { getCollectionDetails } from '~/adapters/collection/adapter.server';
+import { getPlaylistDetails } from '~/adapters/playlist/adapter.server';
 import { Artist } from '~/adapters/artist/type';
-import {
-	dataObjectToVideo,
-	getVideoDetails,
-	serializeVideoValues,
-} from '~/adapters/video/adapter.server';
+import { getVideoDetails } from '~/adapters/video/adapter.server';
 import { Video } from '~/adapters/video/type';
-import {
-	dataObjectToChannel,
-	getChannelDetails,
-	serializeChannelValues,
-} from '~/adapters/channel/adapter.server';
 import { Channel } from '~/adapters/channel/type';
+import { deserializeValue } from './serialize.server';
+import { getChannelDetails } from '~/adapters/channel/adapter.server';
 
 export type CompleteDataObjectValue = DataObjectValue & {
 	valueDataObject: DataObject | null;
@@ -76,38 +55,41 @@ export type CompleteDataObject = DataObject & {
 /**
  * Map of DataObjectValue.
  */
-export type DataObjectValueMap = { [key: string]: CompleteDataObjectValue };
+export type DataObjectValueMap<TResource extends Resource> = {
+	[key in keyof TResource['values']]: CompleteDataObjectValue;
+};
 
 /**
  * Convert a DataObject to a resource.
  *
  * @param dataObject The data object to convert
  */
-export function dataObjectToResource(dataObject: CompleteDataObject): Resource {
-	const values = valuesToObject(dataObject.values);
+export function dataObjectToResource<TResource extends Resource>(
+	dataObject: CompleteDataObject
+): Resource {
+	const values = dataObject.values
+		.map((value) => {
+			if (value.type === ValueType.RESOURCE_LIST) {
+				return [
+					value.key,
+					value.items.map((childValue) =>
+						deserializeValue({ ...value, ...childValue })
+					),
+				] as [string, ValueRef[]];
+			} else {
+				return [value.key, deserializeValue(value)] as [string, ValueRef];
+			}
+		})
+		.reduce((acc, [key, value]) => {
+			acc[key] = value;
+			return acc;
+		}, {} as Record<string, ValueRef | ValueRef[]>) as TResource['values'];
 
-	switch (dataObject.type) {
-		case ResourceType.COLLECTION:
-			return dataObjectToCollection(dataObject, values);
-		case ResourceType.PLAYLIST:
-			return dataObjectToPlaylist(dataObject, values);
-
-		case ResourceType.ALBUM:
-			return dataObjectToAlbum(dataObject, values);
-		case ResourceType.ARTIST:
-			return dataObjectToArtist(dataObject, values);
-		case ResourceType.SONG:
-			return dataObjectToSong(dataObject, values);
-
-		case ResourceType.VIDEO:
-			return dataObjectToVideo(dataObject, values);
-		case ResourceType.CHANNEL:
-			return dataObjectToChannel(dataObject, values);
-		default:
-			throw new Error(
-				`dataObjectToResource: resource type ${dataObject.type} not implemented`
-			);
-	}
+	return {
+		...composeResourceBase<TResource['type']>(dataObject),
+		// additional spotify-specific fields
+		values,
+	};
 }
 
 /**
@@ -145,24 +127,6 @@ export async function getResourceDetails(
 }
 
 /**
- * Serialize resource values to string for the DB.
- *
- * @param resource The resource to find additional details for
- */
-export function serializeValues(
-	resource: Resource
-): SerializedValues<Resource['values']> {
-	switch (resource.type) {
-		case ResourceType.VIDEO:
-			return serializeVideoValues(resource.values as Video['values']);
-		case ResourceType.CHANNEL:
-			return serializeChannelValues(resource.values as Channel['values']);
-		default:
-			return resource.values;
-	}
-}
-
-/**
  * Detail function placeholder.
  */
 export function getEmptyDetails(_resource: Resource): ResourceDetails {
@@ -173,16 +137,16 @@ export function getEmptyDetails(_resource: Resource): ResourceDetails {
  * Convert a DataObjectValue array to a map.
  * @param values The value array
  */
-export function valuesToObject(
+export function valuesToObject<TResource extends Resource>(
 	values: CompleteDataObjectValue[]
-): DataObjectValueMap {
-	let object: DataObjectValueMap = {};
+): DataObjectValueMap<TResource> {
+	let object: Partial<DataObjectValueMap<TResource>> = {};
 
 	for (const value of values) {
-		object[value.key] = value;
+		object[value.key as keyof TResource['values']] = value;
 	}
 
-	return object;
+	return object as DataObjectValueMap<TResource>;
 }
 
 /**
@@ -217,7 +181,6 @@ export function composeResourceBase<ForcedType extends ResourceType>(
 }
 
 type Parser<T> = (v: string) => T;
-type RefReturn<T, R extends Resource> = RawValue<T> | ValueRef<T, R> | null;
 
 /**
  * Compose a RawValue or ValueRef from a DataObjectValue.
@@ -236,27 +199,26 @@ type RefReturn<T, R extends Resource> = RawValue<T> | ValueRef<T, R> | null;
  *
  * @param value The DataObjectValue to convert from
  */
-export function composeRefFromValue(
+// export function composeRefFromValue(
+// 	value: CompleteDataObjectValue | undefined,
+// 	type?: ValueType,
+// 	parser?: Parser<ValueTypeRawValue<ValueType>>
+// ): RefReturn<ValueType>;
+export function composeRefFromValue<EValueType extends ValueType>(
 	value: CompleteDataObjectValue | undefined,
-	parser?: Parser<string>
-): RefReturn<string, Resource>;
-export function composeRefFromValue<
-	T extends string,
-	R extends Resource = Resource
->(
-	value: CompleteDataObjectValue | undefined,
-	parser?: Parser<T>
-): RefReturn<T, R>;
-export function composeRefFromValue<T, R extends Resource = Resource>(
-	value: CompleteDataObjectValue | undefined,
-	parser: Parser<T>
-): RefReturn<T, R>;
-export function composeRefFromValue<T, R extends Resource = Resource>(
-	value: CompleteDataObjectValue | undefined,
-	parser?: Parser<T>
-): RefReturn<T, R> {
+	type: EValueType,
+	parser?: Parser<ValueTypeRawValue<EValueType>>
+): ValueRef<EValueType> | null {
 	if (!value) {
 		return null;
+	}
+
+	const dbType = stringToValueType(value.type);
+
+	if (dbType !== type) {
+		throw new Error(
+			`composeRefFromValue: value type from DB '${dbType}' does not match expected type '${type}'`
+		);
 	}
 
 	const ref = value.valueDataObjectId;
@@ -268,7 +230,8 @@ export function composeRefFromValue<T, R extends Resource = Resource>(
 	return {
 		ref,
 		value: parsedValue,
-	} as RefReturn<T, R>;
+		type: type,
+	} as ValueRef<EValueType>;
 }
 
 /**
@@ -276,12 +239,9 @@ export function composeRefFromValue<T, R extends Resource = Resource>(
  *
  * @param value The DataObjectValue to convert from
  */
-export function composeRefArrayFromValue<
-	ValueType extends any = string,
-	TResource extends Resource = Resource
->(
-	value?: CompleteDataObjectValue
-): RawValue<ValueType>[] | ValueRef<ValueType, TResource>[] {
+export function composeRefArrayFromValue(
+	value: CompleteDataObjectValue | undefined
+): ValueRef<ValueType.RESOURCE>[] {
 	if (!value) return [];
 
 	invariant(value.isArray, 'value is not an array');
@@ -290,7 +250,8 @@ export function composeRefArrayFromValue<
 		return {
 			ref: item.valueDataObjectId,
 			value: item.value,
-		} as ValueRef<ValueType, TResource>;
+			type: ValueType.RESOURCE,
+		} as ValueRef<ValueType.RESOURCE>;
 	});
 }
 
@@ -302,13 +263,35 @@ export function composeRefArrayFromValue<
  *
  * @param resource The Resource to convert from
  */
-export function composeRefFromResource<ValueType extends any = string>(
+export function composeRefFromResource(
 	resource?: Resource
-): ValueRef<ValueType> | null {
+): ValueRef<ValueType.RESOURCE> | null {
 	return resource
-		? ({
+		? {
 				ref: resource.id,
 				value: resource.title,
-		  } as ValueRef<ValueType>)
+				type: ValueType.RESOURCE,
+		  }
 		: null;
+}
+
+/**
+ * Compose a ValueRef from a resource.
+ *
+ * The function accepts null / undefined as value and will then return null.
+ * This is for easier usage when serializing resources.
+ *
+ * @param resource The Resource to convert from
+ */
+export function composeRefFromResourceArray(
+	resources: Resource[]
+): ValueRef<ValueType.RESOURCE>[] {
+	return resources.map(
+		(resource) =>
+			({
+				ref: resource.id,
+				value: resource.title,
+				type: ValueType.RESOURCE,
+			})
+	);
 }

@@ -1,6 +1,6 @@
 import { SearchIcon } from '@heroicons/react/solid';
 import { Drawer, Input, Button, Loader } from '@mantine/core';
-import { ChangeEventHandler, useState } from 'react';
+import { ChangeEventHandler } from 'react';
 import {
 	ActionFunction,
 	Form,

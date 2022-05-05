@@ -1,6 +1,4 @@
 import type { LoaderFunction, MetaFunction } from 'remix';
-import type { List } from '~/models/list.server';
-import type { ListItemData } from '~/models/item.server';
 import { Resource, ResourceType } from '~/models/resource/types';
 
 import { json, useLoaderData } from 'remix';
@@ -13,14 +11,12 @@ import { stringToResourceTypeOptional } from '~/models/resource/types';
 import { findOptionalPageQuery } from '~/utilities/paginate';
 import capitalize from '~/utilities/capitalize';
 
-import ListView from '~/components/views/list-view';
-import ListHeader from '~/components/views/list-view/list-header';
 import composePageTitle from '~/utilities/page-title';
 import CompactView from '~/components/views/compact-view/compact-view';
 import GenericListView from '~/components/views/generic-list-view';
-import { RefObject, useRef } from 'react';
-import BaseRow from '~/components/views/list-view/rows/base-row';
+import { useRef } from 'react';
 import type { ContextLoaderFunction } from '~/models/context';
+import BaseRow from '~/components/views/rows/base-row';
 
 type LoaderData = {
 	title: string;
@@ -34,7 +30,7 @@ export const loader: LoaderFunction = async ({
 	params,
 	context,
 }: ContextLoaderFunction) => {
-	const userId = await requireUserId(request, context);
+	await requireUserId(request, context);
 
 	invariant(params.groupType, 'Library not found');
 	invariant(params.resourceType, 'Resource type not found');
@@ -96,9 +92,7 @@ export default function ListPage() {
 					return (
 						<BaseRow
 							key={`${resource.id}-${index}`}
-							measureRef={
-								row.measureRef as unknown as RefObject<HTMLDivElement>
-							}
+							measureRef={row.measureRef}
 							resource={resource}
 							style={
 								row

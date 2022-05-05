@@ -4,6 +4,7 @@ import {
 	Song,
 	Playlist,
 	stringToResourceTypeOptional,
+	ValueType,
 } from '~/models/resource/types';
 import type { User } from '~/models/user.server';
 
@@ -114,7 +115,7 @@ export function detectSourceType(uri: string): ValidatedSourceURI | null {
 	if (uri.startsWith('https://open.spotify.com/')) {
 		const path = uri.replace('https://open.spotify.com/', '');
 		const paths = path.split('/');
-		const type = paths[0];
+		const uriType = paths[0];
 		const id = paths[1].split('?')[0];
 
 		const resourceType = stringToResourceTypeOptional(uriType);
@@ -123,7 +124,7 @@ export function detectSourceType(uri: string): ValidatedSourceURI | null {
 			return {
 				sourceType: SourceType.SPOTIFY,
 				resourceType,
-				uri: `spotify:${type}:${id}`,
+				uri: `spotify:${uriType}:${id}`,
 			};
 		}
 	}
@@ -318,7 +319,7 @@ async function importArtist(
 			type: ResourceType.ARTIST,
 			thumbnail: thumbnail,
 			values: {
-				name: { value: artistData.name },
+				name: { value: artistData.name, type: ValueType.TEXT, ref: null },
 			},
 			remotes: {
 				[SourceType.SPOTIFY]: artistData.uri,
@@ -377,8 +378,10 @@ async function importAlbum(
 			type: ResourceType.ALBUM,
 			thumbnail: thumbnail,
 			values: {
-				name: { value: albumData.name },
-				artist: artist ? { value: artist.title, ref: artist.id } : null,
+				name: { value: albumData.name, type: ValueType.TEXT, ref: null },
+				artist: artist
+					? { value: artist.title, type: ValueType.RESOURCE, ref: artist.id }
+					: null,
 				songs: [],
 			},
 			remotes: {
@@ -413,7 +416,11 @@ async function importAlbum(
 					}
 				);
 
-				album.values.songs.push({ value: song.title, ref: song.id });
+				album.values.songs.push({
+					value: song.title,
+					type: ValueType.RESOURCE,
+					ref: song.id,
+				});
 			} catch (e) {
 				// TODO: Proper import error handling
 				console.error(e);
@@ -499,9 +506,13 @@ async function importSong(
 			type: ResourceType.SONG,
 			thumbnail: album.thumbnail,
 			values: {
-				name: { value: songData.name },
-				artist: artist ? { value: artist.title, ref: artist.id } : null,
-				album: album ? { value: album.title, ref: album.id } : null,
+				name: { value: songData.name, type: ValueType.TEXT, ref: null },
+				artist: artist
+					? { value: artist.title, type: ValueType.RESOURCE, ref: artist.id }
+					: null,
+				album: album
+					? { value: album.title, type: ValueType.RESOURCE, ref: album.id }
+					: null,
 			},
 			remotes: {
 				[SourceType.SPOTIFY]: songData.uri,
@@ -510,7 +521,11 @@ async function importSong(
 	);
 
 	if (!skipPushToAlbum) {
-		album.values.songs.push({ value: song.title, ref: song.id });
+		album.values.songs.push({
+			value: song.title,
+			type: ValueType.RESOURCE,
+			ref: song.id,
+		});
 		await upsertValues(album);
 	}
 
@@ -558,12 +573,16 @@ async function importPlaylist(
 			type: ResourceType.PLAYLIST,
 			thumbnail: fileRef,
 			values: {
-				name: { value: playlistData.name },
+				name: { value: playlistData.name, type: ValueType.TEXT, ref: null },
 				description: playlistData.description
-					? { value: playlistData.description }
+					? { value: playlistData.description, type: ValueType.TEXT, ref: null }
 					: null,
 				items: [],
-				source: { value: SourceType.SPOTIFY },
+				source: {
+					value: SourceType.SPOTIFY,
+					type: ValueType.SOURCE_TYPE,
+					ref: null,
+				},
 			},
 			remotes: {
 				[SourceType.SPOTIFY]: playlistData.uri,
@@ -590,7 +609,11 @@ async function importPlaylist(
 					}
 				);
 
-				playlist.values.items.push({ value: song.title, ref: song.id });
+				playlist.values.items.push({
+					value: song.title,
+					type: ValueType.RESOURCE,
+					ref: song.id,
+				});
 			} catch (e) {
 				// TODO: Proper import error handling
 				console.error(e);

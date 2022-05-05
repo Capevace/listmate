@@ -1,4 +1,4 @@
-import type { Resource } from '~/models/resource/types';
+import { Resource, ValueType } from '~/models/resource/types';
 import ResourceValueLabel from '~/components/common/resource-value-label';
 import InlineFavouriteButton from '~/components/resource/inline-favourite-button';
 import composeCoverUrl from '~/utilities/cover-url';
@@ -29,7 +29,11 @@ export default function GenericRow({
 			<div className="col-span-10">
 				<ResourceValueLabel
 					resource={resource}
-					valueRef={{ value: resource.title }}
+					valueRef={{
+						value: resource.title,
+						type: ValueType.RESOURCE,
+						ref: resource.id,
+					}}
 					forceRef={resource.id}
 				/>
 			</div>

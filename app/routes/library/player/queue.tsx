@@ -1,10 +1,11 @@
 import { usePlayer } from '~/components/player/use-player';
-import Header from '~/components/views/header';
 import GenericListView from '~/components/views/generic-list-view';
-import BaseRow from '~/components/views/list-view/rows/base-row';
 import invariant from 'tiny-invariant';
 import composePageTitle from '~/utilities/page-title';
 import { MetaFunction } from 'remix';
+import CompactView from '~/components/views/compact-view/compact-view';
+import { useRef } from 'react';
+import BaseRow from '~/components/views/rows/base-row';
 
 export const meta: MetaFunction = () => {
 	return {
@@ -21,34 +22,33 @@ export default function QueueView() {
 		...(playerState?.context?.queue ?? []).map((song) => song.resource),
 	];
 
-	const estimateHeight = (index: number) => {
-		return index === 0 ? 114 : 50;
-	};
+	const ref = useRef<HTMLElement>(null);
 
 	return (
-		<GenericListView
-			size={items.length}
-			estimateHeight={estimateHeight}
-			header={
-				<Header
-					className="mx-auto max-w-7xl"
-					title="Player Queue"
-					subtitle={
-						playerState?.context
-							? `Playing ${playerState.context.resource.title}`
-							: ''
-					}
-				/>
-			}
+		<CompactView
+			parentRef={ref}
+			title={'Search results'}
+			subtitle={playerState?.queue ? `${playerState.queue.length} items` : ''}
 		>
-			{(index, row) => {
-				invariant(row, 'Only JS-enabled supported for now');
+			<GenericListView
+				size={items.length}
+				estimateHeight={() => 50}
+				parentRef={ref}
+			>
+				{(index, row) => {
+					invariant(row, 'Only JS-enabled supported for now');
 
-				const item = items[index];
+					const resource = items[index];
 
-				if (typeof item === 'string') {
+					if (typeof resource === 'string') {
+						return <div className="separator" />;
+					}
+
 					return (
-						<div
+						<BaseRow
+							key={`${resource.id}-${index}`}
+							measureRef={row.measureRef}
+							resource={resource}
 							style={
 								row
 									? {
@@ -56,37 +56,14 @@ export default function QueueView() {
 											top: 0,
 											left: 0,
 											width: '100%',
-											height: `${row.size}px`,
 											transform: `translateY(${row.start}px)`,
 									  }
 									: { position: 'relative' }
 							}
-							className="flex items-center justify-center"
-						>
-							<hr className="w-full border-4 border-gray-700" />
-						</div>
+						/>
 					);
-				}
-
-				return (
-					<BaseRow
-						key={`${item.id}-${index}`}
-						resource={item}
-						style={
-							row
-								? {
-										position: 'absolute',
-										top: 0,
-										left: 0,
-										width: '100%',
-										height: `${row.size}px`,
-										transform: `translateY(${row.start}px)`,
-								  }
-								: { position: 'relative' }
-						}
-					/>
-				);
-			}}
-		</GenericListView>
+				}}
+			</GenericListView>
+		</CompactView>
 	);
 }

@@ -2,13 +2,9 @@ import { GroupType, ResourceType, Song } from '~/models/resource/types';
 import CollectionDetailsView, {
 	CollectionDetailsProps,
 } from '~/adapters/collection/details-view';
-import PlayButton from '~/components/resource/play-button';
 import findPreferredRemote from '~/utilities/preferred-remote';
 import { PlayableTrack, PlayerContext, Queue } from '~/components/player/types';
-import InlineQueueButton from '~/components/resource/inline-queue-button';
 import InlinePlayButton from '~/components/resource/inline-play-button';
-import { graphqlContext } from 'msw';
-import InlineFavouriteButton from '~/components/resource/inline-favourite-button';
 
 type PlaylistDetailsProps = CollectionDetailsProps<Song, ResourceType.PLAYLIST>;
 

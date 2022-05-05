@@ -4,18 +4,18 @@ import type {
 	FileReference,
 } from '@prisma/client';
 import type { Except } from 'type-fest';
-import type {
+import {
 	Resource,
 	ResourceType,
 	ResourceWithoutDefaults,
-	SerializedValues,
 	SourceType,
-	ValueRef,
+	ValueType,
 } from '~/models/resource/types';
 
 import invariant from 'tiny-invariant';
 import { prisma as db } from '~/db.server';
-import { dataObjectToResource, serializeValues } from './adapters.server';
+import { dataObjectToResource } from './adapters.server';
+import { serializeValue } from './serialize.server';
 
 //
 // READ
@@ -559,17 +559,15 @@ export async function upsertResource(resource: Resource): Promise<Resource> {
  * @param resource
  */
 export async function upsertValues(resource: Resource) {
-	const serializedValues = serializeValues(resource);
-
-	for (const key of Object.keys(serializedValues)) {
-		const valueRefOrArray = resource.values[
-			key as keyof typeof serializedValues
-		] as ValueRef<string> | ValueRef<string>[] | null;
-
+	for (const [key, valueRefOrArray] of Object.entries(resource.values)) {
 		// TODO: If valueRefOrArray is null, we want to delete the value if it exists
 		if (!valueRefOrArray) continue;
 
 		if (Array.isArray(valueRefOrArray)) {
+			const serializedValue = valueRefOrArray
+				.map((valueRef) => serializeValue(valueRef))
+				.join(', ');
+
 			await db.dataObjectValue.upsert({
 				where: {
 					dataObjectId_key: {
@@ -580,7 +578,8 @@ export async function upsertValues(resource: Resource) {
 				update: {
 					isArray: true,
 					valueDataObjectId: null,
-					value: valueRefOrArray.map((valueRef) => valueRef.value).join(', '),
+					type: ValueType.RESOURCE_LIST,
+					value: serializedValue,
 					items: {
 						deleteMany: {},
 					},
@@ -588,14 +587,17 @@ export async function upsertValues(resource: Resource) {
 				create: {
 					dataObjectId: resource.id,
 					key,
-					value: valueRefOrArray.map((valueRef) => valueRef.value).join(', '),
+					type: ValueType.RESOURCE_LIST,
+					value: serializedValue,
 					isArray: true,
 				},
 			});
 
 			await db.$transaction(
-				valueRefOrArray.map((valueRef, index) =>
-					db.valueArrayItem.upsert({
+				valueRefOrArray.map((valueRef, index) => {
+					const serializedValue = serializeValue(valueRef);
+
+					return db.valueArrayItem.upsert({
 						where: {
 							parentDataObjectId_parentKey_position: {
 								parentDataObjectId: resource.id,
@@ -606,7 +608,7 @@ export async function upsertValues(resource: Resource) {
 						update: {
 							position: index,
 
-							value: valueRef.value,
+							value: serializedValue,
 							valueDataObjectId: valueRef.ref,
 						},
 						create: {
@@ -614,13 +616,15 @@ export async function upsertValues(resource: Resource) {
 							parentKey: key,
 							position: index,
 
-							value: valueRef.value,
+							value: serializedValue,
 							valueDataObjectId: valueRef.ref,
 						},
-					})
-				)
+					});
+				})
 			);
 		} else {
+			const serializedValue = serializeValue(valueRefOrArray);
+
 			await db.dataObjectValue.upsert({
 				where: {
 					dataObjectId_key: {
@@ -629,9 +633,10 @@ export async function upsertValues(resource: Resource) {
 					},
 				},
 				update: {
-					value: valueRefOrArray.value,
+					value: serializedValue,
 					valueDataObjectId: valueRefOrArray.ref,
 					isArray: false,
+					type: valueRefOrArray.type,
 					items: {
 						deleteMany: {
 							parentDataObjectId: resource.id,
@@ -643,7 +648,8 @@ export async function upsertValues(resource: Resource) {
 					dataObjectId: resource.id,
 					key,
 					isArray: false,
-					value: valueRefOrArray.value,
+					type: valueRefOrArray.type,
+					value: serializedValue,
 					valueDataObjectId: valueRefOrArray.ref,
 				},
 			});

@@ -1,13 +1,12 @@
 import { renderToString } from 'react-dom/server';
-import { RemixServer } from 'remix';
-import type { EntryContext } from 'remix';
+import { RemixServer, RemixServerProps } from 'remix';
 import { injectStylesIntoStaticMarkup } from '~/styles/inject-styles';
 
 export default function handleRequest(
 	request: Request,
 	responseStatusCode: number,
 	responseHeaders: Headers,
-	remixContext: EntryContext
+	remixContext: RemixServerProps['context']
 ) {
 	const markup = renderToString(
 		<RemixServer context={remixContext} url={request.url} />

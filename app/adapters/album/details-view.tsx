@@ -2,10 +2,10 @@ import type { Album, ResourceDetailsProps } from '~/models/resource/types';
 import type { AlbumDetails } from './adapter.server';
 
 import invariant from 'tiny-invariant';
-import BaseRow from '~/components/views/list-view/rows/base-row';
 import GenericListView from '~/components/views/generic-list-view';
 import CompactResourceView from '~/components/views/compact-view/compact-resource-header';
 import { useRef } from 'react';
+import BaseRow from '~/components/views/rows/base-row';
 
 type AlbumDetailsProps = ResourceDetailsProps<Album, AlbumDetails>;
 

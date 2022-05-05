@@ -1,4 +1,4 @@
-import type { Resource } from '~/models/resource/types';
+import { Resource, ResourceType } from '~/models/resource/types';
 import type { ContextLoaderFunction } from '~/models/context';
 
 import { useLoaderData, json, MetaFunction } from 'remix';
@@ -8,9 +8,11 @@ import { requireUserId } from '~/session.server';
 import { searchResources } from '~/models/resource/resource.server';
 import { findOptionalPageQuery } from '~/utilities/paginate';
 
-import ListView from '~/components/views/list-view';
 import composePageTitle from '~/utilities/page-title';
-import Header from '~/components/views/header';
+import CompactView from '~/components/views/compact-view/compact-view';
+import { useRef } from 'react';
+import GenericListView from '~/components/views/generic-list-view';
+import BaseRow from '~/components/views/rows/base-row';
 
 type LoaderData = {
 	resources: Resource[];
@@ -45,20 +47,55 @@ export const meta: MetaFunction = ({ data }) => {
 };
 
 export default function SearchPage() {
-	const { resources, page, searchString } = useLoaderData<LoaderData>();
+	const ref = useRef<HTMLElement>(null);
+	const { resources, searchString } = useLoaderData<LoaderData>();
 
 	return (
-		<ListView
-			items={resources}
-			page={page}
-			header={
-				<Header
-					title="Search results"
-					subtitle={searchString}
-					className="mx-auto max-w-7xl"
-				/>
-			}
-			headerHeight={365}
-		/>
+		<CompactView
+			parentRef={ref}
+			title={'Search results'}
+			subtitle={searchString ? `${resources.length} items found` : ''}
+		>
+			<GenericListView
+				size={resources.length}
+				estimateHeight={() => 50}
+				parentRef={ref}
+			>
+				{(index, row) => {
+					invariant(row, 'Only JS-enabled supported for now');
+
+					const resource = resources[index];
+
+					const isMasonry = false && resource.type === ResourceType.ALBUM;
+
+					return (
+						<BaseRow
+							key={`${resource.id}-${index}`}
+							measureRef={row.measureRef}
+							resource={resource}
+							style={
+								row
+									? {
+											...(isMasonry
+												? {
+														width: '20%',
+														// height: `${row.size}px`,
+														transform: `translateY(${row.start % 5}px)`,
+												  }
+												: {
+														position: 'absolute',
+														top: 0,
+														left: 0,
+														width: '100%',
+														transform: `translateY(${row.start}px)`,
+												  }),
+									  }
+									: { position: 'relative' }
+							}
+						/>
+					);
+				}}
+			</GenericListView>
+		</CompactView>
 	);
 }

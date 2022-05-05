@@ -47,7 +47,15 @@ export default function InlinePlayButton(props: InlinePlayButtonProps) {
 	);
 
 	return (
-		<InlineButton {...props} resource={undefined} onClick={playSong}>
+		<InlineButton
+			{...{
+				...props,
+				resource: undefined,
+				sourceType: undefined,
+				uri: undefined,
+			}}
+			onClick={playSong}
+		>
 			{wasClicked ? (
 				<Loader className="w-6" color={'gray'} />
 			) : (

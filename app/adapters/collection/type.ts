@@ -1,17 +1,15 @@
 import type {
 	Resource,
-	RawValue,
-	ForceResourceType,
 	ResourceType,
 	ValueRef,
-	SourceType,
+	ValueType,
 } from '~/models/resource/types';
 
 export type CollectionData<TResource extends Resource> = {
-	name: RawValue<string>;
-	description: RawValue<string> | null;
-	source: RawValue<SourceType> | null;
-	items: (RawValue<string> | ValueRef<string, TResource>)[];
+	name: ValueRef<ValueType.TEXT>;
+	description: ValueRef<ValueType.TEXT> | null;
+	source: ValueRef<ValueType.SOURCE_TYPE> | null;
+	items: ValueRef<ValueType.RESOURCE>[];
 
 	// release_date: '1976-10-14';
 	// release_date_precision: 'day';

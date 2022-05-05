@@ -21,7 +21,7 @@ export * from '~/adapters/playlist/type';
  */
 export type Resource<
 	TResourceType extends ResourceType = ResourceType,
-	TValues = {}
+	TValues extends ResourceValues = ResourceValues
 > = {
 	id: string;
 	title: string; // always available string, most basic representation of item
@@ -48,26 +48,6 @@ export type ResourceWithSerializedValues<
 > = Except<ResourceWithoutDefaults<TResource>, 'values'> & {
 	values: SerializedValues<TResource['values']>;
 };
-
-/**
- * Complicated type that casts all ValueRef generics to string for a given resource
- */
-export type SerializedValues<TResourceValues extends Resource['values']> = {
-	[key in keyof TResourceValues]: IsArray<TResourceValues[key]> extends false
-		? null extends TResourceValues[key]
-			? IsValueRef<TResourceValues, key> | null
-			: IsValueRef<TResourceValues, key>
-		: ValueRef<string>[];
-};
-
-type IsValueRef<
-	TResourceValues extends Resource['values'],
-	key extends keyof TResourceValues
-> = keyof TResourceValues[key] extends 'ref'
-	? ValueRef<string>
-	: RawValue<string>;
-
-type IsArray<A> = A extends Array<infer T> ? T : false;
 
 /**
  * ResourceType expresses what kind of resource it is.
@@ -231,8 +211,20 @@ export function sourceTypeToName(type: SourceType): string {
  *
  * It is a map of key to corresponding ValueRef.
  */
-export type ResourceValues = {
-	[key: string]: ValueRef<any>[] | ValueRef<any> | null;
+export type ResourceValues<EValueType extends ValueType = ValueType> = {
+	[key: string]: ValueRef<EValueType> | ValueRef<EValueType>[] | null;
+};
+
+/**
+ * Complicated type that casts all ValueRef generics to string for a given resource
+ */
+export type SerializedValues<
+	TResourceValues extends ResourceValues = ResourceValues
+> = {
+	[key in keyof TResourceValues]:
+		| SerializedValueRef
+		| SerializedValueRef[]
+		| null;
 };
 
 export type ResourceRemotes = { [key in SourceType]?: string };
@@ -245,20 +237,87 @@ export type ResourceRemotes = { [key in SourceType]?: string };
  *
  * Used for: A song's artist / an album's artist.
  */
-export type ValueRef<ValueType, TResource extends Resource = Resource> = {
-	ref?: TResource['id'];
-	value: ValueType;
+export type ValueRef<EValueType extends ValueType = ValueType> = {
+	value: ValueTypeRawValue<EValueType>;
+	type: EValueType;
+	ref: ValueRefType<EValueType> | null;
 };
 
-/**
- * RawValues are the most basic form of ValueRef, in that they do not link to another DataObject,
- * and only contain a value.
- *
- * Used for: A song's name / an bookmarks's url.
- */
-export type RawValue<ValueType = string> = {
-	value: ValueType;
+// /**
+//  * RawValues are the most basic form of ValueRef, in that they do not link to another DataObject,
+//  * and only contain a value.
+//  *
+//  * Used for: A song's name / an bookmarks's url.
+//  */
+// export type RawValue<EValueType extends ValueType = ValueType.TEXT> = {
+// 	value: ValueTypeRawValue<EValueType>;
+// 	type: EValueType;
+// };
+
+export type SerializedValueRef = {
+	value: string;
+	type: ValueType;
+	ref?: Resource['id'];
 };
+
+export enum ValueType {
+	TEXT = 'text',
+	NUMBER = 'number',
+
+	DATE = 'date',
+	URL = 'url',
+	SOURCE_TYPE = 'source-type',
+
+	RESOURCE = 'resource',
+	RESOURCE_LIST = 'resource-list',
+}
+
+export const VALUE_TYPES: { [key in ValueType]: ValueType } = {
+	text: ValueType.TEXT,
+	number: ValueType.NUMBER,
+	date: ValueType.DATE,
+	url: ValueType.URL,
+	'source-type': ValueType.SOURCE_TYPE,
+	resource: ValueType.RESOURCE,
+	'resource-list': ValueType.RESOURCE_LIST,
+};
+
+export type ValueTypeRawValue<EValueType extends ValueType> =
+	EValueType extends ValueType.RESOURCE_LIST
+		? Resource['title']
+		: EValueType extends ValueType.RESOURCE
+		? Resource['title']
+		: EValueType extends ValueType.SOURCE_TYPE
+		? SourceType
+		: EValueType extends ValueType.URL
+		? URL
+		: EValueType extends ValueType.DATE
+		? Date
+		: EValueType extends ValueType.NUMBER
+		? number
+		: string;
+
+export type ValueRefType<EValueType extends ValueType> =
+	EValueType extends ValueType.RESOURCE_LIST
+		? Resource['id']
+		: EValueType extends ValueType.RESOURCE
+		? Resource['id']
+		: undefined;
+
+/**
+ * Convert a string to a SourceType.
+ *
+ * @param type The type to convert
+ */
+export function stringToValueType(type: string): ValueType {
+	const valueType = VALUE_TYPES[type as ValueType];
+
+	if (!valueType) {
+		throw new Error(`Unknown value type: ${type}`);
+	}
+
+	return valueType;
+}
 
 /**
  * Representing a FileReference.

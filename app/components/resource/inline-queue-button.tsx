@@ -52,7 +52,15 @@ export default function InlineQueueButton(props: InlineQueueButtonProps) {
 	);
 
 	return (
-		<InlineButton {...props} resource={undefined} onClick={playSong}>
+		<InlineButton
+			{...{
+				...props,
+				resource: undefined,
+				sourceType: undefined,
+				uri: undefined,
+			}}
+			onClick={playSong}
+		>
 			{wasClicked ? (
 				<CheckIcon className="w-6" />
 			) : (

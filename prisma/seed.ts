@@ -1,11 +1,5 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
-import { addResourceToList } from '~/models/item.server';
-import { upsertList } from '~/models/list.server';
-import { upsertResources } from '~/models/resource/resource.server';
-import { generateLibrary } from './fake-data';
-import fs from 'fs/promises';
-import { saveFile } from '~/models/file.server';
 
 const db = new PrismaClient();
 
@@ -112,7 +106,7 @@ const db = new PrismaClient();
 const seed = async () => {
 	const hashedPassword = await bcrypt.hash('123456789', 10);
 
-	const user = await db.user.upsert({
+	await db.user.upsert({
 		where: {
 			email: 'lukas@mateffy.me',
 		},
