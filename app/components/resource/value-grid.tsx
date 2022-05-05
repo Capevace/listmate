@@ -1,6 +1,7 @@
 import type { Resource, ValueRef } from '~/models/resource/types';
 import capitalize from '~/utilities/capitalize';
 import ResourceValueLabel from '~/components/common/resource-value-label';
+import BaseValue from './values/base-value';
 
 export default function ValueGrid({ values }: { values: Resource['values'] }) {
 	const valueList = Object.entries(values) as [[string, ValueRef | null]];
@@ -13,7 +14,7 @@ export default function ValueGrid({ values }: { values: Resource['values'] }) {
 						{capitalize(key)}
 					</dt>
 					<dd className="mt-1 text-lg  sm:col-span-2 sm:mt-0">
-						<ResourceValueLabel valueRef={value} />
+						{value ? <BaseValue valueRef={value} /> : '-'}
 					</dd>
 				</div>
 			))}

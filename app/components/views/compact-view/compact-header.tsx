@@ -50,13 +50,13 @@ export default function CompactHeader({
 				)}
 
 				<section className="flex flex-1 flex-col gap-1 font-medium">
-					<h1 className="inline-flex flex-col items-start justify-start xl:flex-row  xl:items-center xl:items-baseline xl:gap-3">
+					<h1 className="flex flex-col items-start justify-start ">
 						<div className="clamp-2 flex flex-col text-lg md:flex-row md:text-xl lg:text-2xl">
 							{title}
 						</div>
 						{/* <div className="opacity-30">~</div> */}
 						{subtitle && (
-							<div className="hidden truncate text-xs text-gray-500 opacity-90 dark:text-gray-500 sm:text-sm md:block md:text-base lg:text-lg">
+							<div className="hidden max-w-md flex-grow-0 truncate text-xs text-gray-500 opacity-90 dark:text-gray-500 sm:text-sm md:block md:text-base lg:text-lg">
 								{subtitle}
 							</div>
 						)}

@@ -15,7 +15,7 @@ import {
 import invariant from 'tiny-invariant';
 import { prisma as db } from '~/db.server';
 import { dataObjectToResource } from './adapters.server';
-import { serializeValue } from './serialize.server';
+import { serialize } from './serialize';
 
 //
 // READ
@@ -565,7 +565,7 @@ export async function upsertValues(resource: Resource) {
 
 		if (Array.isArray(valueRefOrArray)) {
 			const serializedValue = valueRefOrArray
-				.map((valueRef) => serializeValue(valueRef))
+				.map((valueRef) => serialize(valueRef.value, valueRef.type))
 				.join(', ');
 
 			await db.dataObjectValue.upsert({
@@ -595,7 +595,7 @@ export async function upsertValues(resource: Resource) {
 
 			await db.$transaction(
 				valueRefOrArray.map((valueRef, index) => {
-					const serializedValue = serializeValue(valueRef);
+					const serializedValue = serialize(valueRef.value, valueRef.type);
 
 					return db.valueArrayItem.upsert({
 						where: {
@@ -623,7 +623,10 @@ export async function upsertValues(resource: Resource) {
 				})
 			);
 		} else {
-			const serializedValue = serializeValue(valueRefOrArray);
+			const serializedValue = serialize(
+				valueRefOrArray.value,
+				valueRefOrArray.type
+			);
 
 			await db.dataObjectValue.upsert({
 				where: {

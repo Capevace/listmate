@@ -260,6 +260,13 @@ export type SerializedValueRef = {
 	ref?: Resource['id'];
 };
 
+export type SerializedResource<TResource extends Resource> = Except<
+	TResource,
+	'values'
+> & {
+	values: SerializedValues<TResource['values']>;
+};
+
 export enum ValueType {
 	TEXT = 'text',
 	NUMBER = 'number',

@@ -1,4 +1,9 @@
-import type { Resource, ResourceDetails } from '~/models/resource/types';
+import type {
+	Resource,
+	ResourceDetails,
+	SerializedResource,
+	SerializedValues,
+} from '~/models/resource/types';
 import { ActionFunction, Outlet, MetaFunction } from 'remix';
 
 import { json, useLoaderData, redirect } from 'remix';
@@ -12,9 +17,14 @@ import { getResourceDetails } from '~/models/resource/adapters.server';
 import composePageTitle from '~/utilities/page-title';
 import httpFindResourceType from '~/utilities/http/find-resource-type';
 import type { ContextLoaderFunction } from '~/models/context';
+import { Except } from 'type-fest';
+import {
+	deserializeResource,
+	serializeResource,
+} from '~/models/resource/serialize';
 
 type LoaderData = {
-	resource: Resource;
+	resource: SerializedResource<Resource>;
 	details: ResourceDetails;
 };
 
@@ -38,7 +48,7 @@ export const loader = async ({
 
 	const details = await getResourceDetails(resource);
 
-	return json<LoaderData>({ resource, details });
+	return json<LoaderData>({ resource: serializeResource(resource), details });
 };
 
 export const action: ActionFunction = async ({
@@ -73,9 +83,11 @@ export const meta: MetaFunction = ({ data }) => {
 export default function ResourceDetailsPage() {
 	const data = useLoaderData() as LoaderData;
 
+	const resource = deserializeResource(data.resource);
+
 	return (
 		<>
-			<ResourceView resource={data.resource} details={data.details} />
+			<ResourceView resource={resource} details={data.details} />
 			<Outlet />
 		</>
 	);

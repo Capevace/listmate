@@ -35,7 +35,7 @@ import { Artist } from '~/adapters/artist/type';
 import { getVideoDetails } from '~/adapters/video/adapter.server';
 import { Video } from '~/adapters/video/type';
 import { Channel } from '~/adapters/channel/type';
-import { deserializeValue } from './serialize.server';
+import { deserializeValue } from './serialize';
 import { getChannelDetails } from '~/adapters/channel/adapter.server';
 
 export type CompleteDataObjectValue = DataObjectValue & {
@@ -73,7 +73,11 @@ export function dataObjectToResource<TResource extends Resource>(
 				return [
 					value.key,
 					value.items.map((childValue) =>
-						deserializeValue({ ...value, ...childValue })
+						deserializeValue({
+							...value,
+							type: ValueType.RESOURCE,
+							...childValue,
+						})
 					),
 				] as [string, ValueRef[]];
 			} else {
@@ -286,12 +290,9 @@ export function composeRefFromResource(
 export function composeRefFromResourceArray(
 	resources: Resource[]
 ): ValueRef<ValueType.RESOURCE>[] {
-	return resources.map(
-		(resource) =>
-			({
-				ref: resource.id,
-				value: resource.title,
-				type: ValueType.RESOURCE,
-			})
-	);
+	return resources.map((resource) => ({
+		ref: resource.id,
+		value: resource.title,
+		type: ValueType.RESOURCE,
+	}));
 }
