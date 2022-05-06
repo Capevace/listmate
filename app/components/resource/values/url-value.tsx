@@ -6,5 +6,14 @@ export type URLValueProps = {
 };
 
 export default function URLValue({ valueRef }: URLValueProps) {
-	return <ValueLink valueRef={valueRef}>{valueRef.value.toString()}</ValueLink>;
+	return (
+		<a
+			href={valueRef.value.toString()}
+			target="_blank"
+			className="truncate hover:opacity-80"
+			rel="noreferrer"
+		>
+			{valueRef.value.toString()}
+		</a>
+	);
 }

@@ -7,20 +7,23 @@ import ValueGrid from '~/components/resource/value-grid';
 import ResourceDebugger from '~/components/resource/resource-debugger';
 
 import { useRef } from 'react';
+import BaseValue from '~/components/resource/values/base-value';
+import { Except } from 'type-fest';
+import filterValues from '~/utilities/filter-values';
 
 type VideoDetailsProps = ResourceDetailsProps<Video, VideoDetails>;
 
 function YouTubeIFrame({ id }: { id: string }) {
 	return (
 		<iframe
-			width="560"
-			height="315"
+			// width="560"
+			// height="315"
 			src={`https://www.youtube.com/embed/${id}`}
 			title="YouTube video player"
 			frameBorder="0"
 			allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
 			allowFullScreen
-			className="mb-10 rounded"
+			className="mx-auto my-5 aspect-video w-full max-w-6xl rounded-md lg:my-10"
 			loading="lazy"
 		></iframe>
 	);
@@ -34,16 +37,50 @@ export default function VideoDetailsView({
 
 	const youtubeRemoteUri = resource.remotes[SourceType.YOUTUBE];
 
+	// Remove all properties that have a custom view
+	let filteredValues = filterValues<
+		'description' | 'channel' | 'title' | 'publishedAt',
+		typeof resource
+	>(resource.values, ['description', 'channel', 'title', 'publishedAt']);
+
 	return (
 		<CompactResourceView parentRef={ref} resource={resource} showCover>
 			<>
-				<section className="flex gap-5">
-					{youtubeRemoteUri && <YouTubeIFrame id={youtubeRemoteUri} />}
-					<p className="flex-1 text-sm font-medium text-gray-400">
-						{resource.values.description?.value}
-					</p>
-				</section>
-				<ValueGrid values={resource.values} />
+				{youtubeRemoteUri ? <YouTubeIFrame id={youtubeRemoteUri} /> : undefined}
+
+				<h3 className="mb-1 text-sm font-medium text-gray-400">Description</h3>
+				<p className="mb-10 font-medium leading-relaxed">
+					{resource.values.description ? (
+						<BaseValue valueRef={resource.values.description} />
+					) : (
+						'-'
+					)}
+				</p>
+				<div className="grid grid-cols-1 md:grid-cols-2">
+					<section className="col-span-1">
+						<h3 className="mb-1 text-sm font-medium text-gray-400">Channel</h3>
+						<p className="mb-10 font-medium leading-relaxed">
+							{resource.values.channel ? (
+								<BaseValue valueRef={resource.values.channel} />
+							) : (
+								'-'
+							)}
+						</p>
+					</section>
+					<section className="col-span-1">
+						<h3 className="mb-1 text-sm font-medium text-gray-400">
+							Publishing date
+						</h3>
+						<p className="mb-10 font-medium leading-relaxed">
+							{resource.values.publishedAt ? (
+								<BaseValue valueRef={resource.values.publishedAt} />
+							) : (
+								'-'
+							)}
+						</p>
+					</section>
+				</div>
+				<ValueGrid values={filteredValues} />
 				<ResourceDebugger
 					resource={resource}
 					details={details}

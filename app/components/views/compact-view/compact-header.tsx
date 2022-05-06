@@ -26,7 +26,7 @@ export default function CompactHeader({
 	return (
 		<header
 			className={`${className} flex w-full flex-col gap-5 ${
-				disableTopPadding ? 'md:pt-6' : 'pt-4 lg:pt-20'
+				disableTopPadding ? 'md:pt-4' : 'pt-4 lg:pt-20'
 			}`}
 		>
 			{coverUrl && (

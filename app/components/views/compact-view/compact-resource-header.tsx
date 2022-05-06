@@ -19,6 +19,7 @@ export type CompactResourceViewProps = {
 	actions?: JSX.Element;
 	showCover?: boolean;
 	parentRef?: React.RefObject<HTMLElement>;
+	top?: JSX.Element;
 	children?: JSX.Element;
 };
 
@@ -27,6 +28,7 @@ export default function CompactResourceView({
 	actions,
 	parentRef,
 	showCover,
+	top,
 	children,
 }: CompactResourceViewProps) {
 	const values = resource.values;
@@ -39,6 +41,7 @@ export default function CompactResourceView({
 			parentRef={parentRef}
 			title={resource.title}
 			subtitle={description}
+			top={top}
 			headerDetails={
 				<>
 					<span className="text-xs font-bold uppercase opacity-60">
