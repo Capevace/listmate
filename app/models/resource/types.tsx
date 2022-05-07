@@ -181,7 +181,9 @@ export function stringToSourceType(type: string): SourceType {
 /**
  * Convert a string to a SourceType, returning null if the string is invalid instead of throwing an error.
  */
-export function stringToSourceTypeOptional(type?: string): SourceType | null {
+export function stringToSourceTypeOptional(
+	type?: string | null
+): SourceType | null {
 	try {
 		return type ? stringToSourceType(type) : null;
 	} catch {
