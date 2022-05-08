@@ -36,7 +36,7 @@ export const RESOURCE_GROUP_MAP: { [key in ResourceType]: GroupType } = {
 	[ResourceType.ALBUM]: GroupType.MUSIC,
 	[ResourceType.ARTIST]: GroupType.MUSIC,
 	[ResourceType.PLAYLIST]: GroupType.MUSIC,
-	[ResourceType.BOOKMARK]: GroupType.BOOKMARKS,
+	[ResourceType.WEBPAGE]: GroupType.BOOKMARKS,
 	[ResourceType.VIDEO]: GroupType.VIDEOS,
 	[ResourceType.CHANNEL]: GroupType.VIDEOS,
 };
@@ -59,7 +59,7 @@ export const GROUP_TYPE_ITEMS: { [key in GroupType]: GroupTypeItem[] } = {
 	[GroupType.BOOKMARKS]: [
 		{
 			label: 'Bookmarks',
-			type: ResourceType.BOOKMARK,
+			type: ResourceType.WEBPAGE,
 		},
 	],
 	[GroupType.VIDEOS]: [

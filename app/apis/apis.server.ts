@@ -199,7 +199,7 @@ export async function searchForResource(
 
 	let results: {
 		[key in Unarray<typeof parameters.resourceTypes>]?: Promise<
-			GeneralSearchResults<Unarray<typeof parameters.resourceTypes>>
+			GeneralSearchResults<Unarray<typeof parameters.resourceTypes>> | null
 		>;
 	} = {};
 
@@ -226,17 +226,21 @@ export async function searchForResource(
 				switch (sourceType) {
 					case SourceType.SPOTIFY:
 						results[resourceType] = (async () => {
-							const searchResults = await spotifyApi.searchForResourceWithType({
-								...parameters,
-								sourceType,
-								resourceType,
-							} as ResourceSearchParameters<spotifyApi.API>);
+							try {
+								const searchResults = await spotifyApi.searchForResourceWithType({
+									...parameters,
+									sourceType,
+									resourceType,
+								} as ResourceSearchParameters<spotifyApi.API>);
 
-							return {
-								resourceType,
-								sourceType,
-								searchResults,
-							};
+								return {
+									resourceType,
+									sourceType,
+									searchResults,
+								};
+							} catch (e) {
+								return null;
+							}
 						})();
 
 					// case SourceType.YOUTUBE:
@@ -248,7 +252,11 @@ export async function searchForResource(
 		}
 	}
 
-	return await Promise.all(Object.values(results));
+	const unfilteredResults = await Promise.all(Object.values(results));
+
+	console.log(unfilteredResults.filter(result => result !== null) as GeneralSearchResults<Unarray<typeof parameters.resourceTypes>>[])
+
+	return unfilteredResults.filter(result => result !== null) as GeneralSearchResults<Unarray<typeof parameters.resourceTypes>>[];
 }
 
 export type ResourceSearchParameters<TImportAPI extends ImportAPI = ImportAPI> =

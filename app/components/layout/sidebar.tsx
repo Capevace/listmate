@@ -57,7 +57,7 @@ const LIBRARY_ICONS: { [key in ResourceType]?: React.ReactNode } = {
 	[ResourceType.SONG]: <MusicNoteIcon />,
 	[ResourceType.ALBUM]: <CollectionIcon />,
 	[ResourceType.ARTIST]: <UsersIcon />,
-	[ResourceType.BOOKMARK]: <BookmarkIcon />,
+	[ResourceType.WEBPAGE]: <BookmarkIcon />,
 	[ResourceType.VIDEO]: <VideoCameraIcon />,
 };
 

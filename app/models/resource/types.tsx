@@ -12,6 +12,8 @@ export * from '~/adapters/album/type';
 export * from '~/adapters/artist/type';
 export * from '~/adapters/song/type';
 export * from '~/adapters/playlist/type';
+export * from '~/adapters/webpage/type';
+export * from '~/adapters/rss-feed/type';
 
 /**
  * Resource's are used as an abstraction for data objects.
@@ -57,7 +59,7 @@ export type ResourceWithSerializedValues<
 export enum ResourceType {
 	COLLECTION = 'collection',
 
-	BOOKMARK = 'bookmark',
+	WEBPAGE = 'webpage',
 
 	// Music (Spotify etc)
 	PLAYLIST = 'playlist',
@@ -68,6 +70,8 @@ export enum ResourceType {
 	// Video (YouTube etc.)
 	VIDEO = 'video',
 	CHANNEL = 'channel',
+
+	RSS_FEED = 'rss_feed',
 }
 
 /**
@@ -76,7 +80,7 @@ export enum ResourceType {
 export const ALL_RESOURCE_TYPES: ResourceType[] = [
 	ResourceType.COLLECTION,
 
-	ResourceType.BOOKMARK,
+	ResourceType.WEBPAGE,
 
 	ResourceType.PLAYLIST,
 	ResourceType.SONG,
@@ -85,6 +89,8 @@ export const ALL_RESOURCE_TYPES: ResourceType[] = [
 
 	ResourceType.VIDEO,
 	ResourceType.CHANNEL,
+
+	ResourceType.RSS_FEED,
 ];
 
 /**
@@ -97,8 +103,8 @@ export function stringToResourceType(type: string): ResourceType {
 		case 'collection':
 			return ResourceType.COLLECTION;
 
-		case 'bookmark':
-			return ResourceType.BOOKMARK;
+		case 'webpage':
+			return ResourceType.WEBPAGE;
 
 		case 'playlist':
 			return ResourceType.PLAYLIST;
@@ -113,6 +119,9 @@ export function stringToResourceType(type: string): ResourceType {
 			return ResourceType.VIDEO;
 		case 'channel':
 			return ResourceType.CHANNEL;
+
+		case ResourceType.RSS_FEED:
+			return ResourceType.RSS_FEED;
 
 		default:
 			throw new Error(`Unknown resource type: ${type}`);

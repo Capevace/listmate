@@ -121,7 +121,7 @@ export function detectSourceType(uri: string): ValidatedSourceURI | null {
 		const uriType = paths[0];
 		const id = paths[1].split('?')[0];
 
-		const resourceType = stringToResourceTypeOptional(uriType);
+		const resourceType = stringToResourceTypeOptional(uriType.replace('track', 'song'));
 
 		if (resourceType) {
 			return {
