@@ -29,7 +29,7 @@ import { ContextLoaderFunction } from './models/context';
 
 export const meta: MetaFunction = () => ({
 	charset: 'utf-8',
-	title: 'Listmates',
+	title: 'Listmate',
 	viewport: 'width=device-width,initial-scale=1',
 });
 
