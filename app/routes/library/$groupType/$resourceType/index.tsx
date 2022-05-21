@@ -1,11 +1,11 @@
+import { Resource, ResourceType, GroupType } from '~/models/resource/types';
 import type { LoaderFunction, MetaFunction } from 'remix';
-import { Resource, ResourceType } from '~/models/resource/types';
 
-import { json, useLoaderData } from 'remix';
+import { json, useCatch, useLoaderData } from 'remix';
 import invariant from 'tiny-invariant';
 
 import { requireUserId } from '~/session.server';
-import { findResourcesByType } from '~/models/resource/resource.server';
+import { findResourcesByType, paginateResources, FilterOperator, PaginatedResources } from '~/models/resource/resource.server';
 import { stringToGroupTypeOptional } from '~/models/resource/group-type';
 import { stringToResourceTypeOptional } from '~/models/resource/types';
 import { findOptionalPageQuery } from '~/utilities/paginate';
@@ -17,12 +17,12 @@ import GenericListView from '~/components/views/generic-list-view';
 import { useRef } from 'react';
 import type { ContextLoaderFunction } from '~/models/context';
 import BaseRow from '~/components/views/rows/base-row';
+import ErrorView from '~/components/views/error-view';
 
 type LoaderData = {
 	title: string;
 	subtitle?: string;
-	resources: Resource[];
-	page?: number;
+	pagination: PaginatedResources;
 };
 
 export const loader: LoaderFunction = async ({
@@ -36,26 +36,34 @@ export const loader: LoaderFunction = async ({
 	invariant(params.resourceType, 'Resource type not found');
 
 	const groupType = stringToGroupTypeOptional(params.groupType);
+	const resourceType = stringToResourceTypeOptional(params.resourceType);
 
 	if (!groupType) {
 		throw new Response('Not Found', { status: 404 });
 	}
 
-	const resourceType = stringToResourceTypeOptional(params.resourceType);
-
 	if (!resourceType) {
 		throw new Response('Not Found', { status: 404 });
 	}
 
-	const page = findOptionalPageQuery(request.url);
-
-	const resources: Resource[] = await findResourcesByType(resourceType);
+	const pagination = await paginateResources({
+		filterBy: [
+			{
+				key: 'type',
+				operator: FilterOperator.Equals,
+				needle: resourceType
+			}
+		],
+		slice: {
+			page: 1,
+			max: 20
+		}
+	});
 
 	return json<LoaderData>({
 		title: capitalize(resourceType) + 's',
 		subtitle: `All ${resourceType}s in your ${groupType} library.`,
-		resources,
-		page,
+		pagination,
 	});
 };
 
@@ -72,20 +80,20 @@ export const meta: MetaFunction = ({ data }) => {
 };
 
 export default function ListPage() {
-	const { resources, title, subtitle } = useLoaderData<LoaderData>();
+	const { pagination, title, subtitle } = useLoaderData<LoaderData>();
 	const ref = useRef<HTMLElement>(null);
 
 	return (
 		<CompactView parentRef={ref} title={title} subtitle={subtitle}>
 			<GenericListView
-				size={resources.length}
+				size={pagination.resources.length}
 				estimateHeight={(index) => 50}
 				parentRef={ref}
 			>
 				{(index, row) => {
 					invariant(row, 'Only JS-enabled supported for now');
 
-					const resource = resources[index];
+					const resource = pagination.resources[index];
 
 					const isMasonry = false && resource.type === ResourceType.ALBUM;
 
@@ -119,4 +127,17 @@ export default function ListPage() {
 			</GenericListView>
 		</CompactView>
 	);
+}
+
+export function CatchBoundary() {
+	const caught = useCatch();
+	console.log('lol')
+
+	if (caught.status === 404) {
+		return (
+			<ErrorView status={401} className="mt-20" />
+		);
+	}
+
+	throw new Error(`Unexpected caught response with status: ${caught.status}`);
 }
