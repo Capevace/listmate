@@ -252,6 +252,7 @@ export type ValueRef<EValueType extends ValueType = ValueType> = {
 	value: ValueTypeRawValue<EValueType>;
 	type: EValueType;
 	ref: ValueRefType<EValueType> | null;
+	url?: string;
 };
 
 // /**

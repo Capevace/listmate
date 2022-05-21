@@ -23,6 +23,7 @@ import { User } from '~/models/user.server';
 import invariant from 'tiny-invariant';
 import { Channel } from '~/adapters/channel/type';
 import { addSeconds } from '~/utilities/date';
+import composeSourceRedirectUrl from '~/utilities/redirect-url';
 
 export type API = ImportAPI<SourceType.YOUTUBE, YouTubeAPIType>;
 
@@ -49,7 +50,7 @@ export function createApi(): API {
 			auth: new google.auth.OAuth2(
 				process.env.YOUTUBE_CLIENT_ID,
 				process.env.YOUTUBE_CLIENT_SECRET,
-				'http://localhost:3000/connections/youtube/oauth'
+				composeSourceRedirectUrl(SourceType.YOUTUBE)
 			), //google.auth.OAuth2,
 			youtube: YouTubeAPI,
 		},
@@ -174,6 +175,7 @@ export async function searchForResourceWithType({
 					.then((items) =>
 						items.map((item) => ({
 							uri: item.id?.videoId ?? '',
+							type: ResourceType.VIDEO,
 							title: item.snippet?.title ?? 'No title returned',
 							subtitle: item.snippet?.channelTitle ?? null,
 							thumbnailUrl: item.snippet?.thumbnails?.default?.url ?? null,
@@ -198,6 +200,7 @@ export async function searchForResourceWithType({
 					.then((items) =>
 						items.map((item) => ({
 							uri: item.id?.channelId ?? '',
+							type: ResourceType.CHANNEL,
 							title: item.snippet?.title ?? 'No title returned',
 							subtitle: null,
 							thumbnailUrl: item.snippet?.thumbnails?.default?.url ?? null,

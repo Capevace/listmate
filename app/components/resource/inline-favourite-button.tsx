@@ -14,6 +14,7 @@ type FavouriteButtonProps = {
 	resource: Resource;
 	className?: string;
 };
+
 export default function InlineFavouriteButton({
 	resource,
 	className,
