@@ -13,11 +13,11 @@ export function ErrorBoundary({ error }: { error: Error }) {
 
 export function CatchBoundary() {
 	const caught = useCatch();
-	console.log('lol')
+	console.log('caugt', caught)
 
 	if (caught.status === 404) {
 		return (
-			<ErrorView status={401} className="mt-20" />
+			<ErrorView status={404} className="mt-20" />
 		);
 	}
 
