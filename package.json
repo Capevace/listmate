@@ -41,6 +41,7 @@
 		"@googleapis/youtube": "^4.2.0",
 		"@headlessui/react": "^1.6.1",
 		"@heroicons/react": "^1.0.6",
+		"@hookform/resolvers": "^2.8.10",
 		"@mantine/core": "^4.1.0",
 		"@mantine/form": "^4.1.0",
 		"@mantine/hooks": "^4.1.0",

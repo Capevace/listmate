@@ -115,7 +115,7 @@ export default function App() {
 }
 
 export function ErrorBoundary({ error }: { error: Error }) {
-	console.error(error);
+	console.error('root: ErrorBoundary', error);
 
 	return (
 		<Frame hideSidebar>

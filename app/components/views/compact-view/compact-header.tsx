@@ -1,6 +1,12 @@
+import { useFetcher } from 'remix';
+import { useRef } from 'react';
+import { MergeExclusive } from 'type-fest';
+
 export type CompactHeaderProps = {
 	title: JSX.Element | string;
+	onTitleChanged?: (title: string, event: Event) => void;
 	subtitle?: JSX.Element | string | null;
+	onSubtitleChanged?: (title: string, event: Event) => void;
 	actions?: JSX.Element;
 	details?: JSX.Element;
 	coverUrl?: string | null;
@@ -8,6 +14,7 @@ export type CompactHeaderProps = {
 	disableTopPadding?: boolean;
 	className?: string | null;
 	children?: JSX.Element;
+	editable?: boolean;
 };
 
 export default function CompactHeader({
@@ -20,7 +27,26 @@ export default function CompactHeader({
 	children,
 	disableTopPadding,
 	className,
+	editable,
+	onTitleChanged,
+	onSubtitleChanged
 }: CompactHeaderProps) {
+	const fetcher = useFetcher();
+	const timeout = useRef();
+
+	const debounceSave = (text: string, immediate: (text: string) => void) => {
+		if (timeout.current) {
+			clearTimeout(timeout.current);
+		}
+
+		immediate(text);
+
+		timeout.current = setTimeout(() => {
+			// alert('test');
+			fetcher.submit();
+		}, 400);
+	};
+
 	const displayCover = showCover && coverUrl;
 
 	return (
@@ -50,17 +76,31 @@ export default function CompactHeader({
 				)}
 
 				<section className="flex flex-1 flex-col gap-1 font-medium">
-					<h1 className="flex flex-col items-start justify-start ">
-						<div className="clamp-2 flex flex-col text-lg md:flex-row md:text-xl lg:text-2xl">
-							{title}
-						</div>
-						{/* <div className="opacity-30">~</div> */}
-						{subtitle && (
-							<div className="hidden max-w-md flex-grow-0 truncate text-xs text-gray-500 opacity-90 dark:text-gray-500 sm:text-sm md:block md:text-base lg:text-lg">
-								{subtitle}
-							</div>
-						)}
-					</h1>
+					{editable ? (
+						<fetcher.Form method="post" action="" className="flex flex-col items-start justify-start ">
+							<h1 className="clamp-2 w-full flex flex-col text-lg md:flex-row md:text-xl lg:text-2xl !overflow-visible">
+								<input value={title} onChange={e => debounceSave(e.target.value, onTitleChanged)} className="bg-transparent font-medium focus:outline outline-blue-500 rounded py-0 w-full" />
+							</h1>
+							{/* <div className="opacity-30">~</div> */}
+							{subtitle && (
+								<h2 className="w-full hidden max-w-md flex-grow-0 truncate !overflow-visible text-xs text-gray-600 opacity-90 dark:text-gray-400 sm:text-sm md:block md:text-base lg:text-lg">
+									<input value={subtitle} onChange={e => debounceSave(e.target.value, onSubtitleChanged)} className="bg-transparent font-medium focus:outline outline-blue-500 rounded py-0 w-full" />
+								</h2>
+							)}
+
+							<button type="submit" className="hidden">Submit</button>	
+						</fetcher.Form>
+					) : <section method="post" action="" className="flex flex-col items-start justify-start ">
+							<h1 className="clamp-2 w-full flex flex-col text-lg md:flex-row md:text-xl lg:text-2xl !overflow-visible">
+								{title}
+							</h1>
+							{/* <div className="opacity-30">~</div> */}
+							{subtitle && (
+								<div className="w-full hidden max-w-md flex-grow-0 truncate !overflow-visible text-xs text-gray-600 opacity-90 dark:text-gray-400 sm:text-sm md:block md:text-base lg:text-lg">
+									{subtitle}
+								</div>
+							)}
+						</section>}
 
 					<section className="flex gap-4">{children}</section>
 				</section>

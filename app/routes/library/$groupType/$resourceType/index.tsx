@@ -3,6 +3,7 @@ import type { LoaderFunction, MetaFunction } from 'remix';
 
 import { json, useCatch, useLoaderData } from 'remix';
 import invariant from 'tiny-invariant';
+import { useRef } from 'react';
 
 import { requireUserId } from '~/session.server';
 import { findResourcesByType, paginateResources, FilterOperator, PaginatedResources } from '~/models/resource/resource.server';
@@ -14,7 +15,6 @@ import capitalize from '~/utilities/capitalize';
 import composePageTitle from '~/utilities/page-title';
 import CompactView from '~/components/views/compact-view/compact-view';
 import GenericListView from '~/components/views/generic-list-view';
-import { useRef } from 'react';
 import type { ContextLoaderFunction } from '~/models/context';
 import BaseRow from '~/components/views/rows/base-row';
 import ErrorView from '~/components/views/error-view';
@@ -135,7 +135,7 @@ export function CatchBoundary() {
 
 	if (caught.status === 404) {
 		return (
-			<ErrorView status={401} className="mt-20" />
+			<ErrorView status={404} className="mt-20" />
 		);
 	}
 

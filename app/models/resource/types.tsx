@@ -2,7 +2,9 @@ import {
 	Spotify as SpotifyIcon,
 	Youtube as YoutubeIcon,
 } from 'react-bootstrap-icons';
+import * as zod from 'zod';
 import { Except, SetOptional } from 'type-fest';
+import * as SongType from '~/adapters/song/type';
 
 export * from './group-type';
 
@@ -138,6 +140,21 @@ export function stringToResourceTypeOptional(
 		return type ? stringToResourceType(type) : null;
 	} catch {
 		return null;
+	}
+}
+
+/**
+ * Convert a string to a ResourceType.
+ *
+ * @param type The type to convert
+ */
+export function findSchema(type: ResourceType): zod.ZodRawShape {
+	switch (type) {
+		case ResourceType.SONG:
+			return ResourceType.RSS_FEED;
+
+		default:
+			throw new Error(`Unknown resource type: ${type}`);
 	}
 }
 
@@ -371,3 +388,38 @@ export type ResourceDetailsProps<
 	resource: TResource;
 	details: TResourceDetails;
 };
+
+const Schemas: { [key: ResourceType]?: zod.ZodRawShape } = {
+	[ResourceType.SONG]: SongType.SongDataSchema
+}
+
+const valuesShape = zod.object({});
+
+
+export function composeValueRefShape(type: ValueType, valueSchema = zod.string()) {
+	return zod.object({
+		ref: zod.string().uuid().optional(),
+		type: zod.string(),
+		value: valueSchema
+	});
+}
+
+export function composeResourceSchema(values: typeof valuesShape) {
+	return zod.object({
+		id: zod.string().uuid(),
+		title: zod.string().min(1),
+		type: zod.nativeEnum(ResourceType),
+		isFavourite: zod.boolean(),
+		values: valuesShape,
+		thumbnail: zod.object({
+			id: zod.string().uuid(),
+			mimeType: zod.string().min(1),
+			createdAt: zod.date()
+		}).optional(),
+		remotes: zod
+			.object({})
+			.catchall(zod.string())
+	});
+}
+
+
