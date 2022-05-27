@@ -1,9 +1,9 @@
-import type {
-	Resource,
-	ValueRef,
-	ResourceType,
+import type { Resource, ValueRef, ResourceType } from '~/models/resource/types';
+import {
+	composeResourceSchema,
+	composeValueRefShape,
+	ValueType,
 } from '~/models/resource/types';
-import { composeResourceSchema, composeValueRefShape, ValueType, } from '~/models/resource/types';
 import * as zod from 'zod';
 
 export type SongData = {
@@ -12,10 +12,14 @@ export type SongData = {
 	album: ValueRef<ValueType.RESOURCE> | null;
 };
 
-export const SongDataSchema = composeResourceSchema(zod.object({
-	name: composeValueRefShape(ValueType.TEXT, zod.string().min(1)),
-	artist: composeValueRefShape(ValueType.RESOURCE).optional(),
-	album: composeValueRefShape(ValueType.RESOURCE).optional(),
-}));
+type RValue = { type: ValueType; value: string };
+
+const resourceRefSchema = () => zod.string().uuid();
+
+export const SongDataSchema = {
+	name: zod.string().min(1),
+	artist: zod.string().optional(),
+	album: zod.string().optional(),
+};
 
 export type Song = Resource<ResourceType.SONG, SongData>;

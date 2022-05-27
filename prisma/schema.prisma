@@ -87,7 +87,7 @@ model DataObjectValue {
     key          String
     type         String     @default("text") // TEXT, NUMBER, RESOURCE
 
-    value             String
+    value             String?
     valueDataObject   DataObject? @relation("ValueReferences", fields: [valueDataObjectId], references: [id], onDelete: SetNull)
     valueDataObjectId String?
 

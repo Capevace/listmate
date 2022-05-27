@@ -23,7 +23,7 @@ export function SourceTag({ resource, sourceType, uri }: SourceTagProps) {
 			break;
 
 		default:
-			className += 'bg-gray-700 text-gray-300 hover:text-gray-500';
+			className += 'bg-theme-700 text-theme-300 hover:text-theme-500';
 			break;
 	}
 

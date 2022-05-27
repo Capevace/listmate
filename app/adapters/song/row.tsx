@@ -24,7 +24,7 @@ export default function SongRow({
 
 	return (
 		<li
-			className="grid w-full grid-cols-12 items-center py-1 text-sm  text-gray-600 dark:text-gray-200"
+			className="grid w-full grid-cols-12 items-center py-1 text-sm  text-theme-600 dark:text-theme-200"
 			style={style}
 		>
 			<div className="col-span-1 grid grid-cols-3 justify-start">
@@ -58,9 +58,9 @@ export default function SongRow({
 					</>
 				)}
 			</div>
-			<div className="col-span-10 flex items-center gap-4 truncate text-gray-700 dark:text-gray-300 sm:col-span-7">
+			<div className="col-span-10 flex items-center gap-4 truncate text-theme-700 dark:text-theme-300 sm:col-span-7">
 				<img
-					className="ml-2 aspect-square w-8 rounded"
+					className="ml-2 aspect-square w-8 truncate rounded bg-theme-200 text-xs dark:bg-theme-800"
 					alt={`${resource.title} thumbnail`}
 					src={resource.thumbnail ? composeCoverUrl(resource) ?? '' : ''}
 					loading="lazy"

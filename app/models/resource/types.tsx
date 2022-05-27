@@ -356,6 +356,21 @@ export function stringToValueType(type: string): ValueType {
 }
 
 /**
+ * Convert a string to a SourceType.
+ *
+ * @param type The type to convert
+ */
+export function stringToOptionalValueType(type: string): ValueType | null {
+	const valueType = VALUE_TYPES[type as ValueType];
+
+	if (!valueType) {
+		return null;
+	}
+
+	return valueType;
+}
+
+/**
  * Representing a FileReference.
  */
 export type ResourceFile = {

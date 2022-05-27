@@ -22,7 +22,7 @@ export function EmbeddedSelect({ label, children }: EmbeddedSelectProps) {
 			<select
 				id="currency"
 				name="currency"
-				className="h-full rounded-md border-transparent bg-transparent py-0 pl-2 pr-7 text-gray-500 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+				className="h-full rounded-md border-transparent bg-transparent py-0 pl-2 pr-7 text-theme-500 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
 			>
 				{children}
 			</select>
@@ -53,12 +53,12 @@ export default function TextInput(props: TextInputProps) {
 		<div>
 			<label
 				htmlFor={props.name}
-				className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+				className="block text-sm font-medium text-theme-700 dark:text-theme-300"
 			>
 				{props.label}
 			</label>
 			<div className="relative mt-1 rounded-md shadow-sm">
-				<div className="pointer-events-none absolute inset-y-0 left-0 flex w-12 pl-2 items-center justify-center">
+				<div className="pointer-events-none absolute inset-y-0 left-0 flex w-12 items-center justify-center pl-2">
 					{props.loading ? (
 						<figure className="w-5">
 							<SpinnerIcon />
@@ -73,7 +73,7 @@ export default function TextInput(props: TextInputProps) {
 					{...inputProps}
 					className={`${
 						props.loading || props.left ? 'pl-14' : 'pl-0'
-					} block w-full rounded-md border-gray-300 pr-12 focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 sm:text-sm font-medium`}
+					} block w-full rounded-md border-theme-300 pr-12 font-medium focus:border-indigo-500 focus:ring-indigo-500 dark:border-theme-600 dark:bg-theme-700 sm:text-sm`}
 				/>
 				<div className="absolute inset-y-0 right-0 flex items-center">
 					{props.right}

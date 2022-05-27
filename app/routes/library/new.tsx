@@ -8,13 +8,13 @@ import {
 	useLoaderData,
 	useLocation,
 	useTransition,
-	useNavigate
+	useNavigate,
 } from 'remix';
 import {
 	composeAuthenticatedApi,
 	ResourceSearchResult,
 	searchForResource,
-	GeneralSearchResults
+	GeneralSearchResults,
 } from '~/apis/apis.server';
 import TextInput from '~/components/forms/text-input';
 import CompactView from '~/components/views/compact-view/compact-view';
@@ -25,7 +25,7 @@ import {
 	SourceType,
 	stringToSourceTypeOptional,
 	ALL_RESOURCE_TYPES,
-	SOURCE_NAMES
+	SOURCE_NAMES,
 } from '~/models/resource/types';
 import { requireUserId } from '~/session.server';
 
@@ -66,7 +66,7 @@ export const loader = async ({
 		searchResults,
 	});
 };
-/*{selectedData && <li className="grid grid-cols-12 items-center gap-4 rounded-md bg-gray-800 p-5 py-4 border border-gray-700">
+/*{selectedData && <li className="grid grid-cols-12 items-center gap-4 rounded-md bg-theme-800 p-5 py-4 border border-theme-700">
 										{selectedData.thumbnailUrl && (
 											<figure className="col-span-2">
 												<img
@@ -78,14 +78,14 @@ export const loader = async ({
 										)}
 										<div className="col-span-10 flex flex-col gap-1">
 											<div>
-												<h3 className="font-bold dark:text-gray-100">
+												<h3 className="font-bold dark:text-theme-100">
 													{selectedData.title}
 												</h3>
-												<p className="text-sm dark:text-gray-400">
+												<p className="text-sm dark:text-theme-400">
 													{selectedData.subtitle}
 												</p>
 											</div>
-											<pre className="text-sm dark:text-gray-400">
+											<pre className="text-sm dark:text-theme-400">
 												{selectedData.uri}
 											</pre>
 										</div>
@@ -100,7 +100,9 @@ export default function NewEntryPage() {
 
 	const selectedData: any | null = null;
 	const data = fetcher.data ?? loaderData;
-	const isLoadingSearchResults = transition.submission && transition.submission.formData.get('search') !== data.search;
+	const isLoadingSearchResults =
+		transition.submission &&
+		transition.submission.formData.get('search') !== data.search;
 	const isLoadingUri = (buttonUri: string) => {
 		const transitionUri = transition.submission?.formData.get('uri');
 
@@ -128,7 +130,7 @@ export default function NewEntryPage() {
 								Source
 								<select
 									name="source"
-									className="w-full rounded border border-gray-600 bg-gray-700 px-5 py-2 text-gray-200 shadow-lg focus:border-gray-500 focus:outline-none"
+									className="w-full rounded border border-theme-600 bg-theme-700 px-5 py-2 text-theme-200 shadow-lg focus:border-theme-500 focus:outline-none"
 									defaultValue={data.sourceType}
 								>
 									<option value="youtube">YouTube</option>
@@ -143,7 +145,7 @@ export default function NewEntryPage() {
 									label={'Search'}
 									name={'search'}
 									left={
-										<figure className="font-mono text-gray-500">
+										<figure className="font-mono text-theme-500">
 											<Search />
 										</figure>
 									}
@@ -152,14 +154,19 @@ export default function NewEntryPage() {
 									loading={isLoadingSearchResults}
 								/>
 								<section className="grid grid-cols-1 sm:grid-cols-2">
-									{data.searchResults && data.searchResults.map(
-										(resourceResults) => {
+									{data.searchResults &&
+										data.searchResults.map((resourceResults) => {
 											return (
 												<>
-													<h2>{resourceResults.resourceType} – {SOURCE_NAMES[resourceResults.sourceType]}</h2>
+													<h2>
+														{resourceResults.resourceType} –{' '}
+														{SOURCE_NAMES[resourceResults.sourceType]}
+													</h2>
 													<ul className="col-span-1 flex flex-col gap-2">
-														{resourceResults.searchResults.map(result => {
-															const searchParams = new URLSearchParams(location.search);
+														{resourceResults.searchResults.map((result) => {
+															const searchParams = new URLSearchParams(
+																location.search
+															);
 															searchParams.set('uri', result.uri);
 
 															console.log('hello', result);
@@ -179,18 +186,18 @@ export default function NewEntryPage() {
 																		</figure>
 																	)}
 																	<div className="col-span-10">
-																		<h3 className="font-medium dark:text-gray-100">
+																		<h3 className="font-medium dark:text-theme-100">
 																			{result.title}
 																		</h3>
-																		<p className="text-sm dark:text-gray-400">
+																		<p className="text-sm dark:text-theme-400">
 																			{result.subtitle}
 																		</p>
 																	</div>
-																	<CompactButton 
-																		name="uri" 
-																		value={result.uri} 
-																		type="submit" 
-																		className="col-span-1" 
+																	<CompactButton
+																		name="uri"
+																		value={result.uri}
+																		type="submit"
+																		className="col-span-1"
 																		loading={isLoadingUri(result.uri)}
 																	>
 																		Use
@@ -201,13 +208,10 @@ export default function NewEntryPage() {
 													</ul>
 												</>
 											);
-										}
-									)}
+										})}
 								</section>
-								
 							</div>
 						</section>
-
 					</Form>
 				</section>
 			</>

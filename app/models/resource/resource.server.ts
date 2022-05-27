@@ -368,16 +368,15 @@ export async function findResources(
 	return dataObjects.map(dataObjectToResource);
 }
 
-
 export type PageSlice = {
 	page: number;
 	max: number;
-}
+};
 
 export type OffsetSlice = {
 	take: number;
 	skip: number;
-}
+};
 
 export enum FilterOperator {
 	Equals = 'equals',
@@ -390,33 +389,33 @@ export enum FilterOperator {
 	LessThanOrEquals = 'lte',
 	Contains = 'contains',
 	StartsWith = 'startsWith',
-	EndsWith = 'endsWith'
+	EndsWith = 'endsWith',
 }
 
-
-export type QueryFilter<TResource extends Resource, Type = 'any' | 'main' | 'value'> = 
-	(Type extends 'any'
-			? MergeExclusive<
-				{ valueKey: keyof TResource['values']; }, 
-				{ key: keyof TResource }
-			> 
-			: Type extends 'main' 
-				? { key: keyof TResource }
-				: { valueKey: keyof TResource['values'] }
-	) & {	
+export type QueryFilter<
+	TResource extends Resource,
+	Type = 'any' | 'main' | 'value'
+> = (Type extends 'any'
+	? MergeExclusive<
+			{ valueKey: keyof TResource['values'] },
+			{ key: keyof TResource }
+	  >
+	: Type extends 'main'
+	? { key: keyof TResource }
+	: { valueKey: keyof TResource['values'] }) & {
 	operator: FilterOperator;
 	needle: string;
 };
 
 export enum SortDirection {
 	Ascending = 'asc',
-	Descending = 'desc'
+	Descending = 'desc',
 }
 
 export type QuerySort = {
 	key: string;
 	order: SortDirection;
-}
+};
 
 export type PaginateQuery<TResource extends Resource> = {
 	slice: PageSlice | OffsetSlice;
@@ -427,42 +426,43 @@ export type PaginateQuery<TResource extends Resource> = {
 export type PaginatedResources = {
 	slice: PageSlice;
 	resources: Resource[];
-}
+};
 
 export async function paginateResources<TResource extends Resource>(
 	query: PaginateQuery<TResource>
 ): Promise<PaginatedResources> {
-	const { take, skip } = 'page' in query.slice 
-		? { take: query.slice.max, skip: query.slice.page * query.slice.max } 
-		: query.slice;
+	const { take, skip } =
+		'page' in query.slice
+			? { take: query.slice.max, skip: query.slice.page * query.slice.max }
+			: query.slice;
 
-	const filters: Prisma.Enumerable<Prisma.DataObjectWhereInput> = query.filterBy?.map(filter => {
-		if (filter.valueKey) { // Filter is Resource values
-			return {
-				values: {
-					every: {
-						[filter.valueKey]: {
-							[filter.operator]: filter.needle
-						}
-					}
-				}
-			};
-		} else if (filter.key) {
-			return { 
-				[filter.key]: {
-					[filter.operator]: filter.needle
-				}
-			};
-		} else {
-			throw new Error('QueryFilters need to include a key or valueKey');
-		}
-	}) ?? [];
-
-
+	const filters: Prisma.Enumerable<Prisma.DataObjectWhereInput> =
+		query.filterBy?.map((filter) => {
+			if (filter.valueKey) {
+				// Filter is Resource values
+				return {
+					values: {
+						every: {
+							[filter.valueKey]: {
+								[filter.operator]: filter.needle,
+							},
+						},
+					},
+				};
+			} else if (filter.key) {
+				return {
+					[filter.key]: {
+						[filter.operator]: filter.needle,
+					},
+				};
+			} else {
+				throw new Error('QueryFilters need to include a key or valueKey');
+			}
+		}) ?? [];
 
 	const dataObjects = await db.dataObject.findMany({
 		where: {
-			AND: filters
+			AND: filters,
 		},
 		include: {
 			remotes: true,
@@ -474,23 +474,23 @@ export async function paginateResources<TResource extends Resource>(
 			},
 			thumbnail: true,
 		},
-		orderBy: query.orderBy 
+		orderBy: query.orderBy
 			? {
-				values: {
-					[query.orderBy.key]: query.orderBy.order
-				}
-			} 
+					values: {
+						[query.orderBy.key]: query.orderBy.order,
+					},
+			  }
 			: { title: SortDirection.Descending },
 		take,
-		skip
+		skip,
 	});
 
 	return {
 		slice: {
 			page: Math.ceil(skip / take),
-			max: take
+			max: take,
 		},
-		resources: dataObjects.map(dataObjectToResource)
+		resources: dataObjects.map(dataObjectToResource),
 	};
 }
 
@@ -685,8 +685,13 @@ export async function upsertResource(resource: Resource): Promise<Resource> {
  *
  * @param resource
  */
-export async function upsertValues(resource: Resource) {
-	for (const [key, valueRefOrArray] of Object.entries(resource.values)) {
+export async function upsertValues(
+	resource: Resource,
+	values?: Partial<Resource['values']>
+) {
+	for (const [key, valueRefOrArray] of Object.entries(
+		values ?? resource.values
+	)) {
 		// TODO: If valueRefOrArray is null, we want to delete the value if it exists
 		if (!valueRefOrArray) continue;
 

@@ -26,9 +26,9 @@ function Background({ src }: { src: string }) {
 					backgroundImage: `url(${src})`,
 				}}
 			></div>
-			<div className="absolute top-0 left-0 right-0 h-72 bg-gray-100 opacity-40 dark:bg-gray-900"></div>
+			<div className="absolute top-0 left-0 right-0 h-72 bg-theme-100 opacity-40 dark:bg-theme-900"></div>
 
-			<div className="absolute top-0 left-0 right-0 h-72 bg-gradient-to-b from-transparent to-gray-50 dark:to-gray-900"></div>
+			<div className="absolute top-0 left-0 right-0 h-72 bg-gradient-to-b from-transparent to-theme-50 dark:to-theme-900"></div>
 		</div>
 	);
 }
@@ -36,7 +36,11 @@ function Background({ src }: { src: string }) {
 function Cover({ src, alt }: { src: string; alt?: string }) {
 	return (
 		<figure className="flex h-full w-12 flex-shrink-0 items-center overflow-hidden overflow-visible md:w-16 lg:w-20 xl:w-32 xl:flex-shrink">
-			<img src={src} alt={alt} className="rounded shadow-lg " />
+			<img
+				src={src}
+				alt={alt}
+				className="w-full rounded bg-theme-200 text-xs shadow-lg dark:bg-theme-800"
+			/>
 		</figure>
 	);
 }
@@ -87,7 +91,7 @@ export function Header(props: CompactHeaderProps) {
 		>
 			{coverUrl && <Background src={coverUrl} />}
 
-			<div className="z-10 flex w-full items-end justify-between gap-5 text-gray-900 dark:text-gray-100">
+			<div className="z-10 flex w-full items-end justify-between gap-5 text-theme-900 dark:text-theme-100">
 				<Cover
 					src={
 						coverUrl ??
@@ -124,7 +128,7 @@ export function Header(props: CompactHeaderProps) {
 						{hasDescription && (
 							<h2
 								id={props.resource.id + '-description-input'}
-								className="hidden w-full max-w-md flex-grow-0 !overflow-visible truncate text-xs text-gray-600 opacity-90 dark:text-gray-400 sm:text-sm md:block md:text-base lg:text-lg"
+								className="hidden w-full max-w-md flex-grow-0 !overflow-visible truncate text-xs text-theme-600 opacity-90 dark:text-theme-400 sm:text-sm md:block md:text-base lg:text-lg"
 							>
 								<input
 									defaultValue={initialDescription}
@@ -142,11 +146,11 @@ export function Header(props: CompactHeaderProps) {
 
 					<section className="flex gap-4">{props.children}</section>
 				</section>
-				<nav className="z-10 flex items-center justify-end gap-4 text-gray-700 dark:text-gray-400">
+				<nav className="z-10 flex items-center justify-end gap-4 text-theme-700 dark:text-theme-400">
 					{props.actions}
 				</nav>
 			</div>
-			<hr className="z-10 border-gray-700 border-opacity-20 dark:border-gray-600" />
+			<hr className="z-10 border-theme-700 border-opacity-20 dark:border-theme-600" />
 		</header>
 	);
 }

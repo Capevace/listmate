@@ -27,7 +27,7 @@ export default function InlineFavouriteButton({
 
 	const [isFavouriteState, setIsFavouriteState] = useState(isFavourite);
 
-	const heartClass = isFavouriteState ? 'text-gray-300' : 'text-gray-500';
+	const heartClass = isFavouriteState ? 'text-theme-300' : 'text-theme-500';
 
 	return (
 		<Form

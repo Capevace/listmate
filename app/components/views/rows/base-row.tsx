@@ -20,7 +20,7 @@ export default function BaseRow({
 	measureRef,
 }: BaseRowProps) {
 	if (isSeparator) {
-		return <hr className="border-2 border-gray-700" />;
+		return <hr className="border-2 border-theme-700" />;
 	}
 	switch (resource.type) {
 		case ResourceType.SONG:
