@@ -1,11 +1,16 @@
 import { ActionFunction, redirect } from 'remix';
 import invariant from 'tiny-invariant';
 import { requireUserId } from '~/session.server';
-import { findResourceById, upsertResource } from '~/models/resource/resource.server';
+import {
+	findResourceById,
+	upsertResource,
+} from '~/models/resource/resource.server';
 import { composeResourceUrl } from '~/utilities/resource-url';
 import * as zod from 'zod';
 
-const action: ActionFunction = async ({ params, request }) => {
+export const action: ActionFunction = async ({ params, request, context }) => {
+	await requireUserId(request, context);
+
 	invariant(params.resourceId, 'No resourceId passed');
 
 	const schema = zod.object({
@@ -13,7 +18,7 @@ const action: ActionFunction = async ({ params, request }) => {
 		description: zod.string().min(1).optional(),
 	});
 
-	const formData = await request.formData();
+	const formData = Object.fromEntries(await request.formData());
 	const data = schema.parse(formData);
 
 	let resource = await findResourceById(params.resourceId);
@@ -24,7 +29,11 @@ const action: ActionFunction = async ({ params, request }) => {
 
 	resource.title = data.title;
 
-	if (resource.values.description && !Array.isArray(resource.values.description) && data.description) {
+	if (
+		resource.values.description &&
+		!Array.isArray(resource.values.description) &&
+		data.description
+	) {
 		resource.values.description.value = data.description;
 	}
 
