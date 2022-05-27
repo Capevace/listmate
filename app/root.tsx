@@ -76,7 +76,7 @@ function Frame({ children, hideSidebar, user, collections }: FrameProps) {
 				<Links />
 				<link rel="stylesheet" href={metaStylesheetUrl} />
 			</head>
-			<body className="no-js h-screen bg-gray-100 text-gray-900 antialiased dark:bg-gray-900 dark:text-gray-100">
+			<body className="no-js h-screen bg-theme-100 text-theme-900 antialiased dark:bg-theme-900 dark:text-theme-100">
 				<script
 					type="text/javascript"
 					dangerouslySetInnerHTML={{
