@@ -69,6 +69,7 @@ export function Header(props: CompactHeaderProps) {
 			description: initialDescription,
 		},
 	});
+	const formAction = composeShortResourceUrl(props.resource.id, 'update');
 
 	useEffect(() => {
 		setValue('title', props.resource.title);
@@ -97,18 +98,26 @@ export function Header(props: CompactHeaderProps) {
 				<section className="flex flex-1 flex-col gap-1 font-medium">
 					<fetcher.Form
 						method="post"
-						action={composeShortResourceUrl(props.resource.id, 'update')}
+						action={formAction}
 						className="flex flex-col items-start justify-start "
-						onSubmit={handleSubmit(() =>
-							(document.activeElement as HTMLInputElement | undefined)?.blur()
-						)}
+						onSubmit={handleSubmit((data) => {
+							(document.activeElement as HTMLInputElement | undefined)?.blur();
+
+							fetcher.submit(
+								data.description
+									? { title: data.title, description: data.description }
+									: { title: data.title },
+								{ method: 'post', action: formAction }
+							);
+						})}
 					>
 						<h1 className="clamp-2 flex w-full flex-col !overflow-visible text-lg md:flex-row md:text-xl lg:text-2xl">
 							<input
 								defaultValue={props.resource.title}
 								{...register('title')}
 								id={props.resource.id + '-title-input'}
-								className="w-full rounded bg-transparent py-0 font-medium outline-blue-500 focus:outline"
+								className="w-full rounded bg-transparent py-0 font-medium outline-blue-500 focus:outline disabled:opacity-70"
+								disabled={!!fetcher.submission}
 							/>
 						</h1>
 						{/* <div className="opacity-30">~</div> */}
@@ -120,7 +129,8 @@ export function Header(props: CompactHeaderProps) {
 								<input
 									defaultValue={initialDescription}
 									{...register('description')}
-									className="w-full rounded bg-transparent py-0 font-medium outline-blue-500 focus:outline"
+									className="w-full rounded bg-transparent py-0 font-medium outline-blue-500 focus:outline disabled:opacity-70"
+									disabled={!!fetcher.submission}
 								/>
 							</h2>
 						)}
