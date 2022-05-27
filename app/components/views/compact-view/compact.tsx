@@ -33,7 +33,7 @@ function Background({ src }: { src: string }) {
 	);
 }
 
-function Cover({ src, alt }: { src: string, alt?: string }) {
+function Cover({ src, alt }: { src: string; alt?: string }) {
 	return (
 		<figure className="flex h-full w-12 flex-shrink-0 items-center overflow-hidden overflow-visible md:w-16 lg:w-20 xl:w-32 xl:flex-shrink">
 			<img src={src} alt={alt} className="rounded shadow-lg " />
@@ -51,9 +51,11 @@ export function Header(props: CompactHeaderProps) {
 
 	const hasDescription = 'description' in props.resource.values;
 	const coverUrl = composeCoverUrl(props.resource);
-	const initialDescription = 'description' in props.resource.values && !Array.isArray(props.resource.values.description)
-		? props.resource.values.description?.value as string
-		: undefined;
+	const initialDescription =
+		'description' in props.resource.values &&
+		!Array.isArray(props.resource.values.description)
+			? (props.resource.values.description?.value as string)
+			: undefined;
 
 	const {
 		register,
@@ -64,10 +66,9 @@ export function Header(props: CompactHeaderProps) {
 		resolver: zodResolver(schema),
 		defaultValues: {
 			title: props.resource.title,
-			description: initialDescription
-		}
+			description: initialDescription,
+		},
 	});
-
 
 	useEffect(() => {
 		setValue('title', props.resource.title);
@@ -76,11 +77,6 @@ export function Header(props: CompactHeaderProps) {
 	useEffect(() => {
 		setValue('description', initialDescription);
 	}, [initialDescription]);
-
-
-	const debounceChange = () => {
-		fetcher.submit
-	};
 
 	return (
 		<header
@@ -91,25 +87,47 @@ export function Header(props: CompactHeaderProps) {
 			{coverUrl && <Background src={coverUrl} />}
 
 			<div className="z-10 flex w-full items-end justify-between gap-5 text-gray-900 dark:text-gray-100">
-				<Cover src={coverUrl ?? 'https://dummyimage.com/200x200/474c54/ffffff&text=+++++++++Cover+++++++'} />
+				<Cover
+					src={
+						coverUrl ??
+						'https://dummyimage.com/200x200/474c54/ffffff&text=+++++++++Cover+++++++'
+					}
+				/>
 
 				<section className="flex flex-1 flex-col gap-1 font-medium">
-					<fetcher.Form 
-						method="post" 
-						action={composeShortResourceUrl(props.resource.id, 'update')} 
+					<fetcher.Form
+						method="post"
+						action={composeShortResourceUrl(props.resource.id, 'update')}
 						className="flex flex-col items-start justify-start "
+						onSubmit={handleSubmit(() =>
+							(document.activeElement as HTMLInputElement | undefined)?.blur()
+						)}
 					>
-						<h1 className="clamp-2 w-full flex flex-col text-lg md:flex-row md:text-xl lg:text-2xl !overflow-visible">
-							<input {...register('title')} className="bg-transparent font-medium focus:outline outline-blue-500 rounded py-0 w-full" />
+						<h1 className="clamp-2 flex w-full flex-col !overflow-visible text-lg md:flex-row md:text-xl lg:text-2xl">
+							<input
+								defaultValue={props.resource.title}
+								{...register('title')}
+								id={props.resource.id + '-title-input'}
+								className="w-full rounded bg-transparent py-0 font-medium outline-blue-500 focus:outline"
+							/>
 						</h1>
 						{/* <div className="opacity-30">~</div> */}
 						{hasDescription && (
-							<h2 className="w-full hidden max-w-md flex-grow-0 truncate !overflow-visible text-xs text-gray-600 opacity-90 dark:text-gray-400 sm:text-sm md:block md:text-base lg:text-lg">
-								<input {...register('description')} className="bg-transparent font-medium focus:outline outline-blue-500 rounded py-0 w-full" />
+							<h2
+								id={props.resource.id + '-description-input'}
+								className="hidden w-full max-w-md flex-grow-0 !overflow-visible truncate text-xs text-gray-600 opacity-90 dark:text-gray-400 sm:text-sm md:block md:text-base lg:text-lg"
+							>
+								<input
+									defaultValue={initialDescription}
+									{...register('description')}
+									className="w-full rounded bg-transparent py-0 font-medium outline-blue-500 focus:outline"
+								/>
 							</h2>
 						)}
 
-						<button type="submit" className="hidden">Submit</button>	
+						<button type="submit" className="hidden">
+							Submit
+						</button>
 					</fetcher.Form>
 
 					<section className="flex gap-4">{props.children}</section>
@@ -122,7 +140,6 @@ export function Header(props: CompactHeaderProps) {
 		</header>
 	);
 }
-
 
 export type CompactViewProps = CompactHeaderProps & {
 	parentRef?: React.RefObject<HTMLElement>;
