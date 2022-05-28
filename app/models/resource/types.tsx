@@ -2,9 +2,7 @@ import {
 	Spotify as SpotifyIcon,
 	Youtube as YoutubeIcon,
 } from 'react-bootstrap-icons';
-import * as zod from 'zod';
 import { Except, SetOptional } from 'type-fest';
-import * as SongType from '~/adapters/song/type';
 
 export * from './group-type';
 
@@ -144,31 +142,17 @@ export function stringToResourceTypeOptional(
 }
 
 /**
- * Convert a string to a ResourceType.
- *
- * @param type The type to convert
- */
-export function findSchema(type: ResourceType): zod.ZodRawShape {
-	switch (type) {
-		case ResourceType.SONG:
-			return ResourceType.RSS_FEED;
-
-		default:
-			throw new Error(`Unknown resource type: ${type}`);
-	}
-}
-
-/**
  * Type of external data source.
  *
  * Important to identify the correct external API to use with a given URI.
  */
 export enum SourceType {
-	LOCAL = 'local',
-	SPOTIFY = 'spotify',
-	YOUTUBE = 'youtube',
-	SOUNDCLOUD = 'soundcloud',
-	POCKET = 'pocket',
+	LOCAL = 'local', // DB File ID
+	EXTERNAL = 'external', // FS File Path
+	SPOTIFY = 'spotify', // Spotify ID
+	YOUTUBE = 'youtube', // Youtube ID
+	SOUNDCLOUD = 'soundcloud', // Soundcloud ID
+	POCKET = 'pocket', // Pocket ID
 }
 
 /**
@@ -176,6 +160,7 @@ export enum SourceType {
  */
 export const ALL_SOURCE_TYPES = [
 	SourceType.LOCAL,
+	SourceType.EXTERNAL,
 	SourceType.SPOTIFY,
 	SourceType.YOUTUBE,
 	SourceType.SOUNDCLOUD,
@@ -189,15 +174,17 @@ export const ALL_SOURCE_TYPES = [
  */
 export function stringToSourceType(type: string): SourceType {
 	switch (type) {
-		case 'local':
+		case SourceType.LOCAL:
 			return SourceType.LOCAL;
-		case 'spotify':
+		case SourceType.EXTERNAL:
+			return SourceType.EXTERNAL;
+		case SourceType.SPOTIFY:
 			return SourceType.SPOTIFY;
-		case 'youtube':
+		case SourceType.YOUTUBE:
 			return SourceType.YOUTUBE;
-		case 'soundcloud':
+		case SourceType.SOUNDCLOUD:
 			return SourceType.SOUNDCLOUD;
-		case 'pocket':
+		case SourceType.POCKET:
 			return SourceType.POCKET;
 		default:
 			throw new Error(`Unknown source type: ${type}`);
@@ -223,7 +210,8 @@ export const SOURCE_ICONS: { [key in SourceType]?: React.ReactNode } = {
 };
 
 export const SOURCE_NAMES: { [key in SourceType]: string } = {
-	[SourceType.LOCAL]: 'Local',
+	[SourceType.LOCAL]: 'Library',
+	[SourceType.EXTERNAL]: 'Filesystem',
 	[SourceType.SPOTIFY]: 'Spotify',
 	[SourceType.YOUTUBE]: 'YouTube',
 	[SourceType.SOUNDCLOUD]: 'Soundcloud',
@@ -404,37 +392,20 @@ export type ResourceDetailsProps<
 	details: TResourceDetails;
 };
 
-const Schemas: { [key: ResourceType]?: zod.ZodRawShape } = {
-	[ResourceType.SONG]: SongType.SongDataSchema
-}
-
-const valuesShape = zod.object({});
-
-
-export function composeValueRefShape(type: ValueType, valueSchema = zod.string()) {
-	return zod.object({
-		ref: zod.string().uuid().optional(),
-		type: zod.string(),
-		value: valueSchema
-	});
-}
-
-export function composeResourceSchema(values: typeof valuesShape) {
-	return zod.object({
-		id: zod.string().uuid(),
-		title: zod.string().min(1),
-		type: zod.nativeEnum(ResourceType),
-		isFavourite: zod.boolean(),
-		values: valuesShape,
-		thumbnail: zod.object({
-			id: zod.string().uuid(),
-			mimeType: zod.string().min(1),
-			createdAt: zod.date()
-		}).optional(),
-		remotes: zod
-			.object({})
-			.catchall(zod.string())
-	});
-}
-
-
+// export function composeResourceSchema(values: typeof valuesShape) {
+// 	return zod.object({
+// 		id: zod.string().uuid(),
+// 		title: zod.string().min(1),
+// 		type: zod.nativeEnum(ResourceType),
+// 		isFavourite: zod.boolean(),
+// 		values: valuesShape,
+// 		thumbnail: zod
+// 			.object({
+// 				id: zod.string().uuid(),
+// 				mimeType: zod.string().min(1),
+// 				createdAt: zod.date(),
+// 			})
+// 			.optional(),
+// 		remotes: zod.object({}).catchall(zod.string()),
+// 	});
+// }
