@@ -28,6 +28,7 @@ import {
 	ValueType,
 	ValueTypeRawValue,
 } from '~/models/resource/types';
+import { getFileUrl } from '~/models/file.server'
 import invariant from 'tiny-invariant';
 import { getCollectionDetails } from '~/adapters/collection/adapter.server';
 import { getPlaylistDetails } from '~/adapters/playlist/adapter.server';

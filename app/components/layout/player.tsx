@@ -66,8 +66,8 @@ export default function Player() {
 	return (
 		currentTrack &&
 		song && (
-			<footer className="relative flex w-full flex-col bg-gray-700 ">
-				<section className="flex gap-3 px-3 py-2 text-xs font-medium text-gray-200">
+			<footer className="relative flex w-full flex-col bg-theme-700 ">
+				<section className="flex gap-3 px-3 py-2 text-xs font-medium text-theme-200">
 					{coverUrl && (
 						<figure className="aspect-square w-8 overflow-hidden rounded-md">
 							<img src={coverUrl} className="w-full" alt="" />
@@ -75,11 +75,11 @@ export default function Player() {
 					)}
 					<div className="flex flex-col ">
 						<div>{song.values.name.value}</div>
-						<div className="text-gray-400">{song.values.artist?.value}</div>
+						<div className="text-theme-400">{song.values.artist?.value}</div>
 					</div>
 				</section>
 
-				<nav className="relative flex items-center justify-between bg-gray-800 px-3 py-2 pt-4">
+				<nav className="relative flex items-center justify-between bg-theme-800 px-3 py-2 pt-4">
 					<div
 						className="absolute top-0 left-0 right-0 block h-1.5 cursor-pointer bg-green-900"
 						onClick={(e) => {
@@ -106,13 +106,13 @@ export default function Player() {
 					</section>
 					<section>
 						<button
-							className="w-7 text-gray-500 hover:text-gray-300"
+							className="w-7 text-theme-500 hover:text-theme-300"
 							onClick={() => multiPlayer.previous()}
 						>
 							<ChevronDoubleLeftIcon className="w-full" />
 						</button>
 						<button
-							className="w-8 text-gray-400 hover:text-gray-300"
+							className="w-8 text-theme-400 hover:text-theme-300"
 							onClick={() => multiPlayer.togglePlay()}
 						>
 							{playerState.playing ? (
@@ -122,7 +122,7 @@ export default function Player() {
 							)}
 						</button>
 						<button
-							className="w-7 text-gray-500 hover:text-gray-300"
+							className="w-7 text-theme-500 hover:text-theme-300"
 							onClick={() => multiPlayer.next()}
 						>
 							<ChevronDoubleRightIcon className="w-full" />

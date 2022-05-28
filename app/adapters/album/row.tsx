@@ -28,7 +28,7 @@ export default function AlbumRow({
 					loading="lazy"
 				/>
 			</figure>
-			<div className="flex flex-col truncate font-medium text-gray-700 dark:text-gray-300">
+			<div className="flex flex-col truncate font-medium text-theme-700 dark:text-theme-300">
 				<ResourceValueLabel
 					resource={resource}
 					valueRef={resource.values.name}
@@ -64,7 +64,7 @@ export default function AlbumRow({
 					</>
 				)}
 			</div>
-			<div className="col-span-7 flex items-center gap-4 text-gray-700 dark:text-gray-300">
+			<div className="col-span-7 flex items-center gap-4 text-theme-700 dark:text-theme-300">
 				<div className="flex flex-col truncate font-medium">
 					<ResourceValueLabel
 						resource={resource}

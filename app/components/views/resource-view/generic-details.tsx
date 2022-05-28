@@ -11,7 +11,7 @@ export default function GenericDetails({
 	return (
 		<CompactResourceView resource={resource} showCover>
 			<>
-				<ValueGrid values={resource.values} />
+				<ValueGrid resource={resource} />
 				<ResourceDebugger
 					resource={resource}
 					details={details}

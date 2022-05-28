@@ -25,6 +25,9 @@
 		"typecheck": "tsc -b && tsc -b cypress",
 		"validate": "run-p \"test -- --run\" lint typecheck test:e2e:run"
 	},
+	"bin": {
+		"listmate": "./scripts/cli.js"
+	},
 	"prettier": {
 		"useTabs": true,
 		"singleQuote": true
@@ -36,7 +39,9 @@
 	],
 	"dependencies": {
 		"@googleapis/youtube": "^4.2.0",
+		"@headlessui/react": "^1.6.1",
 		"@heroicons/react": "^1.0.6",
+		"@hookform/resolvers": "^2.8.10",
 		"@mantine/core": "^4.1.0",
 		"@mantine/form": "^4.1.0",
 		"@mantine/hooks": "^4.1.0",
@@ -50,20 +55,24 @@
 		"react": "^17.0.2",
 		"react-bootstrap-icons": "^1.8.2",
 		"react-dom": "^17.0.2",
+		"react-hook-form": "^7.31.2",
 		"react-virtual": "^2.10.4",
 		"remix": "^1.3.3",
 		"remix-electron": "^1.2.2",
+		"rsshub": "^1.0.0-master.19e3833",
 		"spotify-types": "^1.0.7",
 		"spotify-web-api-node": "^5.0.2",
 		"tailwindcss": "^3.0.23",
 		"tiny-invariant": "^1.2.0",
 		"type-fest": "^2.12.1",
-		"youtube-api": "^3.0.1"
+		"youtube-api": "^3.0.1",
+		"zod": "^3.17.3"
 	},
 	"devDependencies": {
 		"@faker-js/faker": "^6.1.2",
 		"@remix-run/dev": "^1.3.3",
 		"@remix-run/eslint-config": "^1.3.3",
+		"@tailwindcss/forms": "^0.5.1",
 		"@testing-library/cypress": "^8.0.2",
 		"@testing-library/jest-dom": "^5.16.3",
 		"@testing-library/react": "^12.1.4",

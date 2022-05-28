@@ -37,18 +37,12 @@ export default function VideoDetailsView({
 
 	const youtubeRemoteUri = resource.remotes[SourceType.YOUTUBE];
 
-	// Remove all properties that have a custom view
-	let filteredValues = filterValues<
-		'description' | 'channel' | 'title' | 'publishedAt',
-		typeof resource
-	>(resource.values, ['description', 'channel', 'title', 'publishedAt']);
-
 	return (
 		<CompactResourceView parentRef={ref} resource={resource} showCover>
 			<>
 				{youtubeRemoteUri ? <YouTubeIFrame id={youtubeRemoteUri} /> : undefined}
 
-				<h3 className="mb-1 text-sm font-medium text-gray-400">Description</h3>
+				<h3 className="mb-1 text-sm font-medium text-theme-400">Description</h3>
 				<p className="mb-10 font-medium leading-relaxed">
 					{resource.values.description ? (
 						<BaseValue valueRef={resource.values.description} />
@@ -58,7 +52,7 @@ export default function VideoDetailsView({
 				</p>
 				<div className="grid grid-cols-1 md:grid-cols-2">
 					<section className="col-span-1">
-						<h3 className="mb-1 text-sm font-medium text-gray-400">Channel</h3>
+						<h3 className="mb-1 text-sm font-medium text-theme-400">Channel</h3>
 						<p className="mb-10 font-medium leading-relaxed">
 							{resource.values.channel ? (
 								<BaseValue valueRef={resource.values.channel} />
@@ -68,7 +62,7 @@ export default function VideoDetailsView({
 						</p>
 					</section>
 					<section className="col-span-1">
-						<h3 className="mb-1 text-sm font-medium text-gray-400">
+						<h3 className="mb-1 text-sm font-medium text-theme-400">
 							Publishing date
 						</h3>
 						<p className="mb-10 font-medium leading-relaxed">
@@ -80,7 +74,7 @@ export default function VideoDetailsView({
 						</p>
 					</section>
 				</div>
-				<ValueGrid values={filteredValues} />
+				<ValueGrid resource={resource} />
 				<ResourceDebugger
 					resource={resource}
 					details={details}

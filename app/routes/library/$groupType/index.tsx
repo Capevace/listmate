@@ -1,4 +1,5 @@
-import { LoaderFunction, redirect } from 'remix';
+import { LoaderFunction, redirect, useCatch } from 'remix';
+import ErrorView from '~/components/views/error-view';
 import {
 	GroupType,
 	GROUP_SOURCE_MAP,
@@ -17,6 +18,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 			return redirect(`/library/${groupType}/video`);
 		case GroupType.MUSIC:
 		default:
-			return redirect(`/library/${GroupType.MUSIC}/song`);
+			throw new Response('Not found', { status: 404 });
 	}
 };

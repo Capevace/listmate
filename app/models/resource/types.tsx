@@ -2,7 +2,9 @@ import {
 	Spotify as SpotifyIcon,
 	Youtube as YoutubeIcon,
 } from 'react-bootstrap-icons';
+import * as zod from 'zod';
 import { Except, SetOptional } from 'type-fest';
+import * as SongType from '~/adapters/song/type';
 
 export * from './group-type';
 
@@ -12,6 +14,8 @@ export * from '~/adapters/album/type';
 export * from '~/adapters/artist/type';
 export * from '~/adapters/song/type';
 export * from '~/adapters/playlist/type';
+export * from '~/adapters/webpage/type';
+export * from '~/adapters/rss-feed/type';
 
 /**
  * Resource's are used as an abstraction for data objects.
@@ -57,7 +61,7 @@ export type ResourceWithSerializedValues<
 export enum ResourceType {
 	COLLECTION = 'collection',
 
-	BOOKMARK = 'bookmark',
+	WEBPAGE = 'webpage',
 
 	// Music (Spotify etc)
 	PLAYLIST = 'playlist',
@@ -68,6 +72,8 @@ export enum ResourceType {
 	// Video (YouTube etc.)
 	VIDEO = 'video',
 	CHANNEL = 'channel',
+
+	RSS_FEED = 'rss_feed',
 }
 
 /**
@@ -76,7 +82,7 @@ export enum ResourceType {
 export const ALL_RESOURCE_TYPES: ResourceType[] = [
 	ResourceType.COLLECTION,
 
-	ResourceType.BOOKMARK,
+	ResourceType.WEBPAGE,
 
 	ResourceType.PLAYLIST,
 	ResourceType.SONG,
@@ -85,6 +91,8 @@ export const ALL_RESOURCE_TYPES: ResourceType[] = [
 
 	ResourceType.VIDEO,
 	ResourceType.CHANNEL,
+
+	ResourceType.RSS_FEED,
 ];
 
 /**
@@ -97,8 +105,8 @@ export function stringToResourceType(type: string): ResourceType {
 		case 'collection':
 			return ResourceType.COLLECTION;
 
-		case 'bookmark':
-			return ResourceType.BOOKMARK;
+		case 'webpage':
+			return ResourceType.WEBPAGE;
 
 		case 'playlist':
 			return ResourceType.PLAYLIST;
@@ -113,6 +121,9 @@ export function stringToResourceType(type: string): ResourceType {
 			return ResourceType.VIDEO;
 		case 'channel':
 			return ResourceType.CHANNEL;
+
+		case ResourceType.RSS_FEED:
+			return ResourceType.RSS_FEED;
 
 		default:
 			throw new Error(`Unknown resource type: ${type}`);
@@ -129,6 +140,21 @@ export function stringToResourceTypeOptional(
 		return type ? stringToResourceType(type) : null;
 	} catch {
 		return null;
+	}
+}
+
+/**
+ * Convert a string to a ResourceType.
+ *
+ * @param type The type to convert
+ */
+export function findSchema(type: ResourceType): zod.ZodRawShape {
+	switch (type) {
+		case ResourceType.SONG:
+			return ResourceType.RSS_FEED;
+
+		default:
+			throw new Error(`Unknown resource type: ${type}`);
 	}
 }
 
@@ -181,7 +207,9 @@ export function stringToSourceType(type: string): SourceType {
 /**
  * Convert a string to a SourceType, returning null if the string is invalid instead of throwing an error.
  */
-export function stringToSourceTypeOptional(type?: string): SourceType | null {
+export function stringToSourceTypeOptional(
+	type?: string | null
+): SourceType | null {
 	try {
 		return type ? stringToSourceType(type) : null;
 	} catch {
@@ -241,6 +269,7 @@ export type ValueRef<EValueType extends ValueType = ValueType> = {
 	value: ValueTypeRawValue<EValueType>;
 	type: EValueType;
 	ref: ValueRefType<EValueType> | null;
+	url?: string;
 };
 
 // /**
@@ -327,6 +356,21 @@ export function stringToValueType(type: string): ValueType {
 }
 
 /**
+ * Convert a string to a SourceType.
+ *
+ * @param type The type to convert
+ */
+export function stringToOptionalValueType(type: string): ValueType | null {
+	const valueType = VALUE_TYPES[type as ValueType];
+
+	if (!valueType) {
+		return null;
+	}
+
+	return valueType;
+}
+
+/**
  * Representing a FileReference.
  */
 export type ResourceFile = {
@@ -359,3 +403,38 @@ export type ResourceDetailsProps<
 	resource: TResource;
 	details: TResourceDetails;
 };
+
+const Schemas: { [key: ResourceType]?: zod.ZodRawShape } = {
+	[ResourceType.SONG]: SongType.SongDataSchema
+}
+
+const valuesShape = zod.object({});
+
+
+export function composeValueRefShape(type: ValueType, valueSchema = zod.string()) {
+	return zod.object({
+		ref: zod.string().uuid().optional(),
+		type: zod.string(),
+		value: valueSchema
+	});
+}
+
+export function composeResourceSchema(values: typeof valuesShape) {
+	return zod.object({
+		id: zod.string().uuid(),
+		title: zod.string().min(1),
+		type: zod.nativeEnum(ResourceType),
+		isFavourite: zod.boolean(),
+		values: valuesShape,
+		thumbnail: zod.object({
+			id: zod.string().uuid(),
+			mimeType: zod.string().min(1),
+			createdAt: zod.date()
+		}).optional(),
+		remotes: zod
+			.object({})
+			.catchall(zod.string())
+	});
+}
+
+

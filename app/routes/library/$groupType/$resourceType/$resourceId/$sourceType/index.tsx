@@ -134,7 +134,7 @@ export default function ResourceSourceView() {
 			className="overflow-y-scroll"
 		>
 			<dl className="">
-				<dt className="flex w-full items-center justify-between gap-2 text-sm font-bold text-gray-400">
+				<dt className="flex w-full items-center justify-between gap-2 text-sm font-bold text-theme-400">
 					URI
 					{uri && (
 						<fetcher.Form method="post" action="disconnect">
@@ -144,12 +144,12 @@ export default function ResourceSourceView() {
 						</fetcher.Form>
 					)}
 				</dt>
-				<dd className="mt-1 text-gray-300 sm:col-span-2 sm:mt-0">
+				<dd className="mt-1 text-theme-300 sm:col-span-2 sm:mt-0">
 					<pre>{uri || 'No URI available'}</pre>
 				</dd>
 			</dl>
 
-			<hr className="my-5 border-gray-700" />
+			<hr className="my-5 border-theme-700" />
 			<Form className="mb-4">
 				<Input
 					placeholder="Search..."
@@ -171,7 +171,7 @@ export default function ResourceSourceView() {
 				{(fetcher.data?.searchResults || searchResults).map((result) => (
 					<li
 						key={result.uri}
-						className="grid grid-cols-8 items-center gap-2 rounded bg-gray-900 p-1 pr-4"
+						className="grid grid-cols-8 items-center gap-2 rounded bg-theme-900 p-1 pr-4"
 					>
 						<figure className="col-span-1 ">
 							<img
@@ -181,7 +181,7 @@ export default function ResourceSourceView() {
 								className="aspect-square rounded"
 							/>
 						</figure>
-						<section className="col-span-5 text-xs text-gray-200">
+						<section className="col-span-5 text-xs text-theme-200">
 							<h3 className="font-bold">{result.title}</h3>
 							<span className="">{result.subtitle ?? ''}</span>
 						</section>

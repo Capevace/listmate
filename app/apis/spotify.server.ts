@@ -5,6 +5,7 @@ import {
 	Playlist,
 	stringToResourceTypeOptional,
 	ValueType,
+	stringToResourceType,
 } from '~/models/resource/types';
 import type { User } from '~/models/user.server';
 
@@ -23,12 +24,14 @@ import {
 	ResourcePlayParameters,
 	ResourceSearchParameters,
 	ResourceSearchResult,
+	ResourceUriQueryParameters,
 	retryImport,
 	ValidatedSourceURI,
 } from './apis.server';
 import retry from '~/utilities/retry';
 import makeProgress from '~/utilities/progress';
 import { addSeconds } from '~/utilities/date';
+import capitalize from '~/utilities/capitalize';
 
 export type API = ImportAPI<SourceType.SPOTIFY, SpotifyWebApi>;
 
@@ -105,7 +108,7 @@ export function getPlayerToken(api: API) {
 export function detectSourceType(uri: string): ValidatedSourceURI | null {
 	if (uri.startsWith('spotify:')) {
 		const uriType = uri.split(':')[1];
-		const resourceType = stringToResourceTypeOptional(uriType);
+		const resourceType = stringToResourceTypeOptional(uriType?.replace('track', 'song'));
 
 		if (resourceType) {
 			return { sourceType: SourceType.SPOTIFY, resourceType, uri };
@@ -118,7 +121,7 @@ export function detectSourceType(uri: string): ValidatedSourceURI | null {
 		const uriType = paths[0];
 		const id = paths[1].split('?')[0];
 
-		const resourceType = stringToResourceTypeOptional(uriType);
+		const resourceType = stringToResourceTypeOptional(uriType.replace('track', 'song'));
 
 		if (resourceType) {
 			return {
@@ -206,7 +209,8 @@ export async function searchForResourceWithType({
 							items.map((item) => ({
 								uri: item.uri,
 								title: item.name,
-								subtitle: item.artists.map((artist) => artist.name).join(', '),
+								type: ResourceType.SONG,
+								subtitle: `${capitalize(ResourceType.SONG)} – ${item.artists.map((artist) => artist.name).join(', ')}`,
 								thumbnailUrl: item.album.images[0]?.url ?? null,
 							})) ?? []
 					)
@@ -222,7 +226,8 @@ export async function searchForResourceWithType({
 							items.map((item) => ({
 								uri: item.uri,
 								title: item.name,
-								subtitle: item.genres.join(', '),
+								type: ResourceType.ARTIST,
+								subtitle: `${capitalize(ResourceType.SONG)} – ${item.genres.join(', ')}`,
 								thumbnailUrl: item.images[0]?.url ?? null,
 							})) ?? []
 					)
@@ -238,7 +243,8 @@ export async function searchForResourceWithType({
 							items.map((item) => ({
 								uri: item.uri,
 								title: item.name,
-								subtitle: item.artists.map((album) => album.name).join(', '),
+								type: ResourceType.ALBUM,
+								subtitle: `${capitalize(ResourceType.SONG)} – ${item.artists.map((album) => album.name).join(', ')}`,
 								thumbnailUrl: item.images[0]?.url ?? null,
 							})) ?? []
 					)
@@ -254,7 +260,8 @@ export async function searchForResourceWithType({
 							items.map((item) => ({
 								uri: item.uri,
 								title: item.name,
-								subtitle: item.owner.display_name ?? null,
+								type: ResourceType.PLAYLIST,
+								subtitle: `${ResourceType.PLAYLIST} – ${item.owner.display_name ?? ''}`,
 								thumbnailUrl: item.images[0]?.url ?? null,
 							})) ?? []
 					)
@@ -265,6 +272,56 @@ export async function searchForResourceWithType({
 				`Resource type ${resourceType} not supported by Spotify API`
 			);
 	}
+}
+
+export async function searchForResourceWithUri({
+	api,
+	resourceType,
+	search,
+}: ResourceSearchParameters<API>): Promise<ResourceSearchResult | null> {
+	const id = search.replace('track', 'song').replace(`spotify:${resourceType}:`, '');
+	let response: (() => Promise<any>) = async () => {};
+
+	switch (resourceType) {
+		case ResourceType.SONG:
+			response = () => api.service.getTrack(id);
+			break;
+
+		case ResourceType.ARTIST:
+			response = () => api.service.getArtist(id);
+			break;
+
+		case ResourceType.ALBUM:
+			response = () => api.service.getAlbum(id);
+			break;
+
+		case ResourceType.PLAYLIST:
+			response = () => api.service.getPlaylist(id);
+			break;
+	}
+
+	if (!response) {
+		throw new Error(
+			`Resource type ${resourceType} not supported by Spotify API`
+		);
+	}
+
+	return retryImport(() => response().then((res) => {
+		const rawData = res.body as any;
+		const images = (rawData.images ?? rawData.album?.images) as { url: string }[] || undefined;
+		const type = stringToResourceType(res.body.type.replace('track', 'song'));
+		const subtitle = rawData.artist ? `${capitalize(type)} rawData.artist.name` : capitalize(type);
+
+		return {
+			uri: res.body.uri,
+			title: res.body.name,
+			type,
+			subtitle: subtitle,
+			thumbnailUrl: images
+				? images[0]?.url ?? null
+				: null,
+		};
+	}));
 }
 
 export async function playResource(

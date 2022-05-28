@@ -12,7 +12,7 @@ export default function GenericRow({
 }) {
 	return (
 		<li
-			className="grid w-full grid-cols-12 items-center py-1 text-sm text-gray-200"
+			className="grid w-full grid-cols-12 items-center py-1 text-sm text-theme-200"
 			style={style}
 		>
 			<InlineFavouriteButton resource={resource} className="col-span-1" />

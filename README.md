@@ -132,3 +132,7 @@ This starts your app in development mode, rebuilding assets on file changes.
 - youtube-dl API
 - Internet Archive API
 - Archive API
+
+## Architecture & Todo
+
+![](resources/architecture-todo.png)

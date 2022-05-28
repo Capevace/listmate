@@ -84,13 +84,13 @@ function ConnectRow({
 	token: Token | null;
 }) {
 	return (
-		<div className="flex flex-col rounded-xl border border-gray-800  px-5 py-3">
+		<div className="flex flex-col rounded-xl border border-theme-800  px-5 py-3">
 			<div className="flex items-center justify-between">
 				<div className="flex flex-col gap-3">
 					<h1 className="text-xl font-bold">{capitalize(type)} Settings</h1>
 				</div>
 
-				<div className="grid grid-cols-3 items-center justify-end gap-4 font-semibold text-gray-400">
+				<div className="grid grid-cols-3 items-center justify-end gap-4 font-semibold text-theme-400">
 					{token ? (
 						<>
 							<span className="text-xs opacity-0 xl:opacity-100">

@@ -4,6 +4,10 @@ import path from 'path';
 import mime from 'mime-types';
 import type { FileReference } from '@prisma/client';
 
+export type FileReferenceWithUrl = FileReference & {
+	url: URL;
+};
+
 export function uniqueFilename(
 	id: FileReference['id'],
 	mimeType: FileReference['mimeType']
@@ -11,7 +15,7 @@ export function uniqueFilename(
 	return `${id}.${mime.extension(mimeType)}`;
 }
 
-export function getFile(id: FileReference['id']) {
+export async function getFile(id: FileReference['id']) {
 	return prisma.fileReference.findUnique({
 		where: {
 			id,

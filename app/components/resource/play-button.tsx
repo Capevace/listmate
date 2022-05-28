@@ -15,7 +15,7 @@ export default function PlayButton({ track, playContext }: PlayButtonProps) {
 	};
 
 	return (
-		<button className="text-gray-400 hover:text-gray-100" onClick={onClick}>
+		<button className="text-theme-400 hover:text-theme-100" onClick={onClick}>
 			<PlayIcon className="w-6" />
 		</button>
 	);

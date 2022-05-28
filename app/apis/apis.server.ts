@@ -165,9 +165,99 @@ export async function importResourceWithType(
 export type ResourceSearchResult = {
 	uri: string;
 	title: string;
+	type: ResourceType;
 	subtitle: string | null;
 	thumbnailUrl: string | null;
 };
+
+export type GeneralSearchParameters<TImportAPI extends ImportAPI = ImportAPI> =
+	{
+		api: TImportAPI;
+		userId: User['id'];
+		progress?: ProgressFunction;
+		sourceTypes: SourceType[];
+		resourceTypes: ResourceType[];
+		search: string;
+	};
+
+type Unarray<T> = T extends Array<infer U> ? U : T;
+
+export type GeneralSearchResults<EResourceType extends ResourceType> = {
+	resourceType: EResourceType;
+	sourceType: SourceType;
+	searchResults: ResourceSearchResult[];
+};
+
+export async function searchForResource(
+	parameters: GeneralSearchParameters
+): Promise<GeneralSearchResults<Unarray<typeof parameters.resourceTypes>>[]> {
+	const validatedUris = detectSourceType(parameters.search).filter(
+		(validatedUri) =>
+			parameters.sourceTypes.includes(validatedUri.sourceType) &&
+			parameters.resourceTypes.includes(validatedUri.resourceType)
+	);
+
+	let results: {
+		[key in Unarray<typeof parameters.resourceTypes>]?: Promise<
+			GeneralSearchResults<Unarray<typeof parameters.resourceTypes>> | null
+		>;
+	} = {};
+
+	// When validated uris are found, we lookup those uri's directly (spotify.getTrack, etc)
+	if (validatedUris.length > 0) {
+		for (const validatedUri of validatedUris) {
+			results[validatedUri.resourceType] = (async () => {
+				const result = await searchForResourceWithUri({
+					...parameters,
+					sourceType: validatedUri.sourceType,
+					uri: validatedUri.uri,
+				});
+
+				return {
+					resourceType: validatedUri.resourceType,
+					sourceType: validatedUri.sourceType,
+					searchResults: result ? [result] : [],
+				};
+			})();
+		}
+	} else { // otherwise we run general search
+		for (const sourceType of parameters.sourceTypes) {
+			for (const resourceType of parameters.resourceTypes) {
+				switch (sourceType) {
+					case SourceType.SPOTIFY:
+						results[resourceType] = (async () => {
+							try {
+								const searchResults = await spotifyApi.searchForResourceWithType({
+									...parameters,
+									sourceType,
+									resourceType,
+								} as ResourceSearchParameters<spotifyApi.API>);
+
+								return {
+									resourceType,
+									sourceType,
+									searchResults,
+								};
+							} catch (e) {
+								return null;
+							}
+						})();
+
+					// case SourceType.YOUTUBE:
+					// 	return youtubeApi.searchForResourceWithType(
+					// 		parameters as GeneralSearchParameters<youtubeApi.API>
+					// 	);
+				}
+			}
+		}
+	}
+
+	const unfilteredResults = await Promise.all(Object.values(results));
+
+	console.log(unfilteredResults.filter(result => result !== null) as GeneralSearchResults<Unarray<typeof parameters.resourceTypes>>[])
+
+	return unfilteredResults.filter(result => result !== null) as GeneralSearchResults<Unarray<typeof parameters.resourceTypes>>[];
+}
 
 export type ResourceSearchParameters<TImportAPI extends ImportAPI = ImportAPI> =
 	{
@@ -194,7 +284,51 @@ export async function searchForResourceWithType(
 			);
 
 		default:
-			throw new Error(`Unsupported API type ${parameters.sourceType}`);
+			throw new Error(
+				`searchForResourceWithType: Unsupported API type ${parameters.sourceType}`
+			);
+	}
+}
+
+export type ResourceUriQueryParameters<
+	TImportAPI extends ImportAPI = ImportAPI
+> = {
+	api: TImportAPI;
+	userId: User['id'];
+	progress?: ProgressFunction;
+	sourceType: SourceType;
+	uri: string;
+};
+
+export async function searchForResourceWithUri(
+	parameters: ResourceUriQueryParameters
+): Promise<ResourceSearchResult | null> {
+	const validatedUris = detectSourceType(parameters.uri);
+
+	if (validatedUris.length === 0) {
+		return null;
+	}
+
+	const validatedUri = validatedUris[0];
+
+	switch (parameters.sourceType) {
+		case SourceType.SPOTIFY:
+			return spotifyApi.searchForResourceWithUri({
+				...parameters,
+				sourceType: SourceType.SPOTIFY,
+				resourceType: validatedUri.resourceType,
+				search: validatedUri.uri,
+			} as ResourceSearchParameters<spotifyApi.API>);
+
+		// case SourceType.YOUTUBE:
+		// 	return youtubeApi.searchForResourceWithUri(
+		// 		parameters as ResourceUriQueryParameters<youtubeApi.API>
+		// 	);
+
+		default:
+			throw new Error(
+				`searchForResourceWithUri: Unsupported API type ${parameters.sourceType}`
+			);
 	}
 }
 

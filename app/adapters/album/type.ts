@@ -2,8 +2,10 @@ import type {
 	Resource,
 	ResourceType,
 	ValueRef,
-	ValueType,
+	ValueType
 } from '~/models/resource/types';
+// import { composeResourceSchema } from '~/models/resource/types';
+import * as zod from 'zod';
 
 export type AlbumData = {
 	name: ValueRef<ValueType.TEXT>;

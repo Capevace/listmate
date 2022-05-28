@@ -1,5 +1,6 @@
 import { Download } from 'react-bootstrap-icons';
 import { Link } from 'remix';
+import { useState, useRef } from 'react';
 import InlineFavouriteButton from '~/components/resource/inline-favourite-button';
 import RefreshButton from '~/components/resource/refresh-button';
 import {
@@ -12,7 +13,11 @@ import {
 import capitalize from '~/utilities/capitalize';
 import composeCoverUrl from '~/utilities/cover-url';
 import { composeResourceUrl } from '~/utilities/resource-url';
-import CompactView from './compact-view';
+import CompactView from './compact';
+
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as zod from 'zod';
 
 export type CompactResourceViewProps = {
 	resource: Resource;
@@ -36,11 +41,34 @@ export default function CompactResourceView({
 		? (values.description as ValueRef<ValueType.TEXT>).value
 		: null;
 
+	const [title, setTitle] = useState(resource.title);
+
+	const [editingTitle, setEditingTitle] = useState(false);
+	const timer = useRef();
+
+	const onClickHandler = (event) => {
+        if (event.detail === 2) {
+            setEditingTitle(() => !editingTitle);
+        }
+    };
+
+    const schema = zod.object({
+		name: zod.string().min(1, { message: 'Required' }),
+		age: zod.number().min(10),
+	});
+
+	const {
+		register,
+		handleSubmit,
+		formState: { errors },
+	} = useForm({
+		resolver: zodResolver(schema),
+	});
+
 	return (
 		<CompactView
 			parentRef={parentRef}
-			title={resource.title}
-			subtitle={description}
+			resource={resource}
 			top={top}
 			headerDetails={
 				<>
@@ -59,8 +87,6 @@ export default function CompactResourceView({
 					))}
 				</>
 			}
-			coverUrl={composeCoverUrl(resource)}
-			showCover={showCover}
 			actions={
 				<>
 					{actions}

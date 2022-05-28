@@ -18,12 +18,20 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
 	const path = getFilePath(file);
 	const contentType = getContentType(file);
-	const contents = await fs.readFile(path);
 
-	return new Response(contents, {
-		headers: {
-			'Content-Type': contentType || 'application/octet-stream, charset=utf-8',
-			'Cache-Control': 'public,max-age=31536000,immutable',
-		},
-	});
+	try {
+		const contents = await fs.readFile(path);
+
+		return new Response(contents, {
+			headers: {
+				'Content-Type':
+					contentType || 'application/octet-stream, charset=utf-8',
+				'Cache-Control': 'public,max-age=31536000,immutable',
+			},
+		});
+	} catch (e) {
+		return new Response(null, {
+			status: 404,
+		});
+	}
 };
