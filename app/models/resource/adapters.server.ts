@@ -1,43 +1,39 @@
-import {
+import type {
 	DataObject,
 	DataObjectRemote,
 	DataObjectValue,
 	FileReference,
 	ValueArrayItem,
 } from '@prisma/client';
-
-import { getArtistDetails } from '~/adapters/artist/adapter.server';
+import invariant from 'tiny-invariant';
 import { getAlbumDetails } from '~/adapters/album/adapter.server';
+import { getArtistDetails } from '~/adapters/artist/adapter.server';
+import type { Artist } from '~/adapters/artist/type';
+import { getChannelDetails } from '~/adapters/channel/adapter.server';
+import type { Channel } from '~/adapters/channel/type';
+import { getCollectionDetails } from '~/adapters/collection/adapter.server';
+import { getDetails as getPlaylistDetails } from '~/adapters/playlist/adapter.server';
 import { getSongDetails } from '~/adapters/song/adapter.server';
-
+import { getVideoDetails } from '~/adapters/video/adapter.server';
+import type { Video } from '~/adapters/video/type';
 // export * from '~/models/resource/adapters/types';
-
-import {
+import type {
 	Album,
 	Collection,
 	Playlist,
 	Resource,
 	ResourceDetails,
 	ResourceRemotes,
-	ResourceType,
 	Song,
+} from '~/models/resource/types';
+import {
+	ResourceType,
 	stringToResourceType,
 	stringToSourceType,
 	stringToValueType,
-	ValueRef,
 	ValueType,
-	ValueTypeRawValue,
 } from '~/models/resource/types';
-import { getFileUrl } from '~/models/file.server'
-import invariant from 'tiny-invariant';
-import { getCollectionDetails } from '~/adapters/collection/adapter.server';
-import { getPlaylistDetails } from '~/adapters/playlist/adapter.server';
-import { Artist } from '~/adapters/artist/type';
-import { getVideoDetails } from '~/adapters/video/adapter.server';
-import { Video } from '~/adapters/video/type';
-import { Channel } from '~/adapters/channel/type';
 import { deserializeValue } from './serialize';
-import { getChannelDetails } from '~/adapters/channel/adapter.server';
 
 export type CompleteDataObjectValue = DataObjectValue & {
 	valueDataObject: DataObject | null;
@@ -70,14 +66,14 @@ export function dataObjectToResource<TResource extends Resource>(
 ): Resource {
 	const values = dataObject.values
 		.map((value) => {
-			if (value.type === ValueType.RESOURCE_LIST) {
+			if (value.type === ValueType.LIST) {
 				return [
 					value.key,
 					value.items.map((childValue) =>
 						deserializeValue({
 							...value,
-							type: ValueType.RESOURCE,
 							...childValue,
+							type: stringToValueType(childValue.type),
 						})
 					),
 				] as [string, ValueRef[]];

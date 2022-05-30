@@ -710,7 +710,7 @@ export async function upsertValues(
 				update: {
 					isArray: true,
 					valueDataObjectId: null,
-					type: ValueType.RESOURCE_LIST,
+					type: ValueType.LIST,
 					value: serializedValue,
 					items: {
 						deleteMany: {},
@@ -719,7 +719,7 @@ export async function upsertValues(
 				create: {
 					dataObjectId: resource.id,
 					key,
-					type: ValueType.RESOURCE_LIST,
+					type: ValueType.LIST,
 					value: serializedValue,
 					isArray: true,
 				},

@@ -2,18 +2,27 @@ import {
 	Spotify as SpotifyIcon,
 	Youtube as YoutubeIcon,
 } from 'react-bootstrap-icons';
-import { Except, SetOptional } from 'type-fest';
+import type { Except, SetOptional } from 'type-fest';
+import { Album } from '~/adapters/album/type';
+import { Artist } from '~/adapters/artist/type';
+import { Channel } from '~/adapters/channel/type';
+import { Playlist } from '~/adapters/playlist/type';
+import { Song } from '~/adapters/song/type';
+import { Video } from '~/adapters/video/type';
+import type { AnyData, AnySerializedData } from './refs';
 
-export * from './group-type';
-
-// Adapter Types
-export * from '~/adapters/collection/type';
 export * from '~/adapters/album/type';
 export * from '~/adapters/artist/type';
-export * from '~/adapters/song/type';
+// Adapter Types
+export * from '~/adapters/collection/type';
 export * from '~/adapters/playlist/type';
-export * from '~/adapters/webpage/type';
-export * from '~/adapters/rss-feed/type';
+export * from '~/adapters/song/type';
+export * from './group-type';
+
+export enum SerializationMode {
+	SERIALIZED = 'serialized',
+	DESERIALIZED = 'deserialized',
+}
 
 /**
  * Resource's are used as an abstraction for data objects.
@@ -22,21 +31,23 @@ export * from '~/adapters/rss-feed/type';
  * and we have some more flexibility without having to change implementations.
  */
 export type Resource<
-	TResourceType extends ResourceType = ResourceType,
-	TValues extends ResourceValues = ResourceValues
+	T extends ResourceType = ResourceType,
+	V extends Values = ResourceValues
 > = {
 	id: string;
 	title: string; // always available string, most basic representation of item
-	type: TResourceType;
+	type: T;
 	isFavourite: boolean;
-
-	// somehow, I can't seem to figure out how to type values properly, so its just an object for now.
-	// BUT, it can only contain values of the following signature: RawValue<T> | ValueRef<T, R> | ValueRef<T, R>[]
-	values: TValues;
+	values: V;
 
 	thumbnail: ResourceFile | null;
 	remotes: ResourceRemotes;
 };
+
+export type SerializedResource<
+	T extends ResourceType = ResourceType,
+	V extends SerializedValues = SerializedValues
+> = Resource<T, V>;
 
 /**
  * This type of Resource makes certain properties optional.
@@ -45,12 +56,6 @@ export type Resource<
 export type ResourceWithoutDefaults<TResource extends Resource = Resource> =
 	SetOptional<Except<TResource, 'id'>, 'isFavourite' | 'thumbnail'>;
 
-export type ResourceWithSerializedValues<
-	TResource extends Resource = Resource
-> = Except<ResourceWithoutDefaults<TResource>, 'values'> & {
-	values: SerializedValues<TResource['values']>;
-};
-
 /**
  * ResourceType expresses what kind of resource it is.
  *
@@ -58,8 +63,6 @@ export type ResourceWithSerializedValues<
  */
 export enum ResourceType {
 	COLLECTION = 'collection',
-
-	WEBPAGE = 'webpage',
 
 	// Music (Spotify etc)
 	PLAYLIST = 'playlist',
@@ -70,9 +73,9 @@ export enum ResourceType {
 	// Video (YouTube etc.)
 	VIDEO = 'video',
 	CHANNEL = 'channel',
-
-	RSS_FEED = 'rss_feed',
 }
+
+export type AnyResource = Playlist | Song | Artist | Album | Video | Channel;
 
 /**
  * A list of all resource types.
@@ -227,38 +230,15 @@ export function sourceTypeToName(type: SourceType): string {
  *
  * It is a map of key to corresponding ValueRef.
  */
-export type ResourceValues<EValueType extends ValueType = ValueType> = {
-	[key: string]: ValueRef<EValueType> | ValueRef<EValueType>[] | null;
+type Values<serialization extends SerializationMode = SerializationMode> = {
+	[key: string]: serialization extends SerializationMode.SERIALIZED
+		? AnySerializedData
+		: AnyData;
 };
-
-/**
- * Complicated type that casts all ValueRef generics to string for a given resource
- */
-export type SerializedValues<
-	TResourceValues extends ResourceValues = ResourceValues
-> = {
-	[key in keyof TResourceValues]:
-		| SerializedValueRef
-		| SerializedValueRef[]
-		| null;
-};
+export type ResourceValues = Values<SerializationMode.DESERIALIZED>;
+export type SerializedValues = Values<SerializationMode.SERIALIZED>;
 
 export type ResourceRemotes = { [key in SourceType]?: string };
-
-/**
- * ValueRef's are the representation for DataObjectValues that link to a DataObject.
- *
- * They are based on RawValues, so always contain a value (most often the DataObject's title).
- * However, they may also contain a reference to another DataObject.
- *
- * Used for: A song's artist / an album's artist.
- */
-export type ValueRef<EValueType extends ValueType = ValueType> = {
-	value: ValueTypeRawValue<EValueType>;
-	type: EValueType;
-	ref: ValueRefType<EValueType> | null;
-	url?: string;
-};
 
 // /**
 //  * RawValues are the most basic form of ValueRef, in that they do not link to another DataObject,
@@ -277,23 +257,13 @@ export type SerializedValueRef = {
 	ref?: Resource['id'];
 };
 
-export type SerializedResource<TResource extends Resource> = Except<
-	TResource,
-	'values'
-> & {
-	values: SerializedValues<TResource['values']>;
-};
-
 export enum ValueType {
 	TEXT = 'text',
 	NUMBER = 'number',
-
 	DATE = 'date',
 	URL = 'url',
 	SOURCE_TYPE = 'source-type',
-
-	RESOURCE = 'resource',
-	RESOURCE_LIST = 'resource-list',
+	LIST = 'list',
 }
 
 export const VALUE_TYPES: { [key in ValueType]: ValueType } = {
@@ -302,31 +272,28 @@ export const VALUE_TYPES: { [key in ValueType]: ValueType } = {
 	date: ValueType.DATE,
 	url: ValueType.URL,
 	'source-type': ValueType.SOURCE_TYPE,
-	resource: ValueType.RESOURCE,
-	'resource-list': ValueType.RESOURCE_LIST,
+	list: ValueType.LIST,
 };
 
-export type ValueTypeRawValue<EValueType extends ValueType> =
-	EValueType extends ValueType.RESOURCE_LIST
-		? Resource['title']
-		: EValueType extends ValueType.RESOURCE
-		? Resource['title']
-		: EValueType extends ValueType.SOURCE_TYPE
-		? SourceType
-		: EValueType extends ValueType.URL
-		? URL
-		: EValueType extends ValueType.DATE
-		? Date
-		: EValueType extends ValueType.NUMBER
-		? number
-		: string;
+// export type ValueTypeRawValue<EValueType extends ValueType> =
+// 	EValueType extends ValueType.RESOURCE_LIST
+// 		? Resource['title']
+// 		: EValueType extends ValueType.SOURCE_TYPE
+// 		? SourceType
+// 		: EValueType extends ValueType.URL
+// 		? URL
+// 		: EValueType extends ValueType.DATE
+// 		? Date
+// 		: EValueType extends ValueType.NUMBER
+// 		? number
+// 		: string;
 
-export type ValueRefType<EValueType extends ValueType> =
-	EValueType extends ValueType.RESOURCE_LIST
-		? Resource['id']
-		: EValueType extends ValueType.RESOURCE
-		? Resource['id']
-		: undefined;
+// export type ValueRefType<EValueType extends ValueType> =
+// 	EValueType extends ValueType.RESOURCE_LIST
+// 		? Resource['id']
+// 		: EValueType extends ValueType.RESOURCE
+// 		? Resource['id']
+// 		: undefined;
 
 /**
  * Convert a string to a SourceType.
@@ -385,7 +352,7 @@ export type ResourceDetails = {};
  * Base type for DetailViewProps
  */
 export type ResourceDetailsProps<
-	TResource extends Resource = Resource,
+	TResource extends Resource = AnyResource,
 	TResourceDetails extends ResourceDetails = ResourceDetails
 > = {
 	resource: TResource;

@@ -1,36 +1,28 @@
-import {
-	Collection,
-	Resource,
-	ResourceDetailsProps,
-	ResourceType,
-} from '~/models/resource/types';
-import type { CollectionDetails } from './adapter.server';
-
-import GenericListView from '~/components/views/generic-list-view';
 import { useRef } from 'react';
 import invariant from 'tiny-invariant';
 import CompactResourceView from '~/components/views/compact-view/compact-resource-header';
-import BaseRow from '~/components/views/rows/base-row';
+import GenericListView from '~/components/views/generic-list-view';
+import ResourceRow from '~/components/views/rows/ResourceRow';
+import type {
+	CollectionDetails,
+	Resource,
+	ResourceDetails,
+	ResourceDetailsProps,
+} from '~/models/resource/types';
 
 export type CollectionDetailsProps<
 	TResource extends Resource,
-	TResourceType extends ResourceType
-> = ResourceDetailsProps<
-	Collection<TResource, TResourceType>,
-	CollectionDetails<TResource>
-> & {
+	TDetails extends ResourceDetails
+> = ResourceDetailsProps<TResource, TDetails> & {
 	actions?: JSX.Element;
 };
 
 export default function CollectionDetailsView<
 	TResource extends Resource = Resource,
-	TResourceType extends ResourceType = ResourceType.COLLECTION
->({
-	resource,
-	details,
-	actions,
-}: CollectionDetailsProps<TResource, TResourceType>) {
+	TDetails extends CollectionDetails = CollectionDetails
+>({ resource, details, actions }: CollectionDetailsProps<TResource, TDetails>) {
 	const ref = useRef<HTMLDivElement>(null);
+	const items = details.items;
 
 	return (
 		<CompactResourceView
@@ -40,18 +32,18 @@ export default function CollectionDetailsView<
 			showCover
 		>
 			<GenericListView
-				size={details.items.length}
+				size={items.length}
 				estimateHeight={() => 50}
 				parentRef={ref}
 			>
 				{(index, row) => {
 					invariant(row, 'Only JS-enabled supported for now');
 
-					const item = details.items[index];
+					const item = items[index];
 
 					return (
-						<BaseRow
-							key={`${item.id}-${index}`}
+						<ResourceRow
+							key={`${item}-${index}`}
 							resource={item}
 							style={
 								row

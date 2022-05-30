@@ -1,7 +1,11 @@
-import type { Album, Collection, Playlist } from '~/models/resource/types';
-import type { AlbumDetails } from '~/adapters/album/adapter.server';
-import type { PlaylistDetails } from '~/adapters/playlist/adapter.server';
-import type { CollectionDetails } from '~/adapters/collection/adapter.server';
+import type {
+	Album,
+	AlbumDetails,
+	Collection,
+	CollectionDetails,
+	Playlist,
+	PlaylistDetails,
+} from '~/models/resource/types';
 
 import { ResourceDetailsProps, ResourceType } from '~/models/resource/types';
 

@@ -1,15 +1,25 @@
 import type {
-	Resource,
-	ResourceType,
-	ValueType,
-	ValueRef,
-} from '~/models/resource/types';
+	DataSchema,
+	DateData,
+	TextData,
+	UrlData,
+} from '~/models/resource/refs';
+import { Schemas } from '~/models/resource/refs';
+import type { Resource, ResourceType } from '~/models/resource/types';
+import { ValueType } from '~/models/resource/types';
 
 export type ChannelData = {
-	name: ValueRef<ValueType.TEXT>;
-	description: ValueRef<ValueType.TEXT> | null;
-	url: ValueRef<ValueType.URL> | null;
-	createdAt: ValueRef<ValueType.DATE> | null;
+	name: TextData;
+	description: TextData;
+	url: UrlData;
+	createdAt: DateData;
+};
+
+export const ChannelDataSchema: DataSchema<ChannelData> = {
+	name: Schemas[ValueType.TEXT]().min(1), // title is required
+	description: Schemas[ValueType.TEXT]().optional(),
+	url: Schemas[ValueType.URL]().optional(),
+	createdAt: Schemas[ValueType.DATE]().optional(),
 };
 
 export type Channel = Resource<ResourceType.CHANNEL, ChannelData>;

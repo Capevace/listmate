@@ -1,12 +1,16 @@
-import { GroupType, ResourceType, Song } from '~/models/resource/types';
-import CollectionDetailsView, {
-	CollectionDetailsProps,
-} from '~/adapters/collection/details-view';
-import findPreferredRemote from '~/utilities/preferred-remote';
-import { PlayableTrack, PlayerContext, Queue } from '~/components/player/types';
+import type { CollectionDetailsProps } from '~/adapters/collection/details-view';
+import CollectionDetailsView from '~/adapters/collection/details-view';
+import type {
+	PlayableTrack,
+	PlayerContext,
+	Queue,
+} from '~/components/player/types';
 import InlinePlayButton from '~/components/resource/inline-play-button';
+import type { Playlist, PlaylistDetails } from '~/models/resource/types';
+import { GroupType } from '~/models/resource/types';
+import findPreferredRemote from '~/utilities/preferred-remote';
 
-type PlaylistDetailsProps = CollectionDetailsProps<Song, ResourceType.PLAYLIST>;
+type PlaylistDetailsProps = CollectionDetailsProps<Playlist, PlaylistDetails>;
 
 export default function PlaylistDetailsView(props: PlaylistDetailsProps) {
 	const queue: Queue = props.details.items

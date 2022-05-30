@@ -1,37 +1,50 @@
-import type { Resource, ValueRef } from '~/models/resource/types';
-import capitalize from '~/utilities/capitalize';
-import ResourceValueLabel from '~/components/common/resource-value-label';
-import BaseValue from './values/base-value';
-import { PencilFill } from 'react-bootstrap-icons';
-import { Form, Link, useLocation } from 'remix';
-import { object, string, ZodSchema } from 'zod';
-import { useEffect, useRef, useState } from 'react';
-import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-	composeResourceUrl,
-	composeShortResourceUrl,
-} from '~/utilities/resource-url';
+import { useEffect, useState } from 'react';
+import { PencilFill } from 'react-bootstrap-icons';
+import { useForm } from 'react-hook-form';
+import { Form, Link, useLocation } from 'remix';
+import { object, string } from 'zod';
+import type { StrictValueData } from '~/models/resource/refs';
+import type { Resource } from '~/models/resource/types';
+import { ValueType } from '~/models/resource/types';
+import capitalize from '~/utilities/capitalize';
+import { composeShortResourceUrl } from '~/utilities/resource-url';
+import DataField from './values/DataField';
 
-type ValueFormProps = {
-	value: ValueRef;
-	schema: ZodSchema;
+type DetailTitleProps = {
+	label: string;
+	editUrl: string;
+	onEdit: () => void;
 };
 
-function ValueForm({ value, schema }: ValueFormProps) {
-	return <></>;
+function DetailTitle({ label, editUrl, onEdit }: DetailTitleProps) {
+	return (
+		<dt className="flex items-center gap-2 text-sm font-medium text-theme-400">
+			{label}
+			<Link
+				className="opacity-40 hover:opacity-100"
+				to={editUrl}
+				onClick={onEdit}
+			>
+				<PencilFill />
+			</Link>
+		</dt>
+	);
 }
 
 type ValueBlockProps = {
-	valueKey: string;
 	resource: Resource;
-	value: ValueRef | null;
+	valueKey: string;
+	data: StrictValueData;
 	className?: string;
 };
 
-function Key() {}
-
-function ValueBlock({ valueKey, value, resource, className }: ValueBlockProps) {
+function StrictValueBlock({
+	valueKey,
+	data,
+	resource,
+	className,
+}: ValueBlockProps) {
 	const location = useLocation();
 	let search = new URLSearchParams(location.search);
 	const editKeys = search.getAll('edit');
@@ -47,8 +60,7 @@ function ValueBlock({ valueKey, value, resource, className }: ValueBlockProps) {
 		);
 	}
 
-	const editUrl = `?${search.toString()}`;
-	const initialValue = value ? (value.value as string) : '';
+	const initialValue = data ? String(data.value) : '';
 	const {
 		register,
 		handleSubmit,
@@ -71,41 +83,32 @@ function ValueBlock({ valueKey, value, resource, className }: ValueBlockProps) {
 			method="post"
 			action={composeShortResourceUrl(resource.id, `update-value`)}
 		>
+			<input type="submit" className="hidden" />
+			<input type="hidden" name="key" value={valueKey} />
+			{/* <input type="hidden" name="ref" value={null} /> */}
 			<input
 				type="hidden"
 				name="redirectUrl"
 				value={`${location.pathname}?${search.toString()}`}
 			/>
-			<input type="submit" className="hidden" />
 
-			<input type="hidden" name="key" value={valueKey} />
-			{/* <input type="hidden" name="ref" value={null} /> */}
+			<DetailTitle
+				label={capitalize(valueKey)}
+				editUrl={`?${search.toString()}`}
+				onEdit={() => setEditing((editing) => !editing)}
+			/>
 
-			<dt className="flex items-center gap-2 text-sm font-medium text-theme-400">
-				{capitalize(valueKey)}
-				<Link
-					className="opacity-40 hover:opacity-100"
-					to={editUrl}
-					onClick={(e) => setEditing((editing) => !editing)}
-				>
-					<PencilFill />
-				</Link>
-			</dt>
 			<dd className="mt-1 text-lg font-medium sm:col-span-2 sm:mt-0">
-				{value ? (
-					editing ? (
-						<input
-							defaultValue={initialValue}
-							{...register('value')}
-							className="w-full rounded bg-theme-800 px-1"
-						/>
-					) : (
-						<span className="block truncate">
-							<BaseValue valueRef={value} />
-						</span>
-					)
+				{editing ? (
+					<input
+						defaultValue={initialValue}
+						{...register('value')}
+						className="w-full rounded bg-theme-800 px-1"
+					/>
 				) : (
-					'-'
+					<span className="block truncate">
+						<DataField data={data} />
+					</span>
 				)}
 			</dd>
 		</Form>
@@ -113,20 +116,21 @@ function ValueBlock({ valueKey, value, resource, className }: ValueBlockProps) {
 }
 
 export default function ValueGrid({ resource }: { resource: Resource }) {
-	const valueList = Object.entries(resource.values) as [
-		[string, ValueRef | null]
-	];
 	return (
 		<dl className="grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-6">
-			{valueList.map(([key, value]: [string, ValueRef | null]) => (
-				<ValueBlock
-					key={key}
-					valueKey={key}
-					value={value}
-					resource={resource}
-					className="col-span-2"
-				/>
-			))}
+			{Object.entries(resource.values).map(([key, value]) =>
+				value.type === ValueType.LIST ? (
+					'list'
+				) : (
+					<StrictValueBlock
+						key={key}
+						valueKey={key}
+						data={value}
+						resource={resource}
+						className="col-span-2"
+					/>
+				)
+			)}
 		</dl>
 	);
 }

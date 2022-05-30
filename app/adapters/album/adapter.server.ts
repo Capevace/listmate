@@ -1,7 +1,4 @@
-import type { Album } from '~/adapters/album/type';
-import type { Song } from '~/adapters/song/type';
-
-import { ResourceDetails } from '~/models/resource/types';
+import type { Album, AlbumDetails, Song } from '~/models/resource/types';
 import { resolveValueRefArray } from '~/models/resource/resource.server';
 
 // export function dataObjectToAlbum(
@@ -24,10 +21,6 @@ import { resolveValueRefArray } from '~/models/resource/resource.server';
 // 		},
 // 	};
 // }
-
-export type AlbumDetails = ResourceDetails & {
-	songs: Song[];
-};
 
 export async function getAlbumDetails(album: Album): Promise<AlbumDetails> {
 	const songs = await resolveValueRefArray(album.id, 'songs');

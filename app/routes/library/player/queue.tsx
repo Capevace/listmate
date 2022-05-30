@@ -5,7 +5,7 @@ import composePageTitle from '~/utilities/page-title';
 import { MetaFunction } from 'remix';
 import CompactView from '~/components/views/compact-view/compact-view';
 import { useRef } from 'react';
-import BaseRow from '~/components/views/rows/base-row';
+import ResourceRow from '~/components/views/rows/ResourceRow';
 
 export const meta: MetaFunction = () => {
 	return {
@@ -45,7 +45,7 @@ export default function QueueView() {
 					}
 
 					return (
-						<BaseRow
+						<ResourceRow
 							key={`${resource.id}-${index}`}
 							measureRef={row.measureRef}
 							resource={resource}

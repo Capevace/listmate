@@ -1,20 +1,19 @@
-import type {
-	Resource,
-	ResourceType,
-	ValueRef,
-	ValueType
-} from '~/models/resource/types';
-// import { composeResourceSchema } from '~/models/resource/types';
-import * as zod from 'zod';
+import type { DataSchema, ListData, TextData } from '~/models/resource/refs';
+import { Schemas } from '~/models/resource/refs';
+import type { Resource, ResourceType, Song } from '~/models/resource/types';
+import { ValueType } from '~/models/resource/types';
 
 export type AlbumData = {
-	name: ValueRef<ValueType.TEXT>;
-	artist: ValueRef<ValueType.RESOURCE> | null;
-	songs: ValueRef<ValueType.RESOURCE>[];
+	name: TextData;
+	artist: TextData;
+	songs: ListData;
+};
 
-	// release_date: '1976-10-14';
-	// release_date_precision: 'day';
-	// total_tracks: 13;
+export const AlbumDataSchema: DataSchema<AlbumData> = {
+	name: Schemas[ValueType.TEXT]().min(1), // title is required
+	artist: Schemas[ValueType.TEXT]().optional(),
+	songs: Schemas[ValueType.LIST]().optional(),
 };
 
 export type Album = Resource<ResourceType.ALBUM, AlbumData>;
+export type AlbumDetails = { songs: Song[] };

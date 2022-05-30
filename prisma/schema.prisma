@@ -104,6 +104,7 @@ model ValueArrayItem {
     parentKey          String
     position           Int
 
+    type              String      @default("text") // TEXT, NUMBER, RESOURCE
     value             String
     valueDataObject   DataObject? @relation("ValueArrayReferences", fields: [valueDataObjectId], references: [id], onDelete: SetNull)
     valueDataObjectId String?

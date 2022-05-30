@@ -1,12 +1,14 @@
-import type {
-	Resource,
-	ResourceType,
-	ValueType,
-	ValueRef,
-} from '~/models/resource/types';
+import type { DataSchema, TextData } from '~/models/resource/refs';
+import { Schemas } from '~/models/resource/refs';
+import type { Resource, ResourceType } from '~/models/resource/types';
+import { ValueType } from '~/models/resource/types';
 
 export type ArtistData = {
-	name: ValueRef<ValueType.TEXT>;
+	name: TextData;
+};
+
+export const ArtistDataSchema: DataSchema<ArtistData> = {
+	name: Schemas[ValueType.TEXT]().min(1), // title is required
 };
 
 export type Artist = Resource<ResourceType.ARTIST, ArtistData>;

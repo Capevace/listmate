@@ -6,7 +6,12 @@ import invariant from 'tiny-invariant';
 import { useRef } from 'react';
 
 import { requireUserId } from '~/session.server';
-import { findResourcesByType, paginateResources, FilterOperator, PaginatedResources } from '~/models/resource/resource.server';
+import {
+	findResourcesByType,
+	paginateResources,
+	FilterOperator,
+	PaginatedResources,
+} from '~/models/resource/resource.server';
 import { stringToGroupTypeOptional } from '~/models/resource/group-type';
 import { stringToResourceTypeOptional } from '~/models/resource/types';
 import { findOptionalPageQuery } from '~/utilities/paginate';
@@ -16,7 +21,7 @@ import composePageTitle from '~/utilities/page-title';
 import CompactView from '~/components/views/compact-view/compact-view';
 import GenericListView from '~/components/views/generic-list-view';
 import type { ContextLoaderFunction } from '~/models/context';
-import BaseRow from '~/components/views/rows/base-row';
+import ResourceRow from '~/components/views/rows/ResourceRow';
 import ErrorView from '~/components/views/error-view';
 
 type LoaderData = {
@@ -51,13 +56,13 @@ export const loader: LoaderFunction = async ({
 			{
 				key: 'type',
 				operator: FilterOperator.Equals,
-				needle: resourceType
-			}
+				needle: resourceType,
+			},
 		],
 		slice: {
 			page: 1,
-			max: 20
-		}
+			max: 20,
+		},
 	});
 
 	return json<LoaderData>({
@@ -98,7 +103,7 @@ export default function ListPage() {
 					const isMasonry = false && resource.type === ResourceType.ALBUM;
 
 					return (
-						<BaseRow
+						<ResourceRow
 							key={`${resource.id}-${index}`}
 							measureRef={row.measureRef}
 							resource={resource}
@@ -131,12 +136,10 @@ export default function ListPage() {
 
 export function CatchBoundary() {
 	const caught = useCatch();
-	console.log('lol')
+	console.log('lol');
 
 	if (caught.status === 404) {
-		return (
-			<ErrorView status={404} className="mt-20" />
-		);
+		return <ErrorView status={404} className="mt-20" />;
 	}
 
 	throw new Error(`Unexpected caught response with status: ${caught.status}`);

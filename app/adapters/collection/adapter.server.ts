@@ -1,11 +1,6 @@
-import type { Collection } from './type';
-
-import {
-	Resource,
-	ResourceDetails,
-	ResourceType,
-} from '~/models/resource/types';
 import { resolveValueRefArray } from '~/models/resource/resource.server';
+import type { Resource, ResourceType } from '~/models/resource/types';
+import type { Collection, CollectionDetails } from './type';
 
 // export function dataObjectToCollection<
 // 	TResource extends Resource = Resource,
@@ -32,16 +27,11 @@ import { resolveValueRefArray } from '~/models/resource/resource.server';
 // 	};
 // }
 
-export type CollectionDetails<TResource extends Resource = Resource> =
-	ResourceDetails & {
-		items: TResource[];
-	};
-
 export async function getCollectionDetails<
 	TResource extends Resource = Resource,
 	TResourceType extends ResourceType = ResourceType.COLLECTION
 >(
-	collection: Collection<TResource, TResourceType>
+	collection: Collection<TResourceType>
 ): Promise<CollectionDetails<TResource>> {
 	const items = await resolveValueRefArray(collection.id, 'items');
 

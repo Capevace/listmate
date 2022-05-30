@@ -12,7 +12,7 @@ import composePageTitle from '~/utilities/page-title';
 import CompactView from '~/components/views/compact-view/compact-view';
 import { useRef } from 'react';
 import GenericListView from '~/components/views/generic-list-view';
-import BaseRow from '~/components/views/rows/base-row';
+import ResourceRow from '~/components/views/rows/ResourceRow';
 
 type LoaderData = {
 	resources: Resource[];
@@ -69,7 +69,7 @@ export default function SearchPage() {
 					const isMasonry = false && resource.type === ResourceType.ALBUM;
 
 					return (
-						<BaseRow
+						<ResourceRow
 							key={`${resource.id}-${index}`}
 							measureRef={row.measureRef}
 							resource={resource}

@@ -1,22 +1,37 @@
 import type {
+	DataSchema,
+	ListData,
+	SourceTypeData,
+	TextData,
+	ValueMode,
+} from '~/models/resource/refs';
+import { Schemas } from '~/models/resource/refs';
+import type {
 	Resource,
+	ResourceDetails,
 	ResourceType,
-	ValueRef,
-	ValueType,
 } from '~/models/resource/types';
+import { ValueType } from '~/models/resource/types';
 
-export type CollectionData<TResource extends Resource> = {
-	name: ValueRef<ValueType.TEXT>;
-	description: ValueRef<ValueType.TEXT> | null;
-	source: ValueRef<ValueType.SOURCE_TYPE> | null;
-	items: ValueRef<ValueType.RESOURCE>[];
+export type CollectionData = {
+	name: TextData;
+	description: TextData;
+	source: SourceTypeData;
+	items: ListData;
+};
 
-	// release_date: '1976-10-14';
-	// release_date_precision: 'day';
-	// total_tracks: 13;
+export const CollectionDataSchema: DataSchema<CollectionData> = {
+	name: Schemas[ValueType.TEXT]().min(1), // title is required
+	description: Schemas[ValueType.TEXT]().optional(),
+	source: Schemas[ValueType.SOURCE_TYPE]().optional(),
+	items: Schemas[ValueType.LIST]().optional(),
 };
 
 export type Collection<
-	TResource extends Resource = Resource,
 	TResourceType extends ResourceType = ResourceType.COLLECTION
-> = Resource<TResourceType, CollectionData<TResource>>;
+> = Resource<TResourceType, CollectionData>;
+
+export type CollectionDetails<TResource extends Resource = Resource> =
+	ResourceDetails & {
+		items: TResource[];
+	};

@@ -1,11 +1,31 @@
+import { datacatalog_v1 } from 'googleapis';
 import invariant from 'tiny-invariant';
+import { ValueOf } from 'type-fest';
+import * as zod from 'zod';
+import { Channel, ChannelDataSchema } from '~/adapters/channel/type';
+import { Video, VideoDataSchema } from '~/adapters/video/type';
 import { CompleteDataObjectValue } from './adapters.server';
+import { AnyData, AnySerializedData, DataSchema, Schemas } from './refs';
 import {
+	Album,
+	AlbumData,
+	AlbumDataSchema,
+	Artist,
+	ArtistData,
+	ArtistDataSchema,
+	Collection,
+	CollectionDataSchema,
+	Playlist,
+	PlaylistDataSchema,
 	Resource,
+	ResourceType,
 	SerializedResource,
 	SerializedValueRef,
 	SerializedValues,
+	Song,
+	SongDataSchema,
 	SourceType,
+	stringToResourceType,
 	stringToSourceType,
 	stringToValueType,
 	ValueRef,
@@ -75,35 +95,160 @@ const SERIALIZERS: {
 	[ValueType.DATE]: (value: Date) => value.toISOString(),
 	[ValueType.URL]: (value: URL) => value.toJSON(),
 	[ValueType.SOURCE_TYPE]: (value: SourceType) => value.toString(),
-	[ValueType.RESOURCE]: (value: Resource['title']) => value,
-	[ValueType.RESOURCE_LIST]: (value: Resource['title']) => value,
+	[ValueType.LIST]: (value: Resource['title']) => value,
 };
+
+function deserializeResource<TSerializedResource extends SerializedResource>(
+	resource: TSerializedResource
+): Resource<TSerializedResource['type']> {
+	const values: [keyof TSerializedResource['values'], AnySerializedData][] =
+		Object.entries(resource.values);
+
+	const resourceType = stringToResourceType(resource.type);
+
+	return {
+		...resource,
+		values: values.reduce((_values, [key, data]) => {
+			const resourceSchema =
+				ResourceSchemas[ResourceType.ALBUM ?? resourceType];
+			const schema = resourceSchema[key];
+
+			_values[key] = deserializeData(data, schema);
+			return _values;
+		}, {} as { [key in keyof TSerializedResource['values']]: AnyData }),
+	};
+}
+
+export type ResourceTypes<T extends ResourceType> = T extends ResourceType.ALBUM
+	? Album
+	: T extends ResourceType.ARTIST
+	? Artist
+	: T extends ResourceType.CHANNEL
+	? Channel
+	: T extends ResourceType.COLLECTION
+	? Collection
+	: T extends ResourceType.PLAYLIST
+	? Playlist
+	: T extends ResourceType.SONG
+	? Song
+	: T extends ResourceType.VIDEO
+	? Video
+	: never;
+
+export type DataTypes<
+	Key extends keyof ResourceTypes<T>['values'],
+	T extends ResourceType
+> = ResourceTypes<T>['values'][Key];
+
+export type ExtractSchemaType<V extends SchemaTypes<ResourceType>> =
+	V extends SchemaTypes<infer T> ? T : never;
+
+export type SchemaTypes<T extends ResourceType> = T extends ResourceType.ALBUM
+	? typeof AlbumDataSchema
+	: T extends ResourceType.ARTIST
+	? typeof ArtistDataSchema
+	: T extends ResourceType.CHANNEL
+	? typeof ChannelDataSchema
+	: T extends ResourceType.COLLECTION
+	? typeof CollectionDataSchema
+	: T extends ResourceType.PLAYLIST
+	? typeof PlaylistDataSchema
+	: T extends ResourceType.SONG
+	? typeof SongDataSchema
+	: T extends ResourceType.VIDEO
+	? typeof VideoDataSchema
+	: never;
+
+export const ResourceSchemas: {
+	[key in ResourceType]: SchemaTypes<key>;
+} = {
+	[ResourceType.ALBUM]: AlbumDataSchema,
+	[ResourceType.ARTIST]: ArtistDataSchema,
+	[ResourceType.CHANNEL]: ChannelDataSchema,
+	[ResourceType.COLLECTION]: CollectionDataSchema,
+	[ResourceType.PLAYLIST]: PlaylistDataSchema,
+	[ResourceType.SONG]: SongDataSchema,
+	[ResourceType.VIDEO]: VideoDataSchema,
+};
+
+const dataSchemaFactory = (
+	subschema: zod.ZodSchema,
+	key: 'value' | 'items' = 'value'
+) =>
+	zod.union([
+		zod.object({
+			type: zod.nativeEnum(ResourceType),
+			value: subschema,
+			ref: zod
+				.object({
+					id: zod.string().uuid(),
+					key: zod.string().optional(),
+				})
+				.nullable(),
+		}),
+		zod.object({
+			type: zod.nativeEnum(ResourceType),
+			items: subschema,
+			ref: zod
+				.object({
+					id: zod.string().uuid(),
+					key: zod.string().optional(),
+				})
+				.nullable(),
+		}),
+	]);
+
+function deserializeData<
+	TResourceType extends ResourceType,
+	TSchema extends SchemaTypes<TResourceType>,
+	TKey extends keyof ResourceTypes<TResourceType>['values']
+>(data: AnySerializedData, schema: TSchema): DataTypes<TKey, TResourceType> {
+	const mainSchema = dataSchemaFactory(schema);
+	const main = mainSchema.parse(data);
+	const type = stringToValueType(data.type);
+	const value = (data as any)[type === ValueType.LIST ? 'value' : 'items'];
+
+	invariant(
+		!data.ref || (data.ref && data.ref.id),
+		'Invalid ref, ID is required'
+	);
+
+	const parsedValue = schema.parse(value);
+
+	return {
+		type,
+		ref: data.ref
+			? {
+					id: data.ref.id,
+					key: data.ref.key ? String(data.ref.key) : undefined,
+			  }
+			: null,
+		value,
+	};
+}
 
 /**
  * Serialize resource values to string for the DB.
  *
  * @param resource The resource to find additional details for
  */
-export function deserializeValue(
-	value: CompleteDataObjectValue
-): ValueRef | ValueRef[] {
+export function deserializeValue(value: CompleteDataObjectValue): AnyData {
 	const type = stringToValueType(value.type);
 
-	if (type === ValueType.RESOURCE_LIST) {
-		return value.items.map((item) => {
-			return {
-				ref: item.valueDataObjectId,
-				value: item.value,
-				type: ValueType.RESOURCE,
-			} as ValueRef<ValueType.RESOURCE>;
-		});
-	}
+	// if (type === ValueType.LIST) {
+	// 	return value.items.map((item) => {
+	// 		return {
+	// 			ref: item.valueDataObjectId,
+	// 			value: item.value,
+	// 			type: ValueType.RESOURCE,
+	// 		} as ValueRef<ValueType.RESOURCE>;
+	// 	});
+	// }
 
-	const deserializedValue = deserialize(value.value, type);
 	return {
-		value: deserializedValue,
+		value: value.value ? deserialize(value.value, type) : null,
 		type,
-		ref: value.valueDataObjectId ?? undefined,
+		ref: value.valueDataObjectId ? { id: value.valueDataObjectId } : null,
 	};
 }
 
@@ -170,5 +315,5 @@ const DESERIALIZERS: {
 	[ValueType.URL]: (value) => new URL(value),
 	[ValueType.SOURCE_TYPE]: (value) => stringToSourceType(value),
 	[ValueType.RESOURCE]: (value) => value,
-	[ValueType.RESOURCE_LIST]: (value) => value,
+	[ValueType.LIST]: (value) => value,
 };

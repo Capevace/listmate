@@ -1,15 +1,12 @@
-import type { Video } from './type';
-import type { VideoDetails } from './adapter.server';
-import { ResourceDetailsProps, SourceType } from '~/models/resource/types';
-
-import CompactResourceView from '~/components/views/compact-view/compact-resource-header';
-import ValueGrid from '~/components/resource/value-grid';
-import ResourceDebugger from '~/components/resource/resource-debugger';
-
 import { useRef } from 'react';
-import BaseValue from '~/components/resource/values/base-value';
-import { Except } from 'type-fest';
-import filterValues from '~/utilities/filter-values';
+import ResourceDebugger from '~/components/resource/resource-debugger';
+import ValueGrid from '~/components/resource/value-grid';
+import DataField from '~/components/resource/values/DataField';
+import CompactResourceView from '~/components/views/compact-view/compact-resource-header';
+import type { ResourceDetailsProps } from '~/models/resource/types';
+import { SourceType } from '~/models/resource/types';
+import type { VideoDetails } from './adapter.server';
+import type { Video } from './type';
 
 type VideoDetailsProps = ResourceDetailsProps<Video, VideoDetails>;
 
@@ -44,21 +41,13 @@ export default function VideoDetailsView({
 
 				<h3 className="mb-1 text-sm font-medium text-theme-400">Description</h3>
 				<p className="mb-10 font-medium leading-relaxed">
-					{resource.values.description ? (
-						<BaseValue valueRef={resource.values.description} />
-					) : (
-						'-'
-					)}
+					<DataField data={resource.values.description} />
 				</p>
 				<div className="grid grid-cols-1 md:grid-cols-2">
 					<section className="col-span-1">
 						<h3 className="mb-1 text-sm font-medium text-theme-400">Channel</h3>
 						<p className="mb-10 font-medium leading-relaxed">
-							{resource.values.channel ? (
-								<BaseValue valueRef={resource.values.channel} />
-							) : (
-								'-'
-							)}
+							<DataField data={resource.values.channel} />
 						</p>
 					</section>
 					<section className="col-span-1">
@@ -66,11 +55,7 @@ export default function VideoDetailsView({
 							Publishing date
 						</h3>
 						<p className="mb-10 font-medium leading-relaxed">
-							{resource.values.publishedAt ? (
-								<BaseValue valueRef={resource.values.publishedAt} />
-							) : (
-								'-'
-							)}
+							<DataField data={resource.values.publishedAt} />
 						</p>
 					</section>
 				</div>

@@ -1,21 +1,18 @@
-import type { Resource, ValueRef, ResourceType } from '~/models/resource/types';
+import type { DataSchema, TextData } from '~/models/resource/refs';
+import { Schemas } from '~/models/resource/refs';
+import type { Resource, ResourceType } from '~/models/resource/types';
 import { ValueType } from '~/models/resource/types';
-import * as zod from 'zod';
 
 export type SongData = {
-	name: ValueRef<ValueType.TEXT>;
-	artist: ValueRef<ValueType.RESOURCE> | null;
-	album: ValueRef<ValueType.RESOURCE> | null;
+	name: TextData;
+	artist: TextData;
+	album: TextData;
 };
 
-type RValue = { type: ValueType; value: string };
-
-const resourceRefSchema = () => zod.string().uuid();
-
-export const SongDataSchema = {
-	name: zod.string().min(1),
-	artist: zod.string().optional(),
-	album: zod.string().optional(),
+export const SongDataSchema: DataSchema<SongData> = {
+	name: Schemas[ValueType.TEXT]().min(1), // name is required
+	artist: Schemas[ValueType.TEXT]().optional(),
+	album: Schemas[ValueType.TEXT]().optional(),
 };
 
 export type Song = Resource<ResourceType.SONG, SongData>;

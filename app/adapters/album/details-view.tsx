@@ -1,11 +1,14 @@
-import type { Album, ResourceDetailsProps } from '~/models/resource/types';
-import type { AlbumDetails } from './adapter.server';
+import type {
+	Album,
+	AlbumDetails,
+	ResourceDetailsProps,
+} from '~/models/resource/types';
 
 import invariant from 'tiny-invariant';
 import GenericListView from '~/components/views/generic-list-view';
 import CompactResourceView from '~/components/views/compact-view/compact-resource-header';
 import { useRef } from 'react';
-import BaseRow from '~/components/views/rows/base-row';
+import ResourceRow from '~/components/views/rows/ResourceRow';
 
 type AlbumDetailsProps = ResourceDetailsProps<Album, AlbumDetails>;
 
@@ -28,7 +31,7 @@ export default function AlbumDetailsView({
 					const item = details.songs[index];
 
 					return (
-						<BaseRow
+						<ResourceRow
 							key={`${item.id}-${index}`}
 							measureRef={row.measureRef}
 							resource={item}
