@@ -5,7 +5,13 @@ import * as zod from 'zod';
 import { Channel, ChannelDataSchema } from '~/adapters/channel/type';
 import { Video, VideoDataSchema } from '~/adapters/video/type';
 import { CompleteDataObjectValue } from './adapters.server';
-import { AnyData, AnySerializedData, DataSchema, Schemas } from './refs';
+import {
+	AnyData,
+	AnySerializedData,
+	DataSchema,
+	ListData,
+	Schemas,
+} from './refs';
 import {
 	Album,
 	AlbumData,
@@ -113,7 +119,7 @@ function deserializeResource<TSerializedResource extends SerializedResource>(
 				ResourceSchemas[ResourceType.ALBUM ?? resourceType];
 			const schema = resourceSchema[key];
 
-			_values[key] = deserializeData(data, schema);
+			_values[key] = deserializeData<key>(data, schema);
 			return _values;
 		}, {} as { [key in keyof TSerializedResource['values']]: AnyData }),
 	};
@@ -177,7 +183,7 @@ const dataSchemaFactory = (
 ) =>
 	zod.union([
 		zod.object({
-			type: zod.nativeEnum(ResourceType),
+			type: zod.nativeEnum(ValueType),
 			value: subschema,
 			ref: zod
 				.object({
@@ -187,7 +193,7 @@ const dataSchemaFactory = (
 				.nullable(),
 		}),
 		zod.object({
-			type: zod.nativeEnum(ResourceType),
+			type: zod.string().regex(/^list$/),
 			items: subschema,
 			ref: zod
 				.object({
@@ -199,32 +205,51 @@ const dataSchemaFactory = (
 	]);
 
 function deserializeData<
-	TResourceType extends ResourceType,
-	TSchema extends SchemaTypes<TResourceType>,
-	TKey extends keyof ResourceTypes<TResourceType>['values']
->(data: AnySerializedData, schema: TSchema): DataTypes<TKey, TResourceType> {
+	TKey extends keyof ResourceTypes<TResourceType>['values'],
+	TResourceType extends ResourceType
+>(
+	data: AnySerializedData,
+	schema: SchemaTypes<TResourceType>[TKey]
+): ResourceTypes<TResourceType>['values'][TKey] {
 	const mainSchema = dataSchemaFactory(schema);
-	const main = mainSchema.parse(data);
-	const type = stringToValueType(data.type);
-	const value = (data as any)[type === ValueType.LIST ? 'value' : 'items'];
+	const parsedData = mainSchema.parse(data);
 
 	invariant(
 		!data.ref || (data.ref && data.ref.id),
 		'Invalid ref, ID is required'
 	);
 
-	const parsedValue = schema.parse(value);
+	if (parsedData.type === ValueType.LIST) {
+		const listData = parsedData as ListData;
 
-	return {
-		type,
-		ref: data.ref
-			? {
-					id: data.ref.id,
-					key: data.ref.key ? String(data.ref.key) : undefined,
-			  }
-			: null,
-		value,
-	};
+		invariant(listData.items, 'Items are required');
+		invariant(
+			!listData.ref || (listData.ref && listData.ref.key),
+			'Ref in lists need keys'
+		);
+
+		return {
+			type: listData.type,
+			ref: listData.ref
+				? {
+						id: listData.ref.id,
+						key: String(listData.ref.key),
+				  }
+				: null,
+			items: listData.items,
+		};
+	} else {
+		return {
+			type: parsedData.type,
+			ref: parsedData.ref
+				? {
+						id: parsedData.ref.id,
+						key: parsedData.ref.key ? String(parsedData.ref.key) : undefined,
+				  }
+				: null,
+			value: parsedData,
+		};
+	}
 }
 
 /**

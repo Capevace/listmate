@@ -9,50 +9,57 @@ export type RefWithRequiredKey = { id: string; key: string };
 // @see {SongData}
 // @see {SongDataSchema}
 
+type Data<
+	Type,
+	TypeOfValue,
+	RefType,
+	ESerializationMode extends SerializationMode
+> = {
+	type: ESerializationMode extends SerializationMode.SERIALIZED ? string : Type;
+	value: ESerializationMode extends SerializationMode.SERIALIZED
+		? string | null
+		: TypeOfValue | null;
+	ref: RefType | null;
+};
+
 /**
  * Value data type for text values.
  */
-export type TextData = {
-	type: ValueType.TEXT;
-	value: string | null;
-	ref: RefWithOptionalKey | null;
-};
+export type TextData<
+	ESerializationMode extends SerializationMode = SerializationMode.DESERIALIZED
+> = Data<ValueType.TEXT, string, RefWithOptionalKey, ESerializationMode>;
 
 /**
  * Value data type for numeric values.
  */
-export type NumberData = {
-	type: ValueType.NUMBER;
-	value: number | null;
-	ref: RefWithRequiredKey | null;
-};
+export type NumberData<
+	ESerializationMode extends SerializationMode = SerializationMode.DESERIALIZED
+> = Data<ValueType.NUMBER, number, RefWithRequiredKey, ESerializationMode>;
 
 /**
  * Value data type for date values.
  */
-export type DateData = {
-	type: ValueType.DATE;
-	value: Date | null;
-	ref: RefWithRequiredKey | null;
-};
-
+export type DateData<
+	ESerializationMode extends SerializationMode = SerializationMode.DESERIALIZED
+> = Data<ValueType.DATE, Date, RefWithRequiredKey, ESerializationMode>;
 /**
  * Value data type for URL values.
  */
-export type UrlData = {
-	type: ValueType.URL;
-	value: URL | null;
-	ref: RefWithRequiredKey | null;
-};
+export type UrlData<
+	ESerializationMode extends SerializationMode = SerializationMode.DESERIALIZED
+> = Data<ValueType.URL, URL, RefWithRequiredKey, ESerializationMode>;
 
 /**
  * Value data type for SourceType values.
  */
-export type SourceTypeData = {
-	type: ValueType.SOURCE_TYPE;
-	value: SourceType | null;
-	ref: RefWithRequiredKey | null;
-};
+export type SourceTypeData<
+	ESerializationMode extends SerializationMode = SerializationMode.DESERIALIZED
+> = Data<
+	ValueType.SOURCE_TYPE,
+	SourceType,
+	RefWithRequiredKey,
+	ESerializationMode
+>;
 
 /**
  * Value data type for resource lists.
@@ -60,7 +67,9 @@ export type SourceTypeData = {
 export type ListData<
 	serialization extends SerializationMode = SerializationMode.DESERIALIZED
 > = {
-	type: ValueType.LIST;
+	type: serialization extends SerializationMode.SERIALIZED
+		? string
+		: ValueType.LIST;
 	items: StrictValueData<serialization>[];
 	ref: RefWithRequiredKey | null;
 };
@@ -72,26 +81,22 @@ export type ListData<
  * Every type except for RESOURCE_LIST is included in this.
  */
 export type StrictValueData<
-	serialization extends SerializationMode = SerializationMode.DESERIALIZED
-> = serialization extends SerializationMode.DESERIALIZED
-	? TextData | NumberData | DateData | UrlData | SourceTypeData
-	: {
-			type: string;
-			value: string | null;
-			ref: RefWithOptionalKey | null;
-	  };
+	S extends SerializationMode = SerializationMode.DESERIALIZED
+> = TextData<S> | NumberData<S> | DateData<S> | UrlData<S> | SourceTypeData<S>;
 
 /**
  * Represents data with a given mode (required / optional).
  */
-export type DataWithMode<serialization extends SerializationMode> =
-	| StrictValueData<serialization>
-	| ListData<serialization>;
+export type DataWithMode<S extends SerializationMode> =
+	| StrictValueData<S>
+	| ListData<S>;
 
 /**
  * Any data with either required or optional value.
  */
-export type AnyData = DataWithMode<SerializationMode.DESERIALIZED>;
+export type AnyData<
+	S extends SerializationMode = SerializationMode.DESERIALIZED
+> = DataWithMode<SerializationMode.DESERIALIZED>;
 
 /**
  * Any data with either required or optional value.
