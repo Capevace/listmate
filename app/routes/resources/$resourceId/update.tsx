@@ -7,6 +7,8 @@ import {
 } from '~/models/resource/resource.server';
 import { composeResourceUrl } from '~/utilities/resource-url';
 import * as zod from 'zod';
+import { is } from '@deepkit/type';
+import { Data } from '~/models/resource/refs';
 
 export const action: ActionFunction = async ({ params, request, context }) => {
 	await requireUserId(request, context);
@@ -31,10 +33,9 @@ export const action: ActionFunction = async ({ params, request, context }) => {
 
 	if (
 		resource.values.description &&
-		!Array.isArray(resource.values.description) &&
-		data.description
+		is<Data<string>>(resource.values.description)
 	) {
-		resource.values.description.value = data.description;
+		resource.values.description = data.description;
 	}
 
 	await upsertResource(resource);
