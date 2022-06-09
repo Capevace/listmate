@@ -12,8 +12,8 @@ import type { ValueRef } from '~/models/resource/types';
 import {
 	SongDataSchema,
 	stringToOptionalValueType,
-	ValueType,
 } from '~/models/resource/types';
+import { ValueType } from '~/models/resource/ValueType';
 
 export const action: ActionFunction = async ({ params, request, context }) => {
 	await requireUserId(request, context);

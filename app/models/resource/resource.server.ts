@@ -5,18 +5,20 @@ import type {
 	FileReference,
 } from '@prisma/client';
 import type { Except, MergeExclusive } from 'type-fest';
-import {
+import type {
 	Resource,
 	ResourceType,
 	ResourceWithoutDefaults,
 	SourceType,
-	ValueType,
 } from '~/models/resource/types';
+import { ValueType } from '~/models/resource/types';
 
 import invariant from 'tiny-invariant';
 import { prisma as db } from '~/db.server';
 import { dataObjectToResource } from './adapters.server';
-import { serialize } from './serialize';
+// import { serialize } from './serialize';
+import { is, serialize } from '@deepkit/type';
+import { Data, ListData } from './refs';
 
 //
 // READ
@@ -689,16 +691,18 @@ export async function upsertValues(
 	resource: Resource,
 	values?: Partial<Resource['values']>
 ) {
-	for (const [key, valueRefOrArray] of Object.entries(
-		values ?? resource.values
-	)) {
+	for (const [key, data] of Object.entries(values ?? resource.values)) {
 		// TODO: If valueRefOrArray is null, we want to delete the value if it exists
-		if (!valueRefOrArray) continue;
+		if (!data) continue;
 
-		if (Array.isArray(valueRefOrArray)) {
-			const serializedValue = valueRefOrArray
-				.map((valueRef) => serialize(valueRef.value, valueRef.type))
+		if (data.type === ValueType.LIST && is<ListData>(data)) {
+			const serializedData = serialize<ListData>(data);
+			const value = serializedData.items
+				.map((dataItem) => dataItem.value)
 				.join(', ');
+			// const serializedValue = data
+			// 	.map((valueRef) => serialize(valueRef.value, valueRef.type))
+			// 	.join(', ');
 
 			await db.dataObjectValue.upsert({
 				where: {
@@ -711,7 +715,7 @@ export async function upsertValues(
 					isArray: true,
 					valueDataObjectId: null,
 					type: ValueType.LIST,
-					value: serializedValue,
+					value: value,
 					items: {
 						deleteMany: {},
 					},
@@ -720,14 +724,14 @@ export async function upsertValues(
 					dataObjectId: resource.id,
 					key,
 					type: ValueType.LIST,
-					value: serializedValue,
+					value: value,
 					isArray: true,
 				},
 			});
 
 			await db.$transaction(
-				valueRefOrArray.map((valueRef, index) => {
-					const serializedValue = serialize(valueRef.value, valueRef.type);
+				data.items.map((dataItem, index) => {
+					const serializedDataItem = serialize<typeof dataItem>(dataItem);
 
 					return db.valueArrayItem.upsert({
 						where: {
@@ -740,25 +744,26 @@ export async function upsertValues(
 						update: {
 							position: index,
 
-							value: serializedValue,
-							valueDataObjectId: valueRef.ref,
+							value: serializedDataItem.value,
+							valueDataObjectId: serializedDataItem.ref
+								? String(serializedDataItem.ref.id)
+								: null,
 						},
 						create: {
 							parentDataObjectId: resource.id,
 							parentKey: key,
 							position: index,
 
-							value: serializedValue,
-							valueDataObjectId: valueRef.ref,
+							value: serializedDataItem.value,
+							valueDataObjectId: serializedDataItem.ref
+								? String(serializedDataItem.ref.id)
+								: null,
 						},
 					});
 				})
 			);
 		} else {
-			const serializedValue = serialize(
-				valueRefOrArray.value,
-				valueRefOrArray.type
-			);
+			const serializedData = serialize<typeof data>(data);
 
 			await db.dataObjectValue.upsert({
 				where: {
@@ -768,10 +773,12 @@ export async function upsertValues(
 					},
 				},
 				update: {
-					value: serializedValue,
-					valueDataObjectId: valueRefOrArray.ref,
+					value: serializedData.value,
+					valueDataObjectId: serializedData.ref
+						? String(serializedData.ref.id)
+						: null,
 					isArray: false,
-					type: valueRefOrArray.type,
+					type: data.type,
 					items: {
 						deleteMany: {
 							parentDataObjectId: resource.id,
@@ -783,9 +790,11 @@ export async function upsertValues(
 					dataObjectId: resource.id,
 					key,
 					isArray: false,
-					type: valueRefOrArray.type,
-					value: serializedValue,
-					valueDataObjectId: valueRefOrArray.ref,
+					type: data.type,
+					value: serializedData.value,
+					valueDataObjectId: serializedData.ref
+						? String(serializedData.ref.id)
+						: null,
 				},
 			});
 		}

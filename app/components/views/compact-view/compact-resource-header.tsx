@@ -8,8 +8,8 @@ import {
 	SourceType,
 	SOURCE_ICONS,
 	ValueRef,
-	ValueType,
 } from '~/models/resource/types';
+import { ValueType } from '~/models/resource/ValueType';
 import capitalize from '~/utilities/capitalize';
 import composeCoverUrl from '~/utilities/cover-url';
 import { composeResourceUrl } from '~/utilities/resource-url';
@@ -47,12 +47,12 @@ export default function CompactResourceView({
 	const timer = useRef();
 
 	const onClickHandler = (event) => {
-        if (event.detail === 2) {
-            setEditingTitle(() => !editingTitle);
-        }
-    };
+		if (event.detail === 2) {
+			setEditingTitle(() => !editingTitle);
+		}
+	};
 
-    const schema = zod.object({
+	const schema = zod.object({
 		name: zod.string().min(1, { message: 'Required' }),
 		age: zod.number().min(10),
 	});

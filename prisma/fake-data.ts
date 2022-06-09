@@ -9,8 +9,8 @@ import {
 	Playlist,
 	Song,
 	SourceType,
-	ValueType,
 } from '~/models/resource/types';
+import { ValueType } from '~/models/resource/ValueType';
 import { ResourceType } from '~/models/resource/types';
 
 export function generateArtist(): Artist {

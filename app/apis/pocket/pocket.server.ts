@@ -4,9 +4,9 @@ import {
 	Song,
 	Playlist,
 	stringToResourceTypeOptional,
-	ValueType,
 	stringToResourceType,
 } from '~/models/resource/types';
+import { ValueType } from '~/models/resource/ValueType';
 import type { User } from '~/models/user.server';
 
 import SpotifyWebApi from 'spotify-web-api-node';

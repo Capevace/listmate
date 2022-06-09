@@ -1,18 +1,17 @@
-import type { DataSchema, TextData } from '~/models/resource/refs';
-import { Schemas } from '~/models/resource/refs';
-import type { Resource, ResourceType } from '~/models/resource/types';
-import { ValueType } from '~/models/resource/types';
+import type { MinLength } from '@deepkit/type';
+import type { Data, RefWithRequiredKey } from '~/models/resource/refs';
+import type {
+	Resource,
+	ResourceType,
+	ValueType,
+} from '~/models/resource/types';
+
+type TitleValue = string & MinLength<1>;
 
 export type SongData = {
-	name: TextData;
-	artist: TextData;
-	album: TextData;
-};
-
-export const SongDataSchema: DataSchema<SongData> = {
-	name: Schemas[ValueType.TEXT]().min(1), // name is required
-	artist: Schemas[ValueType.TEXT]().optional(),
-	album: Schemas[ValueType.TEXT]().optional(),
+	name: Data<TitleValue, ValueType.TEXT>;
+	artist: Data<TitleValue, ValueType.TEXT, RefWithRequiredKey<'title'>>;
+	album: Data<TitleValue, ValueType.TEXT, RefWithRequiredKey<'title'>>;
 };
 
 export type Song = Resource<ResourceType.SONG, SongData>;

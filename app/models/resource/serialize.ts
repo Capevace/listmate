@@ -35,9 +35,9 @@ import {
 	stringToSourceType,
 	stringToValueType,
 	ValueRef,
-	ValueType,
 	ValueTypeRawValue,
 } from './types';
+import { ValueType } from './ValueType';
 
 /**
  * Serialize resource values to string for the DB.

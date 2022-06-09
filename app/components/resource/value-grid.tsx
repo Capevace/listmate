@@ -6,7 +6,7 @@ import { Form, Link, useLocation } from 'remix';
 import { object, string } from 'zod';
 import type { StrictValueData } from '~/models/resource/refs';
 import type { Resource } from '~/models/resource/types';
-import { ValueType } from '~/models/resource/types';
+import { ValueType } from '~/models/resource/ValueType';
 import capitalize from '~/utilities/capitalize';
 import { composeShortResourceUrl } from '~/utilities/resource-url';
 import DataField from './values/DataField';

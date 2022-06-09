@@ -15,7 +15,8 @@ import {
 	ValidatedSourceURI,
 } from './apis.server';
 import makeProgress from '~/utilities/progress';
-import { ResourceType, SourceType, ValueType } from '~/models/resource/types';
+import { ResourceType, SourceType } from '~/models/resource/types';
+import { ValueType } from '~/models/resource/ValueType';
 
 import { youtube_v3, google, Auth } from 'googleapis';
 import { updateTokenData } from '~/models/source-token.server';

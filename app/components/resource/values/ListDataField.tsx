@@ -1,6 +1,6 @@
 /* eslint-disable array-callback-return */
 import type { ListData } from '~/models/resource/refs';
-import { ValueType } from '~/models/resource/types';
+import { ValueType } from '~/models/resource/ValueType';
 import DataLabel from '../DataLabel';
 import type { BaseValueProps } from './DataField';
 import { format as formatDate } from './DateDataField';

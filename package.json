@@ -38,6 +38,8 @@
 		"/public/build"
 	],
 	"dependencies": {
+		"@deepkit/type": "^1.0.1-alpha.71",
+		"@deepkit/type-compiler": "^1.0.1-alpha.71",
 		"@googleapis/youtube": "^4.2.0",
 		"@headlessui/react": "^1.6.1",
 		"@heroicons/react": "^1.0.6",

@@ -1,3 +1,4 @@
+import { deserialize } from '@deepkit/type';
 import type {
 	DataObject,
 	DataObjectRemote,
@@ -17,23 +18,23 @@ import { getSongDetails } from '~/adapters/song/adapter.server';
 import { getVideoDetails } from '~/adapters/video/adapter.server';
 import type { Video } from '~/adapters/video/type';
 // export * from '~/models/resource/adapters/types';
-import type {
+import {
 	Album,
 	Collection,
 	Playlist,
 	Resource,
 	ResourceDetails,
-	ResourceRemotes,
+	Remotes,
 	Song,
+	ValueType,
 } from '~/models/resource/types';
 import {
 	ResourceType,
 	stringToResourceType,
 	stringToSourceType,
 	stringToValueType,
-	ValueType,
 } from '~/models/resource/types';
-import { deserializeValue } from './serialize';
+import { AnyData, Data, ListData } from './refs';
 
 export type CompleteDataObjectValue = DataObjectValue & {
 	valueDataObject: DataObject | null;
@@ -56,6 +57,35 @@ export type DataObjectValueMap<TResource extends Resource> = {
 	[key in keyof TResource['values']]: CompleteDataObjectValue;
 };
 
+export function dataObjectValueToData<T extends Data<any> | ListData<any>>(
+	dataObjectValue: CompleteDataObjectValue
+): T {
+	const ref = dataObjectValue.valueDataObject
+		? {
+				id: dataObjectValue.valueDataObjectId,
+				key: 'title', // TODO: Add support for other keys in DB schema
+		  }
+		: null;
+
+	if (dataObjectValue.type === ValueType.LIST) {
+		return deserialize<T>({
+			type: dataObjectValue.type,
+			items: dataObjectValue.items.map((valueArrayItem) => ({
+				type: valueArrayItem.type,
+				value: valueArrayItem.value,
+				ref: null,
+			})),
+			ref,
+		});
+	} else {
+		return deserialize<T>({
+			type: dataObjectValue.type,
+			value: dataObjectValue.value,
+			ref,
+		});
+	}
+}
+
 /**
  * Convert a DataObject to a resource.
  *
@@ -64,27 +94,12 @@ export type DataObjectValueMap<TResource extends Resource> = {
 export function dataObjectToResource<TResource extends Resource>(
 	dataObject: CompleteDataObject
 ): Resource {
-	const values = dataObject.values
-		.map((value) => {
-			if (value.type === ValueType.LIST) {
-				return [
-					value.key,
-					value.items.map((childValue) =>
-						deserializeValue({
-							...value,
-							...childValue,
-							type: stringToValueType(childValue.type),
-						})
-					),
-				] as [string, ValueRef[]];
-			} else {
-				return [value.key, deserializeValue(value)] as [string, ValueRef];
-			}
-		})
-		.reduce((acc, [key, value]) => {
-			acc[key] = value;
-			return acc;
-		}, {} as Record<string, ValueRef | ValueRef[]>) as TResource['values'];
+	let values: Record<string, AnyData> = {};
+
+	for (const value of dataObject.values) {
+		const data = dataObjectValueToData(value);
+		values[value.key] = data;
+	}
 
 	return {
 		...composeResourceBase<TResource['type']>(dataObject),
@@ -158,7 +173,7 @@ export function valuesToObject<TResource extends Resource>(
 export function composeResourceBase<ForcedType extends ResourceType>(
 	dataObject: CompleteDataObject
 ): Resource & { type: ForcedType } {
-	let remotes: ResourceRemotes = {};
+	let remotes: Remotes = {};
 
 	for (const remote of dataObject.remotes) {
 		const sourceType = stringToSourceType(remote.api);
@@ -183,113 +198,75 @@ export function composeResourceBase<ForcedType extends ResourceType>(
 
 type Parser<T> = (v: string) => T;
 
-/**
- * Compose a RawValue or ValueRef from a DataObjectValue.
- *
- * The function accepts null / undefined as value and will then return null.
- * This is for easier usage when deserializing resources.
- *
- * The generic types here are a bit special.
- * Basically, there are 3 possible cases.
- * 		1. 	No generics are passed
- * 				We assume that the value is a string and references use the plain Resource type.
- * 		2.  A raw value type other than string is passed. (e.g. number)
- * 				Then, a parser function is now required.
- * 		3.  A raw value type and a Resource type is passed.
- * 				A parser function is required, and the linked resource is cast as the resource type.
- *
- * @param value The DataObjectValue to convert from
- */
-// export function composeRefFromValue(
+// /**
+//  * Compose a RawValue or ValueRef from a DataObjectValue.
+//  *
+//  * The function accepts null / undefined as value and will then return null.
+//  * This is for easier usage when deserializing resources.
+//  *
+//  * The generic types here are a bit special.
+//  * Basically, there are 3 possible cases.
+//  * 		1. 	No generics are passed
+//  * 				We assume that the value is a string and references use the plain Resource type.
+//  * 		2.  A raw value type other than string is passed. (e.g. number)
+//  * 				Then, a parser function is now required.
+//  * 		3.  A raw value type and a Resource type is passed.
+//  * 				A parser function is required, and the linked resource is cast as the resource type.
+//  *
+//  * @param value The DataObjectValue to convert from
+//  */
+// // export function composeRefFromValue(
+// // 	value: CompleteDataObjectValue | undefined,
+// // 	type?: ValueType,
+// // 	parser?: Parser<ValueTypeRawValue<ValueType>>
+// // ): RefReturn<ValueType>;
+// export function composeRefFromValue<EValueType extends ValueType>(
 // 	value: CompleteDataObjectValue | undefined,
-// 	type?: ValueType,
-// 	parser?: Parser<ValueTypeRawValue<ValueType>>
-// ): RefReturn<ValueType>;
-export function composeRefFromValue<EValueType extends ValueType>(
-	value: CompleteDataObjectValue | undefined,
-	type: EValueType,
-	parser?: Parser<ValueTypeRawValue<EValueType>>
-): ValueRef<EValueType> | null {
-	if (!value) {
-		return null;
-	}
+// 	type: EValueType,
+// 	parser?: Parser<ValueTypeRawValue<EValueType>>
+// ): ValueRef<EValueType> | null {
+// 	if (!value) {
+// 		return null;
+// 	}
 
-	const dbType = stringToValueType(value.type);
+// 	const dbType = stringToValueType(value.type);
 
-	if (dbType !== type) {
-		throw new Error(
-			`composeRefFromValue: value type from DB '${dbType}' does not match expected type '${type}'`
-		);
-	}
+// 	if (dbType !== type) {
+// 		throw new Error(
+// 			`composeRefFromValue: value type from DB '${dbType}' does not match expected type '${type}'`
+// 		);
+// 	}
 
-	const ref = value.valueDataObjectId;
+// 	const ref = value.valueDataObjectId;
 
-	const parsedValue = parser
-		? parser(value.value)
-		: /*value.valueDataObject?.title ?? */ value.value;
+// 	const parsedValue = parser
+// 		? parser(value.value)
+// 		: /*value.valueDataObject?.title ?? */ value.value;
 
-	return {
-		ref,
-		value: parsedValue,
-		type: type,
-	} as ValueRef<EValueType>;
-}
+// 	return {
+// 		ref,
+// 		value: parsedValue,
+// 		type: type,
+// 	} as ValueRef<EValueType>;
+// }
 
-/**
- * Compose a RawValue or ValueRef array from a DataObjectValue.
- *
- * @param value The DataObjectValue to convert from
- */
-export function composeRefArrayFromValue(
-	value: CompleteDataObjectValue | undefined
-): ValueRef<ValueType.RESOURCE>[] {
-	if (!value) return [];
+// /**
+//  * Compose a RawValue or ValueRef array from a DataObjectValue.
+//  *
+//  * @param value The DataObjectValue to convert from
+//  */
+// export function composeRefArrayFromValue(
+// 	value: CompleteDataObjectValue | undefined
+// ): ValueRef<ValueType.RESOURCE>[] {
+// 	if (!value) return [];
 
-	invariant(value.isArray, 'value is not an array');
+// 	invariant(value.isArray, 'value is not an array');
 
-	return value.items.map((item) => {
-		return {
-			ref: item.valueDataObjectId,
-			value: item.value,
-			type: ValueType.RESOURCE,
-		} as ValueRef<ValueType.RESOURCE>;
-	});
-}
-
-/**
- * Compose a ValueRef from a resource.
- *
- * The function accepts null / undefined as value and will then return null.
- * This is for easier usage when serializing resources.
- *
- * @param resource The Resource to convert from
- */
-export function composeRefFromResource(
-	resource?: Resource
-): ValueRef<ValueType.RESOURCE> | null {
-	return resource
-		? {
-				ref: resource.id,
-				value: resource.title,
-				type: ValueType.RESOURCE,
-		  }
-		: null;
-}
-
-/**
- * Compose a ValueRef from a resource.
- *
- * The function accepts null / undefined as value and will then return null.
- * This is for easier usage when serializing resources.
- *
- * @param resource The Resource to convert from
- */
-export function composeRefFromResourceArray(
-	resources: Resource[]
-): ValueRef<ValueType.RESOURCE>[] {
-	return resources.map((resource) => ({
-		ref: resource.id,
-		value: resource.title,
-		type: ValueType.RESOURCE,
-	}));
-}
+// 	return value.items.map((item) => {
+// 		return {
+// 			ref: item.valueDataObjectId,
+// 			value: item.value,
+// 			type: ValueType.RESOURCE,
+// 		} as ValueRef<ValueType.RESOURCE>;
+// 	});
+// }

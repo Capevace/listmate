@@ -11,7 +11,7 @@ import type {
 	ResourceDetails,
 	ResourceType,
 } from '~/models/resource/types';
-import { ValueType } from '~/models/resource/types';
+import { ValueType } from '~/models/resource/ValueType';
 
 export type CollectionData = {
 	name: TextData;

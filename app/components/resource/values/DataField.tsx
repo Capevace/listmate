@@ -8,7 +8,7 @@ import type {
 	TextData,
 	UrlData,
 } from '~/models/resource/refs';
-import { ValueType } from '~/models/resource/types';
+import { ValueType } from '~/models/resource/ValueType';
 import DateDataField from './DateDataField';
 import NumberValue from './NumberDataField';
 import SourceTypeDataField from './SourceTypeDataField';

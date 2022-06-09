@@ -1,4 +1,5 @@
-import { Resource, ValueType } from '~/models/resource/types';
+import { Resource } from '~/models/resource/types';
+import { ValueType } from '~/models/resource/ValueType';
 import InlineFavouriteButton from '~/components/resource/inline-favourite-button';
 import composeCoverUrl from '~/utilities/cover-url';
 import { BaseRowProps } from './ResourceRow';

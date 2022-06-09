@@ -9,7 +9,7 @@ import { Channel } from '~/adapters/channel/type';
 import { Playlist } from '~/adapters/playlist/type';
 import { Song } from '~/adapters/song/type';
 import { Video } from '~/adapters/video/type';
-import type { AnyData, AnySerializedData } from './refs';
+import type { Data, ListData } from './refs';
 
 export * from '~/adapters/album/type';
 export * from '~/adapters/artist/type';
@@ -32,29 +32,28 @@ export enum SerializationMode {
  */
 export type Resource<
 	T extends ResourceType = ResourceType,
-	V extends Values = ResourceValues
+	V extends Values = Values
 > = {
 	id: string;
 	title: string; // always available string, most basic representation of item
 	type: T;
-	isFavourite: boolean;
 	values: V;
+	remotes: Remotes;
 
+	isFavourite: boolean;
 	thumbnail: ResourceFile | null;
-	remotes: ResourceRemotes;
 };
 
-export type SerializedResource<
-	T extends ResourceType = ResourceType,
-	V extends SerializedValues = SerializedValues
-> = Resource<T, V>;
-
 /**
- * This type of Resource makes certain properties optional.
- * Functions can use this to provide default values for some properties.
+ * The type of the values property on a Resource.
+ *
+ * It is a map of key to corresponding ValueRef.
  */
-export type ResourceWithoutDefaults<TResource extends Resource = Resource> =
-	SetOptional<Except<TResource, 'id'>, 'isFavourite' | 'thumbnail'>;
+export type Values = {
+	[key: string]: Data | ListData;
+};
+
+export type Remotes = { [key in SourceType]?: string };
 
 /**
  * ResourceType expresses what kind of resource it is.
@@ -75,15 +74,13 @@ export enum ResourceType {
 	CHANNEL = 'channel',
 }
 
-export type AnyResource = Playlist | Song | Artist | Album | Video | Channel;
-
 /**
  * A list of all resource types.
  */
 export const ALL_RESOURCE_TYPES: ResourceType[] = [
 	ResourceType.COLLECTION,
 
-	ResourceType.WEBPAGE,
+	// ResourceType.WEBPAGE,
 
 	ResourceType.PLAYLIST,
 	ResourceType.SONG,
@@ -93,7 +90,7 @@ export const ALL_RESOURCE_TYPES: ResourceType[] = [
 	ResourceType.VIDEO,
 	ResourceType.CHANNEL,
 
-	ResourceType.RSS_FEED,
+	// ResourceType.RSS_FEED,
 ];
 
 /**
@@ -106,8 +103,8 @@ export function stringToResourceType(type: string): ResourceType {
 		case 'collection':
 			return ResourceType.COLLECTION;
 
-		case 'webpage':
-			return ResourceType.WEBPAGE;
+		// case 'webpage':
+		// 	return ResourceType.WEBPAGE;
 
 		case 'playlist':
 			return ResourceType.PLAYLIST;
@@ -123,8 +120,8 @@ export function stringToResourceType(type: string): ResourceType {
 		case 'channel':
 			return ResourceType.CHANNEL;
 
-		case ResourceType.RSS_FEED:
-			return ResourceType.RSS_FEED;
+		// case ResourceType.RSS_FEED:
+		// 	return ResourceType.RSS_FEED;
 
 		default:
 			throw new Error(`Unknown resource type: ${type}`);
@@ -226,36 +223,11 @@ export function sourceTypeToName(type: SourceType): string {
 }
 
 /**
- * The type of the values property on a Resource.
- *
- * It is a map of key to corresponding ValueRef.
+ * This type of Resource makes certain properties optional.
+ * Functions can use this to provide default values for some properties.
  */
-type Values<serialization extends SerializationMode = SerializationMode> = {
-	[key: string]: serialization extends SerializationMode.SERIALIZED
-		? AnySerializedData
-		: AnyData;
-};
-export type ResourceValues = Values<SerializationMode.DESERIALIZED>;
-export type SerializedValues = Values<SerializationMode.SERIALIZED>;
-
-export type ResourceRemotes = { [key in SourceType]?: string };
-
-// /**
-//  * RawValues are the most basic form of ValueRef, in that they do not link to another DataObject,
-//  * and only contain a value.
-//  *
-//  * Used for: A song's name / an bookmarks's url.
-//  */
-// export type RawValue<EValueType extends ValueType = ValueType.TEXT> = {
-// 	value: ValueTypeRawValue<EValueType>;
-// 	type: EValueType;
-// };
-
-export type SerializedValueRef = {
-	value: string;
-	type: ValueType;
-	ref?: Resource['id'];
-};
+export type ResourceWithoutDefaults<TResource extends Resource = Resource> =
+	SetOptional<Except<TResource, 'id'>, 'isFavourite' | 'thumbnail'>;
 
 export enum ValueType {
 	TEXT = 'text',
@@ -274,26 +246,6 @@ export const VALUE_TYPES: { [key in ValueType]: ValueType } = {
 	'source-type': ValueType.SOURCE_TYPE,
 	list: ValueType.LIST,
 };
-
-// export type ValueTypeRawValue<EValueType extends ValueType> =
-// 	EValueType extends ValueType.RESOURCE_LIST
-// 		? Resource['title']
-// 		: EValueType extends ValueType.SOURCE_TYPE
-// 		? SourceType
-// 		: EValueType extends ValueType.URL
-// 		? URL
-// 		: EValueType extends ValueType.DATE
-// 		? Date
-// 		: EValueType extends ValueType.NUMBER
-// 		? number
-// 		: string;
-
-// export type ValueRefType<EValueType extends ValueType> =
-// 	EValueType extends ValueType.RESOURCE_LIST
-// 		? Resource['id']
-// 		: EValueType extends ValueType.RESOURCE
-// 		? Resource['id']
-// 		: undefined;
 
 /**
  * Convert a string to a SourceType.
@@ -352,7 +304,7 @@ export type ResourceDetails = {};
  * Base type for DetailViewProps
  */
 export type ResourceDetailsProps<
-	TResource extends Resource = AnyResource,
+	TResource extends Resource = Resource,
 	TResourceDetails extends ResourceDetails = ResourceDetails
 > = {
 	resource: TResource;

@@ -1,7 +1,7 @@
 import type { DataSchema, ListData, TextData } from '~/models/resource/refs';
 import { Schemas } from '~/models/resource/refs';
 import type { Resource, ResourceType, Song } from '~/models/resource/types';
-import { ValueType } from '~/models/resource/types';
+import { ValueType } from '~/models/resource/ValueType';
 
 export type AlbumData = {
 	name: TextData;
