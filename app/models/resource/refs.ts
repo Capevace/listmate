@@ -1,3 +1,4 @@
+import { MinLength } from '@deepkit/type';
 import { ValueType } from './types';
 
 export type RefWithOptionalKey = { id: string; key?: string };
@@ -30,6 +31,10 @@ export type ListData<T = any> = {
 };
 
 export type AnyData = Data<any> | ListData<any>;
+
+export type NonEmptyString = string & MinLength<1>;
+export type TitleValue = NonEmptyString;
+export type DescriptionValue = NonEmptyString;
 
 // /**
 //  * The Zod schemas for available ValueTypes.

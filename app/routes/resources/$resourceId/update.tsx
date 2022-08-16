@@ -7,21 +7,15 @@ import {
 } from '~/models/resource/resource.server';
 import { composeResourceUrl } from '~/utilities/resource-url';
 import * as zod from 'zod';
-import { is } from '@deepkit/type';
-import { Data } from '~/models/resource/refs';
+import { deserialize, is } from '@deepkit/type';
+import { Data, DescriptionValue, TitleValue } from '~/models/resource/refs';
 
 export const action: ActionFunction = async ({ params, request, context }) => {
 	await requireUserId(request, context);
 
 	invariant(params.resourceId, 'No resourceId passed');
 
-	const schema = zod.object({
-		title: zod.string().min(1, { message: 'Required' }),
-		description: zod.string().min(1).optional(),
-	});
-
-	const formData = Object.fromEntries(await request.formData());
-	const data = schema.parse(formData);
+	const formData = await request.formData();
 
 	let resource = await findResourceById(params.resourceId);
 
@@ -29,13 +23,15 @@ export const action: ActionFunction = async ({ params, request, context }) => {
 		throw new Response('Not Found', { status: 404 });
 	}
 
-	resource.title = data.title;
+	resource.title = deserialize<TitleValue>(formData.get('title'));
 
 	if (
 		resource.values.description &&
 		is<Data<string>>(resource.values.description)
 	) {
-		resource.values.description = data.description;
+		resource.values.description.value = deserialize<DescriptionValue>(
+			formData.get('description')
+		);
 	}
 
 	await upsertResource(resource);

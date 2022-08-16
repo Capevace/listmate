@@ -1,12 +1,14 @@
 import type { MinLength } from '@deepkit/type';
-import type { Data, RefWithRequiredKey } from '~/models/resource/refs';
+import type {
+	Data,
+	RefWithRequiredKey,
+	TitleValue,
+} from '~/models/resource/refs';
 import type {
 	Resource,
 	ResourceType,
 	ValueType,
 } from '~/models/resource/types';
-
-type TitleValue = string & MinLength<1>;
 
 export type SongData = {
 	name: Data<TitleValue, ValueType.TEXT>;
